@@ -4,6 +4,7 @@ import (
 	"flag"
 	"os"
 	"runtime"
+	"strings"
 	"testing"
 
 	"gopkg.in/yaml.v3"
@@ -47,7 +48,50 @@ func TestGCPProject(t *testing.T) {
 		t.Errorf("Go runtime version check FAILED, expected version >= '%s', got '%s'", "go"+versions["golang_runtime_version"].(string), goversion)
 	}
 
-	// Check for inputs file
+	// Check for env.yaml file
+	if !assert.FileExists(t, terraformOptions.TerraformDir+"/../env.yaml") {
+		t.Fail()
+	}
+
+	// Read and store the env.yaml
+	yfile, err = os.ReadFile(terraformOptions.TerraformDir + "/../env.yaml")
+	if err != nil {
+		t.Fail()
+	}
+
+	env := make(map[string]interface{})
+	err = yaml.Unmarshal(yfile, &env)
+	if err != nil {
+		t.Fail()
+	}
+
+	// Check for gcp.yaml file or a local override
+	if !assert.FileExists(t, terraformOptions.TerraformDir+"/../local.gcp.yaml") {
+		if !assert.FileExists(t, terraformOptions.TerraformDir+"/../gcp.yaml") {
+			t.Fail()
+		}
+	}
+
+	// Read and store the gcp.yaml or a local override
+	if assert.FileExists(t, terraformOptions.TerraformDir+"/../local.gcp.yaml") {
+		yfile, err = os.ReadFile(terraformOptions.TerraformDir + "/../local.gcp.yaml")
+		if err != nil {
+			t.Fail()
+		}
+	} else {
+		yfile, err = os.ReadFile(terraformOptions.TerraformDir + "/../gcp.yaml")
+		if err != nil {
+			t.Fail()
+		}
+	}
+
+	gcp := make(map[string]interface{})
+	err = yaml.Unmarshal(yfile, &gcp)
+	if err != nil {
+		t.Fail()
+	}
+
+	// Check for inputs.yaml file
 	if !assert.FileExists(t, terraformOptions.TerraformDir+"/inputs.yaml") {
 		t.Fail()
 	}
@@ -98,10 +142,39 @@ func TestGCPProject(t *testing.T) {
 	// Store outputs
 	outputs := terraform.OutputAll(t, terraformOptions)
 
-	// Test for valid output
+	// Test project id
 	if assert.NotNil(t, outputs["project_id"]) {
-		t.Logf("Output test PASSED. Expected output to be string, got %s", outputs["project_id"].(string))
+		t.Logf("Output test PASSED. Expected output to be string, got %s.", outputs["project_id"].(string))
 	} else {
-		t.Error("Output test FAILED. Expected output to be string, got nil")
+		t.Error("Output test FAILED. Expected output to be string, got nil.")
 	}
+	if assert.Equal(t, strings.Split(outputs["project_id"].(string), "-")[0], gcp["prefix"]) {
+		t.Logf("Prefix test PASSED. Expected project name to start with %s, got %s.", gcp["prefix"], strings.Split(outputs["project_id"].(string), "-")[0])
+	} else {
+		t.Errorf("Prefix test FAILED. Expected project name to start with %s, got %s.", gcp["prefix"], strings.Split(outputs["project_id"].(string), "-")[0])
+	}
+	if inputs["project"].(map[string]interface{})["random_project_id"].(bool) {
+		if (assert.Len(t, strings.Split(outputs["project_id"].(string), "-"), len(strings.Split(outputs["project_name"].(string), "-"))+1)) &&
+			(assert.Contains(t, outputs["project_id"].(string), outputs["project_name"].(string))) {
+			t.Logf("Suffix test PASSED. Expected random suffix, got %s.", strings.Split(outputs["project_id"].(string), "-")[len(strings.Split(outputs["project_name"].(string), "-"))])
+		} else {
+			t.Error("Suffix test FAILED. Expected random suffix, got nil.")
+		}
+	}
+
+	// Test enabled APIs
+	api_failed := false
+	apis := []string{}
+	for _, api := range inputs["project"].(map[string]interface{})["activate_apis"].([]interface{}) {
+		if !assert.Contains(t, outputs["enabled_apis"].([]interface{}), api) {
+			t.Errorf("APIs test FAILED. Expected API %s to be enabled, not found.", api)
+			api_failed = true
+		} else {
+			apis = append(apis, api.(string))
+		}
+	}
+	if !api_failed {
+		t.Logf("APIs test PASSED. Expected project APIs are enabled: %v", apis)
+	}
+
 }
