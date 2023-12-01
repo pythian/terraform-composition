@@ -60,5 +60,7 @@ No inputs.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_enabled_apis"></a> [enabled\_apis](#output\_enabled\_apis) | APIs enabled on the configured project |
 | <a name="output_project_id"></a> [project\_id](#output\_project\_id) | ID of the configured project |
+| <a name="output_project_name"></a> [project\_name](#output\_project\_name) | Name of the configured project |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

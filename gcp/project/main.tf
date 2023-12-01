@@ -44,7 +44,17 @@ module "project_name" {
   prefix = try(local.gcp.prefix, null)
 }
 
+output "enabled_apis" {
+  description = "APIs enabled on the configured project"
+  value       = module.project_factory.enabled_apis
+}
+
 output "project_id" {
   description = "ID of the configured project"
   value       = module.project_factory.project_id
+}
+
+output "project_name" {
+  description = "Name of the configured project"
+  value       = module.project_factory.project_name
 }
