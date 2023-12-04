@@ -37,7 +37,9 @@ No requirements.
 
 ## Providers
 
-No providers.
+| Name | Version |
+|------|---------|
+| <a name="provider_google"></a> [google](#provider\_google) | 4.84.0 |
 
 ## Modules
 
@@ -50,7 +52,9 @@ No providers.
 
 ## Resources
 
-No resources.
+| Name | Type |
+|------|------|
+| [google_project.main](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
 
 ## Inputs
 
@@ -60,7 +64,11 @@ No inputs.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_billing_account"></a> [billing\_account](#output\_billing\_account) | Billing account of the configured project |
 | <a name="output_enabled_apis"></a> [enabled\_apis](#output\_enabled\_apis) | APIs enabled on the configured project |
+| <a name="output_folder_id"></a> [folder\_id](#output\_folder\_id) | ID of the configured project's parent folder |
+| <a name="output_folder_name"></a> [folder\_name](#output\_folder\_name) | Name of the configured project's parent folder |
 | <a name="output_project_id"></a> [project\_id](#output\_project\_id) | ID of the configured project |
+| <a name="output_project_labels"></a> [project\_labels](#output\_project\_labels) | Labels configured on the project |
 | <a name="output_project_name"></a> [project\_name](#output\_project\_name) | Name of the configured project |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

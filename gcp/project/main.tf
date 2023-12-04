@@ -5,6 +5,10 @@ locals {
   versions = yamldecode(file("../versions.yaml"))
 }
 
+data "google_project" "main" {
+  project_id = module.project_factory.project_id
+}
+
 module "folder" {
   source  = "terraform-google-modules/folders/google"
   version = "4.0.0"
@@ -30,7 +34,7 @@ module "project_factory" {
   auto_create_network     = local.inputs.project.auto_create_network
   billing_account         = coalesce(local.inputs.project.billing_account_override, local.gcp.billing_account)
   default_service_account = local.inputs.project.default_service_account
-  folder_id               = local.gcp.parent_type == "folders" ? coalesce(local.inputs.project.folder_id_override, local.gcp.parent_id, "") : ""
+  folder_id               = module.folder.id
   labels                  = local.env.labels
   name                    = coalesce(local.inputs.project.project_id_override, module.project_name.random_pet)
   org_id                  = local.gcp.organization_id
@@ -44,14 +48,34 @@ module "project_name" {
   prefix = try(local.gcp.prefix, null)
 }
 
+output "billing_account" {
+  description = "Billing account of the configured project"
+  value       = data.google_project.main.billing_account
+}
+
 output "enabled_apis" {
   description = "APIs enabled on the configured project"
   value       = module.project_factory.enabled_apis
 }
 
+output "folder_id" {
+  description = "ID of the configured project's parent folder"
+  value       = module.folder.id
+}
+
+output "folder_name" {
+  description = "Name of the configured project's parent folder"
+  value       = module.folder.name
+}
+
 output "project_id" {
   description = "ID of the configured project"
   value       = module.project_factory.project_id
+}
+
+output "project_labels" {
+  description = "Labels configured on the project"
+  value       = data.google_project.main.labels
 }
 
 output "project_name" {
