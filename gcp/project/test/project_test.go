@@ -152,24 +152,24 @@ func TestGCPProject(t *testing.T) {
 
 	// Test parent folder name
 	if assert.Equal(t, gcp["prefix"].(string), strings.Split(outputs["folder_name"].(string), "-")[0]) {
-		t.Logf("Prefix test PASSED. Expected folder name to start with %s, got %s.", gcp["prefix"], strings.Split(outputs["folder_name"].(string), "-")[0])
+		t.Logf("Folder prefix test PASSED. Expected folder name to start with %s, got %s.", gcp["prefix"], strings.Split(outputs["folder_name"].(string), "-")[0])
 	} else {
-		t.Errorf("Prefix test FAILED. Expected folder name to start with %s, got %s.", gcp["prefix"], strings.Split(outputs["folder_name"].(string), "-")[0])
+		t.Errorf("Folder prefix test FAILED. Expected folder name to start with %s, got %s.", gcp["prefix"], strings.Split(outputs["folder_name"].(string), "-")[0])
 	}
 
 	// Test project id
 	if assert.Equal(t, gcp["prefix"].(string), strings.Split(outputs["project_id"].(string), "-")[0]) {
-		t.Logf("Prefix test PASSED. Expected project name to start with %s, got %s.", gcp["prefix"].(string), strings.Split(outputs["project_id"].(string), "-")[0])
+		t.Logf("Project prefix test PASSED. Expected project name to start with %s, got %s.", gcp["prefix"].(string), strings.Split(outputs["project_id"].(string), "-")[0])
 	} else {
-		t.Errorf("Prefix test FAILED. Expected project name to start with %s, got %s.", gcp["prefix"].(string), strings.Split(outputs["project_id"].(string), "-")[0])
+		t.Errorf("Project prefix test FAILED. Expected project name to start with %s, got %s.", gcp["prefix"].(string), strings.Split(outputs["project_id"].(string), "-")[0])
 	}
 	if inputs["project"].(map[string]interface{})["random_project_id"].(bool) {
 		if (assert.Len(t, strings.Split(outputs["project_id"].(string), "-"), len(strings.Split(outputs["project_name"].(string), "-"))+1)) &&
 			(assert.Contains(t, outputs["project_id"].(string), outputs["project_name"].(string))) {
-			t.Logf("Suffix test PASSED. Expected project_id to have a random suffix, got %s.",
+			t.Logf("Project suffix test PASSED. Expected project_id to have a random suffix, got %s.",
 				strings.Split(outputs["project_id"].(string), "-")[len(strings.Split(outputs["project_name"].(string), "-"))])
 		} else {
-			t.Error("Suffix test FAILED. Expected project_id to have a random suffix, got nil.")
+			t.Error("Project suffix test FAILED. Expected project_id to have a random suffix, got nil.")
 		}
 	}
 
@@ -180,18 +180,18 @@ func TestGCPProject(t *testing.T) {
 		val, set := outputs["project_labels"].(map[string]interface{})[k].(string)
 		if set {
 			if !assert.Equal(t, v, val) {
-				t.Errorf("Labels test FAILED. Expected label %s to be set to %s, got %s.", k, v, val)
+				t.Errorf("Project labels test FAILED. Expected label %s to be set to %s, got %s.", k, v, val)
 				labelFailed = true
 			} else {
 				labels = append(labels, k)
 			}
 		} else {
-			t.Errorf("Labels test FAILED. Expected label %s to be set, not found.", k)
+			t.Errorf("Project labels test FAILED. Expected label %s to be set, not found.", k)
 			labelFailed = true
 		}
 	}
 	if !labelFailed {
-		t.Logf("Labels test PASSED. Expected project labels are set: %v", labels)
+		t.Logf("Project labels test PASSED. Expected project labels are set: %v", labels)
 	}
 
 	// Test enabled APIs
@@ -199,14 +199,32 @@ func TestGCPProject(t *testing.T) {
 	apis := []string{}
 	for _, api := range inputs["project"].(map[string]interface{})["activate_apis"].([]interface{}) {
 		if !assert.Contains(t, outputs["enabled_apis"].([]interface{}), api) {
-			t.Errorf("APIs test FAILED. Expected API %s to be enabled, not found.", api)
+			t.Errorf("Project APIs test FAILED. Expected project API %s to be enabled, not found.", api)
 			apiFailed = true
 		} else {
 			apis = append(apis, api.(string))
 		}
 	}
 	if !apiFailed {
-		t.Logf("APIs test PASSED. Expected project APIs are enabled: %v", apis)
+		t.Logf("Project APIs test PASSED. Expected project APIs are enabled: %v", apis)
+	}
+
+	// Test audit configuration
+	for _, inputConfig := range inputs["audit_log_config"].([]interface{}) {
+		configFailed := true
+		for _, outputConfig := range outputs["audit_log_config"].([]interface{}) {
+			if inputConfig.(map[string]interface{})["service"].(string) == outputConfig.(map[string]interface{})["service"].(string) &&
+				inputConfig.(map[string]interface{})["log_type"].(string) == outputConfig.(map[string]interface{})["log_type"].(string) {
+				t.Logf("Audit log config test PASSED. Expected log_type %s to be enabled for service %s, got log_type %s for service %s.",
+					inputConfig.(map[string]interface{})["log_type"].(string), inputConfig.(map[string]interface{})["service"].(string),
+					outputConfig.(map[string]interface{})["log_type"].(string), outputConfig.(map[string]interface{})["service"].(string))
+				configFailed = false
+			}
+		}
+		if configFailed == true {
+			t.Errorf("Audit log config test FAILED. Expected log_type %s to be enabled for service %s, not found.",
+				inputConfig.(map[string]interface{})["log_type"].(string), inputConfig.(map[string]interface{})["service"].(string))
+		}
 	}
 
 	// Get the state in json format
@@ -224,27 +242,71 @@ func TestGCPProject(t *testing.T) {
 					// Test auto-create network
 					if assert.Equal(t, inputs["project"].(map[string]interface{})["auto_create_network"].(bool),
 						resource.(map[string]interface{})["values"].(map[string]interface{})["auto_create_network"].(bool)) {
-						t.Logf("Default network creation test PASSED. Expected auto_create_network set to %t, got %t.",
+						t.Logf("Default network creation test PASSED. Expected auto_create_network to be set %t, got %t.",
 							inputs["project"].(map[string]interface{})["auto_create_network"].(bool),
 							resource.(map[string]interface{})["values"].(map[string]interface{})["auto_create_network"].(bool))
 					} else {
-						t.Logf("Default network creation test FAILED. Expected auto_create_network set to %t, got %t.",
+						t.Logf("Default network creation test FAILED. Expected auto_create_network to be set %t, got %t.",
 							inputs["project"].(map[string]interface{})["auto_create_network"].(bool),
 							resource.(map[string]interface{})["values"].(map[string]interface{})["auto_create_network"].(bool))
 					}
 					// Test parent folder id
 					if assert.Equal(t, strings.Split(outputs["folder_id"].(string), "/")[1],
 						resource.(map[string]interface{})["values"].(map[string]interface{})["folder_id"].(string)) {
-						t.Logf("Parent folder ID test PASSED. Expected parent folder ID %s, got %s.",
+						t.Logf("Project parent folder ID test PASSED. Expected project parent folder ID %s, got %s.",
 							strings.Split(outputs["folder_id"].(string), "/")[1],
 							resource.(map[string]interface{})["values"].(map[string]interface{})["folder_id"].(string))
 					} else {
-						t.Logf("Parent folder ID test FAILED. Expected parent folder ID %s, got %s.",
+						t.Logf("Project parent folder ID test FAILED. Expected project parent folder ID %s, got %s.",
 							strings.Split(outputs["folder_id"].(string), "/")[1],
 							resource.(map[string]interface{})["values"].(map[string]interface{})["folder_id"].(string))
 					}
 				}
 			}
 		}
+	}
+
+	// Test state bucket name
+	if assert.Equal(t, outputs["project_name"].(string)+"-state", outputs["state_bucket_name"].(string)) {
+		t.Logf("State bucket name test PASSED. Expected state bucket name %s, got %s.", outputs["project_name"].(string)+"-state", outputs["state_bucket_name"].(string))
+	} else {
+		t.Errorf("State bucket name test FAILED. Expected state bucket name %s, got %s.", outputs["project_name"].(string)+"-state", outputs["state_bucket_name"].(string))
+	}
+
+	// Test state bucket labels
+	labelFailed = false
+	labels = []string{}
+	for k, v := range env["labels"].(map[string]interface{}) {
+		val, set := outputs["state_bucket_labels"].(map[string]interface{})[k].(string)
+		if set {
+			if !assert.Equal(t, v, val) {
+				t.Errorf("State bucket labels test FAILED. Expected label %s to be set to %s, got %s.", k, v, val)
+				labelFailed = true
+			} else {
+				labels = append(labels, k)
+			}
+		} else {
+			t.Errorf("State bucket labels test FAILED. Expected label %s to be set, not found.", k)
+			labelFailed = true
+		}
+	}
+	if !labelFailed {
+		t.Logf("State bucket labels test PASSED. Expected state bucket labels are set: %v", labels)
+	}
+
+	// Test state bucket project
+	if assert.Equal(t, gcp["build_project"].(string), outputs["state_bucket_project"].(string)) {
+		t.Logf("State bucket project test PASSED. Expected state bucket project %s, got %s.", gcp["build_project"].(string), outputs["state_bucket_project"].(string))
+	} else {
+		t.Errorf("State bucket project test FAILED. Expected state bucket project %s, got %s.", gcp["build_project"].(string), outputs["state_bucket_project"].(string))
+	}
+
+	// Test state bucket versioning, should be explicitly true
+	if assert.True(t, outputs["state_bucket_versioning"].([]interface{})[0].(map[string]interface{})["enabled"].(bool)) {
+		t.Logf("State bucket versioning test PASSED. Expected state bucket versioning to be set %t, got %t.",
+			true, outputs["state_bucket_versioning"].([]interface{})[0].(map[string]interface{})["enabled"].(bool))
+	} else {
+		t.Errorf("State bucket versioning test PASSED. Expected state bucket versioning to be set %t, got %t.",
+			true, outputs["state_bucket_versioning"].([]interface{})[0].(map[string]interface{})["enabled"].(bool))
 	}
 }
