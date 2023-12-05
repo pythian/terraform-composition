@@ -40,3 +40,7 @@ project:
   folder_id_override: ""
   project_id_override: ""
   random_project_id: true
+  state_bucket:
+    force_destroy: false
+    uniform_access: true
+    versioning: true

@@ -5,6 +5,10 @@ locals {
   versions = yamldecode(file("../versions.yaml"))
 }
 
+data "google_storage_bucket" "state" {
+  name = split("://", module.project_factory.project_bucket_url[0])[1]
+}
+
 data "google_project" "main" {
   project_id = module.project_factory.project_id
 }
@@ -30,9 +34,19 @@ module "project_factory" {
   source  = "terraform-google-modules/project-factory/google"
   version = "14.3.0"
 
-  activate_apis           = local.inputs.project.activate_apis
-  auto_create_network     = local.inputs.project.auto_create_network
-  billing_account         = coalesce(local.inputs.project.billing_account_override, local.gcp.billing_account)
+  activate_apis       = local.inputs.project.activate_apis
+  auto_create_network = local.inputs.project.auto_create_network
+  billing_account     = coalesce(local.inputs.project.billing_account_override, local.gcp.billing_account)
+
+  # State bucket configuration
+  bucket_force_destroy = local.inputs.project.state_bucket.force_destroy
+  bucket_labels        = local.env.labels
+  bucket_location      = local.env.locations.multiregion
+  bucket_name          = format("%s-state", coalesce(local.inputs.project.project_id_override, module.project_name.random_pet))
+  bucket_project       = local.gcp.build_project
+  bucket_ula           = local.inputs.project.state_bucket.uniform_access
+  bucket_versioning    = local.inputs.project.state_bucket.versioning
+
   default_service_account = local.inputs.project.default_service_account
   folder_id               = module.folder.id
   labels                  = local.env.labels
@@ -46,6 +60,11 @@ module "project_name" {
 
   length = 1
   prefix = try(local.gcp.prefix, null)
+}
+
+output "audit_log_config" {
+  description = "Audit configuration on the configured project"
+  value       = module.iam_audit_config.audit_log_config
 }
 
 output "billing_account" {
@@ -81,4 +100,24 @@ output "project_labels" {
 output "project_name" {
   description = "Name of the configured project"
   value       = module.project_factory.project_name
+}
+
+output "state_bucket_labels" {
+  description = "Labels configured on the state bucket for the configured project"
+  value       = data.google_storage_bucket.state.labels
+}
+
+output "state_bucket_name" {
+  description = "Name of the Terraform state bucket for the configured project"
+  value       = data.google_storage_bucket.state.name
+}
+
+output "state_bucket_project" {
+  description = "Parent project of the Terraform state bucket for the configured project"
+  value       = data.google_storage_bucket.state.project
+}
+
+output "state_bucket_versioning" {
+  description = "Versioning configuration on the state bucket for the configured project"
+  value       = data.google_storage_bucket.state.versioning
 }
