@@ -1,0 +1,5 @@
+---
+build_resource_Group: ""   # az resource group in which to deploy state containers
+build_subscription: ""     # az subscription in which to deploy state containers
+tenant_id: ""              # az tenant id where resources will be created
+prefix: ""                 # prefix to use to uniquely identify and name resources managed under this structure, should be 3-5 characters in length
