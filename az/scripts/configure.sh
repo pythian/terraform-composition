@@ -25,7 +25,6 @@ while [ $# -gt 0 ]; do
       echo "  -a|--azuresubscriptionid [00000000-0000-0000-0000-000000000000]"
       echo "  -o|--owner <owner>"
       echo "  -p|--primaryregion <primary_region>"
-      echo "  -s|--secondaryregion <secondary_region>"
       echo "  -t|--team <owner>"
       exit 0
       ;;
@@ -37,8 +36,8 @@ while [ $# -gt 0 ]; do
       PREGION="${2}"
       shift
       ;;
-    -s|--secondaryregion)
-      SREGION="${2}"
+    -ps|--primaryregionshort)
+      PREGION_SHORT="${2}"
       shift
       ;;
     -t|--team)
@@ -51,10 +50,10 @@ while [ $# -gt 0 ]; do
   shift
 done
 
-if [[ -f local.gcp.yaml ]]; then
-  PREFIX=$(cat local.gcp.yaml | grep ^prefix | awk -F '[: #"]+' '{print $2}')
+if [[ -f local.az.yaml ]]; then
+  PREFIX=$(cat local.az.yaml | grep ^prefix | awk -F '[: #"]+' '{print $2}')
 else
-  PREFIX=$(cat gcp.yaml | grep ^prefix | awk -F '[: #"]+' '{print $2}')
+  PREFIX=$(cat az.yaml | grep ^prefix | awk -F '[: #"]+' '{print $2}')
 fi
 
 [[ -z ${PREFIX} ]] && exit_with_msg "Can't locate deployment prefix. Exiting."
@@ -64,7 +63,7 @@ fi
 [[ -z ${SUBSCRIPTION} ]] && exit_with_msg "-a|--azuresubscriptionid is a required parameter. Exiting."
 [[ -z ${OWNER} ]] && exit_with_msg "-o|--owner is a required parameter. Exiting."
 [[ -z ${PREGION} ]] && exit_with_msg "-p|--primaryregion is a required parameter. Exiting."
-[[ -z ${SREGION} ]] && exit_with_msg "-s|--secondaryregion is a required parameter. Exiting."
+[[ -z ${PREGION_SHORT} ]] && exit_with_msg "-ps|--primaryregionshort is a required parameter. Exiting."
 [[ -z ${TEAM} ]] && exit_with_msg "-t|--team is a required parameter. Exiting."
 
 echo "Deployment Owner: ${OWNER}"
@@ -72,7 +71,7 @@ echo "Environment: ${ENVIRONMENT}"
 echo "Azure Subscription ID: ${SUBSCRIPTION}"
 echo "Name Prefix: ${PREFIX}"
 echo "Primary Region: ${PREGION}"
-echo "Secondary Region: ${SREGION}"
+echo "Primary Region Short: ${PREGION_SHORT}"
 echo "Support Team: ${TEAM}"
 
 cp templates/env.tpl env.yaml
@@ -82,5 +81,5 @@ sed -i -e "s:SUBSCRIPTION:${SUBSCRIPTION}:g" env.yaml
 sed -i -e "s:OWNER:${OWNER}:g" env.yaml
 sed -i -e "s:PREFIX:${PREFIX}:g" env.yaml
 sed -i -e "s:PREGION:${PREGION}:g" env.yaml
-sed -i -e "s:SREGION:${SREGION}:g" env.yaml
+sed -i -e "s:PREGION_SHORT:${PREGION_SHORT}:g" env.yaml
 sed -i -e "s:TEAM:${TEAM}:g" env.yaml

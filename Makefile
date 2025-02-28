@@ -37,7 +37,7 @@ az_clean:
 
 .PHONY: az_configure
 az_configure:
-	@cd az && ./scripts/configure.sh -a 00000000-0000-0000-0000-000000000000 -e example -o kpeder -p us-east1 -s us-central1 -t devops
+	@cd az && ./scripts/configure.sh -a 00000000-0000-0000-0000-000000000000 -e example -o kpeder -p us-east1 -ps eus -t devops
 
 .PHONY: az_deploy
 az_deploy: az_configure az_init

@@ -6,6 +6,5 @@ labels:
   environment: ENVIRONMENT
   owner: OWNER
   team: TEAM
-locations:
-  primary: PREGION
-  secondary: SREGION
+location: PREGION
+location_short: PREGION_SHORT

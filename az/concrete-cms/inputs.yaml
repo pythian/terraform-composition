@@ -1,0 +1,4 @@
+---
+resource_group_name: example
+resource_group_name_override: ""
+tags: {}
