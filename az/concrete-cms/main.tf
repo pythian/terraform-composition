@@ -23,15 +23,15 @@ module "resource_group" {
   source = "../modules/resource-group"
 
   location = local.env.location
-  name     = coalesce(local.inputs.resource_group_name_override, 
-                      format("%s-%s-%s-%s", 
-                              local.env.prefix, 
-                              local.env.environment,
-                              local.env.location_short,
-                              local.env.resource_group_name, 
-                            )
-                      )
-  tags     = merge(local.inputs.tags, local.env.tags)
+  name = coalesce(local.inputs.resource_group_name_override,
+    format("%s-%s-%s-%s",
+      local.env.prefix,
+      local.env.environment,
+      local.env.location_short,
+      local.env.resource_group_name,
+    )
+  )
+  tags = merge(local.inputs.tags, local.env.tags)
 }
 
 output "resource_group_id" {
