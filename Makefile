@@ -16,15 +16,6 @@ help:
 	@echo '    az_plan       Show deployment plan'
 	@echo '    az_test       Run tests'
 	@echo ''
-	@echo '    gcp_clean     Clean up state files'
-	@echo '    gcp_configure Configure the deployment'
-	@echo '    gcp_deploy    Deploy configured resources'
-	@echo '    gcp_init      Initialize modules, providers'
-	@echo '    gcp_install   Install Terraform'
-	@echo '    gcp_lint      Run linters'
-	@echo '    gcp_plan      Show deployment plan'
-	@echo '    gcp_test      Run tests'
-	@echo ''
 
 .PHONY: pre-commit
 pre-commit:
