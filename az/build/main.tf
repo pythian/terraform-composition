@@ -34,6 +34,23 @@ module "resource_group" {
   tags = merge(local.inputs.tags, local.env.tags)
 }
 
+module "storage_account" {
+  source = "../modules/storage-account"
+
+  containers = local.inputs.containers
+  location = local.env.location
+  name = coalesce(local.inputs.resource_group_name_override,
+    format("%s%s%s%s",
+      local.az.prefix,
+      local.env.environment,
+      local.env.location_short,
+      local.inputs.storage_account_name,
+    )
+  )
+  resource_group = module.resource_group.name
+  tags = merge(local.inputs.tags, local.env.tags)
+}
+
 output "resource_group_id" {
   description = "Resource group ID"
   value       = module.resource_group.id
@@ -47,4 +64,19 @@ output "resource_group_location" {
 output "resource_group_name" {
   description = "Resource group name"
   value       = module.resource_group.name
+}
+
+output "storage_account_id" {
+  description = "Storage account ID"
+  value       = module.storage_account.id
+}
+
+output "storage_account_location" {
+  description = "Storage account location"
+  value       = module.storage_account.location
+}
+
+output "storage_account_name" {
+  description = "Storage account name"
+  value       = module.storage_account.name
 }

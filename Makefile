@@ -4,89 +4,120 @@ help:
 	@echo ''
 	@echo 'Targets:'
 	@echo ''
-	@echo '    help          Show this help'
-	@echo '    pre-commit    Run pre-commit checks'
+	@echo '    help               Show this help'
+	@echo '    pre-commit         Run pre-commit checks'
+	@echo '    az_install         Install Terraform'
 	@echo ''
-	@echo '    az_clean      Clean up state files'
-	@echo '    az_configure  Configure the deployment'
-	@echo '    az_deploy     Deploy configured resources'
-	@echo '    az_init       Initialize modules, providers'
-	@echo '    az_install    Install Terraform'
-	@echo '    az_lint       Run linters'
-	@echo '    az_plan       Show deployment plan'
-	@echo '    az_test       Run tests'
+	@echo 'Configure environments'
 	@echo ''
+	@echo '    az_configure_build Configure the deployment for build'
+	@echo '    az_configure_dev   Configure the deployment for dev'
+	@echo ''
+	@echo 'All application environments'
+	@echo ''
+	@echo '    az_clean           Clean up state files'
+	@echo '    az_deploy          Deploy configured resources' 
+	@echo '    az_init            Initialize modules, providers'
+	@echo '    az_lint            Run linters'
+	@echo '    az_plan            Show deployment plan'
+	@echo '    az_test            Run tests'
+	@echo ''
+	@echo 'Load tests'
+	@echo ''
+	@echo '    az_load_test       Run load tests'
+	@echo ''
+	@echo 'Terraform build environment'
+	@echo ''
+	@echo '    az_clean_build     Clean up state files'
+	@echo '    az_deploy_build    Deploy configured resources'
+	@echo '    az_init_build      Initialize modules, providers'
+	@echo '    az_lint_build      Run linters'
+	@echo '    az_plan_build      Show deployment plan'
+	@echo '    az_test_build      Run tests'
+	@echo ''
+
+
+#### BUILD ENVIRONMENT ####
+
+.PHONY: az_clean_build
+az_clean:
+	@cd az/build && rm -rf .terraform *.tfstate* .terraform.lock.hcl
+	@cd az/build/test && rm -f go.mod go.sum
+
+.PHONY: az_configure_build
+az_configure:
+	@cd az && ./scripts/configure.sh -a 9712bfef-07af-4a61-804e-b2fa08462f70 -e build -o connexus -p us-central -ps cus -t devops
+
+.PHONY: az_deploy_build
+az_deploy: az_init_build
+	@cd az/build/test && go test -v
+
+.PHONY: az_init_build
+az_init: az_configure_build
+	@cd az/build && terraform init
+	@cd az/build/test && go mod init build.go; go mod tidy
+
+.PHONY: az_lint_build
+az_lint: az_init_build
+	@cd az/build/test && golangci-lint run --print-linter-name --verbose build.go
+
+.PHONY: az_plan_build
+az_plan: az_init_build
+	@cd az/build && terraform plan
+
+.PHONY: az_test_build
+az_test: az_init_build
+	@cd az/build/test && go test -v -destroy
+
+#### DEV ENVIRONMENT ####
+
+.PHONY: az_configure_dev
+az_configure:
+	@cd az && ./scripts/configure.sh -a 9712bfef-07af-4a61-804e-b2fa08462f70 -e dev -o connexus -p us-central -ps cus -t devops
+
+
+#### DEPLOYMENTS ALL APPLICATION ENVIRONMENTS ####
+
+.PHONY: az_clean
+az_clean:
+	@cd az/concrete-cms && rm -rf .terraform *.tfstate* .terraform.lock.hcl
+	@cd az/concrete-cms/test && rm -f go.mod go.sum
+
+.PHONY: az_deploy
+az_deploy: az_init
+	@cd az/concrete-cms/test && go test -v
+
+.PHONY: az_init
+az_init: 
+	@cd az/concrete-cms && terraform init
+	@cd az/concrete-cms/test && go mod init concrete-cms.go; go mod tidy
+
+.PHONY: az_lint
+az_lint: az_init
+	@cd az/concrete-cms/test && golangci-lint run --print-linter-name --verbose concrete-cms.go
+
+.PHONY: az_plan
+az_plan: az_init
+	@cd az/concrete-cms && terraform plan
+
+.PHONY: az_test
+az_test: az_init
+	@cd az/concrete-cms/test && go test -v -destroy
+
+#### LOAD TESTS ####
+
+.PHONY: az_load_test
+az_load_test:
+	@echo "To be implemented with k6"
+
+#### SHARED ####
 
 .PHONY: pre-commit
 pre-commit:
 	@pre-commit run -a
 
-.PHONY: az_clean
-az_clean:
-	@cd az/resource-group && rm -rf .terraform *.tfstate* .terraform.lock.hcl
-	@cd az/resource-group/test && rm -f go.mod go.sum
-
-.PHONY: az_configure
-az_configure:
-	@cd az && ./scripts/configure.sh -a 00000000-0000-0000-0000-000000000000 -e example -o kpeder -p us-east1 -ps eus -t devops
-
-.PHONY: az_deploy
-az_deploy: az_configure az_init
-	@cd az/resource-group/test && go test -v
-
-.PHONY: az_init
-az_init: az_configure
-	@cd az/resource-group && terraform init
-	@cd az/resource-group/test && go mod init resource_group_test.go; go mod tidy
 
 .PHONY: az_install
 az_install:
 	@chmod +x ./scripts/install_terraform.sh
 	@sudo ./scripts/install_terraform.sh -v ./az/versions.yaml
-
-.PHONY: az_lint
-az_lint: az_configure az_init
-	@cd az/resource-group/test && golangci-lint run --print-linter-name --verbose resource-group_test.go
-
-.PHONY: az_plan
-az_plan: az_configure az_init
-	@cd az/resource-group && terraform plan
-
-.PHONY: az_test
-az_test: az_configure az_init
-	@cd az/resource-group/test && go test -v -destroy
-
-.PHONY: gcp_clean
-gcp_clean:
-	@cd gcp/project && rm -rf .terraform *.tfstate* .terraform.lock.hcl
-	@cd gcp/project/test && rm -f go.mod go.sum
-
-.PHONY: gcp_configure
-gcp_configure:
-	@cd gcp && ./scripts/configure.sh -e example -m US -o kpeder -p us-east1 -s us-central1 -t devops
-
-.PHONY: gcp_deploy
-gcp_deploy: gcp_configure gcp_init
-	@cd gcp/project/test && go test -v
-
-.PHONY: gcp_init
-gcp_init: gcp_configure
-	@cd gcp/project && terraform init
-	@cd gcp/project/test && go mod init project_test.go; go mod tidy
-
-.PHONY: gcp_install
-gcp_install:
-	@chmod +x ./scripts/install_terraform.sh
-	@sudo ./scripts/install_terraform.sh -v ./gcp/versions.yaml
-
-.PHONY: gcp_lint
-gcp_lint: gcp_configure gcp_init
-	@cd gcp/project/test && golangci-lint run --print-linter-name --verbose project_test.go
-
-.PHONY: gcp_plan
-gcp_plan: gcp_configure gcp_init
-	@cd gcp/project && terraform plan
-
-.PHONY: gcp_test
-gcp_test: gcp_configure gcp_init
-	@cd gcp/project/test && go test -v -destroy

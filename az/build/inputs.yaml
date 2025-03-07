@@ -1,0 +1,10 @@
+---
+resource_group_name: tfstate
+resource_group_name_override: ""
+storage_account_name: tfstate
+storage_account_name_override: ""
+containers: 
+  - tfstate
+container_name_override: ""
+key: terraform.tfstate
+tags: {}

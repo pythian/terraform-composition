@@ -80,6 +80,6 @@ sed -i -e "s:ENVIRONMENT:${ENVIRONMENT}:g" env.yaml
 sed -i -e "s:SUBSCRIPTION:${SUBSCRIPTION}:g" env.yaml
 sed -i -e "s:OWNER:${OWNER}:g" env.yaml
 sed -i -e "s:PREFIX:${PREFIX}:g" env.yaml
-sed -i -e "s:PREGION:${PREGION}:g" env.yaml
 sed -i -e "s:PREGION_SHORT:${PREGION_SHORT}:g" env.yaml
+sed -i -e "s:PREGION:${PREGION}:g" env.yaml
 sed -i -e "s:TEAM:${TEAM}:g" env.yaml

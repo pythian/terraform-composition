@@ -1,5 +1,5 @@
 ---
-build_resource_Group: "example-rg"                             # az resource group in which to deploy state containers
-build_subscription: "00000000-0000-0000-0000-000000000000"     # az subscription in which to deploy state containers
-tenant_id: "00000000-0000-0000-0000-000000000000"              # az tenant id where resources will be created
-prefix: "con"                                                  # prefix to use to uniquely identify and name resources managed under this structure, should be 3-5 characters in length
+build_resource_Group: "cnx-build-cus-tfstate"                             # az resource group in which to deploy state containers
+build_subscription: "9712bfef-07af-4a61-804e-b2fa08462f70"     # az subscription in which to deploy state containers
+tenant_id: "0470d6a6-5aba-4ee3-8bd5-9e1adb362d08"              # az tenant id where resources will be created
+prefix: "cnx"                                                  # prefix to use to uniquely identify and name resources managed under this structure, should be 3-5 characters in length
