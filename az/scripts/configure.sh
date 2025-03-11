@@ -63,6 +63,11 @@ else
   BUILDSUBSCRIPTION=$(cat az.yaml | grep ^build_subscription | awk -F '[: #"]+' '{print $2}')
 fi
 
+TFVERSION=$(cat versions.yaml | grep ^terraform_binary_version | awk -F '[: #"]+' '{print $2}')
+AZURERMVERSION=$(cat versions.yaml | grep ^azurerm_provider_version | awk -F '[: #"]+' '{print $2}')
+[[ -z ${TFVERSION} ]] && exit_with_msg "Can't locate deployment terraform version. Exiting."
+[[ -z ${AZURERMVERSION} ]] && exit_with_msg "Can't locate deployment azurerm provider version. Exiting."
+
 [[ -z ${PREFIX} ]] && exit_with_msg "Can't locate deployment prefix. Exiting."
 [[ ${#PREFIX} > 5 ]] && exit_with_msg "Prefix '${PREFIX}' is too long. Exiting."
 
@@ -98,3 +103,5 @@ sed -i -e "s:ENVIRONMENT:${ENVIRONMENT}:g" $ZONE/backend.tf
 sed -i -e "s:BUILDSUBSCRIPTION:${BUILDSUBSCRIPTION}:g" $ZONE/backend.tf
 sed -i -e "s:PREFIX:${PREFIX}:g" $ZONE/backend.tf
 sed -i -e "s:PREGION_SHORT:${PREGION_SHORT}:g" $ZONE/backend.tf
+sed -i -e "s:TFVERSION:${TFVERSION}:g" $ZONE/backend.tf
+sed -i -e "s:AZURERMVERSION:${AZURERMVERSION}:g" $ZONE/backend.tf

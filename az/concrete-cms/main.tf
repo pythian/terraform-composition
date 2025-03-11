@@ -4,17 +4,6 @@ locals {
   az     = fileexists("../local.az.yaml") ? yamldecode(file("../local.az.yaml")) : yamldecode(file("../az.yaml"))
 }
 
-terraform {
-  required_version = "~> 1.5.0"
-
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "4.20.0"
-    }
-  }
-}
-
 provider "azurerm" {
   subscription_id = local.env.subscription
   features {}

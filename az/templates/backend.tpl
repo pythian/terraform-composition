@@ -8,3 +8,14 @@ terraform {
     storage_account_name = "PREFIXbuildPREGION_SHORTtfstate"
   }
 }
+
+terraform {
+  required_version = "~> TFVERSION"
+
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "AZURERMVERSION"
+    }
+  }
+}
