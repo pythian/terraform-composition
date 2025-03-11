@@ -26,6 +26,7 @@ while [ $# -gt 0 ]; do
       echo "  -o|--owner <owner>"
       echo "  -p|--primaryregion <primary_region>"
       echo "  -t|--team <owner>"
+      echo "  -z|--zone-path <zone_path>"
       exit 0
       ;;
     -o|--owner)
@@ -44,6 +45,10 @@ while [ $# -gt 0 ]; do
       TEAM="${2}"
       shift
       ;;
+    -z|--zone-path)
+      ZONE="${2}"
+      shift
+      ;;
     *)
       exit_with_msg "Error: Invalid argument '${1}'."
   esac
@@ -52,8 +57,10 @@ done
 
 if [[ -f local.az.yaml ]]; then
   PREFIX=$(cat local.az.yaml | grep ^prefix | awk -F '[: #"]+' '{print $2}')
+  BUILDSUBSCRIPTION=$(cat local.az.yaml | grep ^build_subscription | awk -F '[: #"]+' '{print $2}')
 else
   PREFIX=$(cat az.yaml | grep ^prefix | awk -F '[: #"]+' '{print $2}')
+  BUILDSUBSCRIPTION=$(cat az.yaml | grep ^build_subscription | awk -F '[: #"]+' '{print $2}')
 fi
 
 [[ -z ${PREFIX} ]] && exit_with_msg "Can't locate deployment prefix. Exiting."
@@ -65,10 +72,12 @@ fi
 [[ -z ${PREGION} ]] && exit_with_msg "-p|--primaryregion is a required parameter. Exiting."
 [[ -z ${PREGION_SHORT} ]] && exit_with_msg "-ps|--primaryregionshort is a required parameter. Exiting."
 [[ -z ${TEAM} ]] && exit_with_msg "-t|--team is a required parameter. Exiting."
+[[ -z ${ZONE} ]] && exit_with_msg "-z|--zone-path is a required parameter and must contain the zone directory path starting from the az directory. Exiting."
 
 echo "Deployment Owner: ${OWNER}"
 echo "Environment: ${ENVIRONMENT}"
 echo "Azure Subscription ID: ${SUBSCRIPTION}"
+echo "Build Subscription ID: ${BUILDSUBSCRIPTION}"
 echo "Name Prefix: ${PREFIX}"
 echo "Primary Region: ${PREGION}"
 echo "Primary Region Short: ${PREGION_SHORT}"
@@ -83,3 +92,9 @@ sed -i -e "s:PREFIX:${PREFIX}:g" env.yaml
 sed -i -e "s:PREGION_SHORT:${PREGION_SHORT}:g" env.yaml
 sed -i -e "s:PREGION:${PREGION}:g" env.yaml
 sed -i -e "s:TEAM:${TEAM}:g" env.yaml
+
+cp templates/backend.tpl $ZONE/backend.tf
+sed -i -e "s:ENVIRONMENT:${ENVIRONMENT}:g" $ZONE/backend.tf
+sed -i -e "s:BUILDSUBSCRIPTION:${BUILDSUBSCRIPTION}:g" $ZONE/backend.tf
+sed -i -e "s:PREFIX:${PREFIX}:g" $ZONE/backend.tf
+sed -i -e "s:PREGION_SHORT:${PREGION_SHORT}:g" $ZONE/backend.tf

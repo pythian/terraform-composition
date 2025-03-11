@@ -49,7 +49,7 @@ az_clean_build:
 
 .PHONY: az_configure_build
 az_configure_build:
-	@cd az && ./scripts/configure.sh -a 9712bfef-07af-4a61-804e-b2fa08462f70 -e build -o connexus -p centralus -ps cus -t devops
+	@cd az && ./scripts/configure.sh -a 9712bfef-07af-4a61-804e-b2fa08462f70 -e build -o connexus -p centralus -ps cus -t devops -z build
 
 .PHONY: az_deploy_build
 az_deploy_build: az_init_build
@@ -76,7 +76,7 @@ az_test_build: az_init_build
 
 .PHONY: az_configure_dev
 az_configure_dev:
-	@cd az && ./scripts/configure.sh -a 9712bfef-07af-4a61-804e-b2fa08462f70 -e dev -o connexus -p centralus -ps cus -t devops
+	@cd az && ./scripts/configure.sh -a 9712bfef-07af-4a61-804e-b2fa08462f70 -e dev -o connexus -p centralus -ps cus -t devops -z concrete-cms
 
 
 #### DEPLOYMENTS ALL APPLICATION ENVIRONMENTS ####
