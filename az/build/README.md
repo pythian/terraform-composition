@@ -17,6 +17,7 @@ No providers.
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | ../modules/resource-group | n/a |
+| <a name="module_storage_account"></a> [storage\_account](#module\_storage\_account) | ../modules/storage-account | n/a |
 
 ## Resources
 
@@ -33,4 +34,7 @@ No inputs.
 | <a name="output_resource_group_id"></a> [resource\_group\_id](#output\_resource\_group\_id) | Resource group ID |
 | <a name="output_resource_group_location"></a> [resource\_group\_location](#output\_resource\_group\_location) | Resource group location |
 | <a name="output_resource_group_name"></a> [resource\_group\_name](#output\_resource\_group\_name) | Resource group name |
+| <a name="output_storage_account_id"></a> [storage\_account\_id](#output\_storage\_account\_id) | Storage account ID |
+| <a name="output_storage_account_location"></a> [storage\_account\_location](#output\_storage\_account\_location) | Storage account location |
+| <a name="output_storage_account_name"></a> [storage\_account\_name](#output\_storage\_account\_name) | Storage account name |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

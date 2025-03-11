@@ -16,6 +16,7 @@ terraform {
 }
 
 provider "azurerm" {
+  subscription_id = local.env.subscription
   features {}
 }
 

@@ -75,12 +75,14 @@ resource "azurerm_storage_account" "main" {
 }
 
 resource "azurerm_storage_container" "main" {
-  for_each             = var.containers
-  name                 = each.value
-  storage_account_id   = azurerm_storage_account.main.id
+  for_each           = var.containers
+  name               = each.value
+  storage_account_id = azurerm_storage_account.main.id
 }
 
 resource "azurerm_storage_data_lake_gen2_filesystem" "main" {
+  count = var.hierarchical_namespace_enabled ? 1 : 0
+
   name               = format("%s-filesystem", var.name)
   storage_account_id = azurerm_storage_account.main.id
 }
@@ -97,7 +99,7 @@ output "container_names" {
 
 output "storage_data_lake_filesystem_id" {
   description = "Data lake filesystem created under the storage account"
-  value       = azurerm_storage_data_lake_gen2_filesystem.main.id
+  value       = var.hierarchical_namespace_enabled ? azurerm_storage_data_lake_gen2_filesystem.main[0].id : null
 }
 
 output "hierarchical_namespaces_enabled" {

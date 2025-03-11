@@ -1,7 +1,7 @@
 ---
 environment: ENVIRONMENT
 subscription: SUBSCRIPTION
-labels:
+tags:
   deployment: PREFIX
   environment: ENVIRONMENT
   owner: OWNER

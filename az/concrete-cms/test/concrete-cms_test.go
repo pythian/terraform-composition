@@ -4,20 +4,20 @@ import (
 	"flag"
 	"os"
 	"runtime"
-	"strings"
+	// "strings"
 	"testing"
 
 	"gopkg.in/yaml.v3"
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
-	"github.com/thedevsaddam/gojsonq/v2"
+	// "github.com/thedevsaddam/gojsonq/v2"
 )
 
 // Flag to destroy the target environment after tests
 var destroy = flag.Bool("destroy", false, "destroy environment after tests")
 
-func TestazProject(t *testing.T) {
+func TestAzProject(t *testing.T) {
 	// Set execution directory
 	terraformOptions := &terraform.Options{
 		TerraformDir: "../.",
@@ -66,24 +66,15 @@ func TestazProject(t *testing.T) {
 		t.Fail()
 	}
 
-	// Check for az.yaml file or a local override
-	if !assert.FileExists(t, terraformOptions.TerraformDir+"/../local.az.yaml") {
-		if !assert.FileExists(t, terraformOptions.TerraformDir+"/../az.yaml") {
-			t.Fail()
-		}
+	// Check for az.yaml file
+	if !assert.FileExists(t, terraformOptions.TerraformDir+"/../az.yaml") {
+		t.Fail()
 	}
 
 	// Read and store the az.yaml or a local override
-	if assert.FileExists(t, terraformOptions.TerraformDir+"/../local.az.yaml") {
-		yfile, err = os.ReadFile(terraformOptions.TerraformDir + "/../local.az.yaml")
-		if err != nil {
-			t.Fail()
-		}
-	} else {
-		yfile, err = os.ReadFile(terraformOptions.TerraformDir + "/../az.yaml")
-		if err != nil {
-			t.Fail()
-		}
+	yfile, err = os.ReadFile(terraformOptions.TerraformDir + "/../az.yaml")
+	if err != nil {
+		t.Fail()
 	}
 
 	az := make(map[string]interface{})
@@ -125,11 +116,11 @@ func TestazProject(t *testing.T) {
 		t.Errorf("Terraform version check FAILED, expected version '~> %s', got \n%s", versions["terraform_binary_version"].(string), version)
 	}
 
-	// Verify configured Google provider version
-	if assert.Contains(t, version, "provider registry.terraform.io/hashicorp/google v"+versions["google_provider_version"].(string)) {
-		t.Logf("Provider version check PASSED, expected hashicorp/google version '~> %s', got \n%s", versions["google_provider_version"].(string), version)
+	// Verify configured Azurerm provider version
+	if assert.Contains(t, version, "provider registry.terraform.io/hashicorp/azurerm v"+versions["azurerm_provider_version"].(string)) {
+		t.Logf("Provider version check PASSED, expected hashicorp/azurerm version '~> %s', got \n%s", versions["azurerm_provider_version"].(string), version)
 	} else {
-		t.Errorf("Provider version check FAILED, expected hashicorp/google version '~> %s', got \n%s", versions["google_provider_version"].(string), version)
+		t.Errorf("Provider version check FAILED, expected hashicorp/azurrm version '~> %s', got \n%s", versions["azurerm_provider_version"].(string), version)
 	}
 
 	// Defer Terraform destroy only if flag is set
@@ -163,12 +154,12 @@ func TestazProject(t *testing.T) {
 		t.Errorf("Resource group location test FAILED. Expected resource group location %s, got %s.", env["location"].(string), outputs["resource_group_location"].(string))
 	}
 
-	// Get the state in json format
-	moduleJson := gojsonq.New().JSONString(terraform.Show(t, terraformOptions)).From("values.root_module.child_modules").
-		Where("address", "eq", "module.project_factory").
-		Select("child_modules")
+	// // Get the state in json format
+	// moduleJson := gojsonq.New().JSONString(terraform.Show(t, terraformOptions)).From("values.root_module.child_modules").
+	// 	Where("address", "eq", "module.project_factory").
+	// 	Select("child_modules")
 
-	childModules := moduleJson.Get()
+	// childModules := moduleJson.Get()
 
 	// Commented to use as reference when added other resources
 

@@ -1,7 +1,8 @@
 locals {
-  env    = yamldecode(file("../env.yaml"))
-  inputs = yamldecode(file("./inputs.yaml"))
-  az     = fileexists("../local.az.yaml") ? yamldecode(file("../local.az.yaml")) : yamldecode(file("../az.yaml"))
+  env      = yamldecode(file("../env.yaml"))
+  inputs   = yamldecode(file("./inputs.yaml"))
+  az       = fileexists("../local.az.yaml") ? yamldecode(file("../local.az.yaml")) : yamldecode(file("../az.yaml"))
+  versions = yamldecode(file("../versions.yaml"))
 }
 
 terraform {
@@ -16,6 +17,7 @@ terraform {
 }
 
 provider "azurerm" {
+  subscription_id = local.env.subscription
   features {}
 }
 
@@ -38,7 +40,7 @@ module "storage_account" {
   source = "../modules/storage-account"
 
   containers = local.inputs.containers
-  location = local.env.location
+  location   = local.env.location
   name = coalesce(local.inputs.resource_group_name_override,
     format("%s%s%s%s",
       local.az.prefix,
@@ -48,7 +50,7 @@ module "storage_account" {
     )
   )
   resource_group = module.resource_group.name
-  tags = merge(local.inputs.tags, local.env.tags)
+  tags           = merge(local.inputs.tags, local.env.tags)
 }
 
 output "resource_group_id" {

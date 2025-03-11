@@ -16,7 +16,7 @@ help:
 	@echo 'All application environments'
 	@echo ''
 	@echo '    az_clean           Clean up state files'
-	@echo '    az_deploy          Deploy configured resources' 
+	@echo '    az_deploy          Deploy configured resources'
 	@echo '    az_init            Initialize modules, providers'
 	@echo '    az_lint            Run linters'
 	@echo '    az_plan            Show deployment plan'
@@ -36,44 +36,47 @@ help:
 	@echo '    az_test_build      Run tests'
 	@echo ''
 
+#### RUN ENTIRE PROJECT ####
+.PHONY: az_project_deploy
+az_project_deploy: az_deploy_build az_configure_dev az_deploy
 
 #### BUILD ENVIRONMENT ####
 
 .PHONY: az_clean_build
-az_clean:
+az_clean_build:
 	@cd az/build && rm -rf .terraform *.tfstate* .terraform.lock.hcl
 	@cd az/build/test && rm -f go.mod go.sum
 
 .PHONY: az_configure_build
-az_configure:
-	@cd az && ./scripts/configure.sh -a 9712bfef-07af-4a61-804e-b2fa08462f70 -e build -o connexus -p us-central -ps cus -t devops
+az_configure_build:
+	@cd az && ./scripts/configure.sh -a 9712bfef-07af-4a61-804e-b2fa08462f70 -e build -o connexus -p centralus -ps cus -t devops
 
 .PHONY: az_deploy_build
-az_deploy: az_init_build
+az_deploy_build: az_init_build
 	@cd az/build/test && go test -v
 
 .PHONY: az_init_build
-az_init: az_configure_build
+az_init_build: az_configure_build
 	@cd az/build && terraform init
-	@cd az/build/test && go mod init build.go; go mod tidy
+	@cd az/build/test && go mod init build_test.go; go mod tidy
 
 .PHONY: az_lint_build
-az_lint: az_init_build
-	@cd az/build/test && golangci-lint run --print-linter-name --verbose build.go
+az_lint_build: az_init_build
+	@cd az/build/test && golangci-lint run --print-linter-name --verbose build_test.go
 
 .PHONY: az_plan_build
-az_plan: az_init_build
+az_plan_build: az_init_build
 	@cd az/build && terraform plan
 
 .PHONY: az_test_build
-az_test: az_init_build
+az_test_build: az_init_build
 	@cd az/build/test && go test -v -destroy
 
 #### DEV ENVIRONMENT ####
 
 .PHONY: az_configure_dev
-az_configure:
-	@cd az && ./scripts/configure.sh -a 9712bfef-07af-4a61-804e-b2fa08462f70 -e dev -o connexus -p us-central -ps cus -t devops
+az_configure_dev:
+	@cd az && ./scripts/configure.sh -a 9712bfef-07af-4a61-804e-b2fa08462f70 -e dev -o connexus -p centralus -ps cus -t devops
 
 
 #### DEPLOYMENTS ALL APPLICATION ENVIRONMENTS ####
@@ -88,13 +91,13 @@ az_deploy: az_init
 	@cd az/concrete-cms/test && go test -v
 
 .PHONY: az_init
-az_init: 
+az_init:
 	@cd az/concrete-cms && terraform init
-	@cd az/concrete-cms/test && go mod init concrete-cms.go; go mod tidy
+	@cd az/concrete-cms/test && go mod init concrete-cms_test.go; go mod tidy
 
 .PHONY: az_lint
 az_lint: az_init
-	@cd az/concrete-cms/test && golangci-lint run --print-linter-name --verbose concrete-cms.go
+	@cd az/concrete-cms/test && golangci-lint run --print-linter-name --verbose concrete-cms_test.go
 
 .PHONY: az_plan
 az_plan: az_init
@@ -121,3 +124,4 @@ pre-commit:
 az_install:
 	@chmod +x ./scripts/install_terraform.sh
 	@sudo ./scripts/install_terraform.sh -v ./az/versions.yaml
+	@sudo ./scripts/install_go.sh -v ./az/versions.yaml
