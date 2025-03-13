@@ -154,6 +154,19 @@ func TestAzProject(t *testing.T) {
 		t.Errorf("Resource group location test FAILED. Expected resource group location %s, got %s.", env["location"].(string), outputs["resource_group_location"].(string))
 	}
 
+	// TODO: As we are focusing in the import of the resources the basic tests will be later added
+	// Tests to be added:
+
+	// Test virtual network names
+
+	// Test subnet names
+
+	// Test vnet peerings
+
+	// Test private dns zones
+
+	// Test private dns zone links
+
 	// // Get the state in json format
 	// moduleJson := gojsonq.New().JSONString(terraform.Show(t, terraformOptions)).From("values.root_module.child_modules").
 	// 	Where("address", "eq", "module.project_factory").

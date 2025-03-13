@@ -48,7 +48,7 @@ resource "azurerm_private_dns_zone" "main" {
 resource "azurerm_private_dns_zone_virtual_network_link" "link" {
   for_each = var.vnet_id == null ? {} : { for i in var.vnet_id : i => i }
 
-  name                  = replace(var.name, ".", "-")
+  name                  = replace("${var.name}-${basename(each.key)}", ".", "-")
   private_dns_zone_name = azurerm_private_dns_zone.main[0].name
   registration_enabled  = local.registration_enabled
   resource_group_name   = var.resource_group

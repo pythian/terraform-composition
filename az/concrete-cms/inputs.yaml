@@ -1,4 +1,78 @@
 ---
+private_dns_zones:
+- "privatelink.azurewebsites.net"
+- "privatelink.mysql.database.azure.com"
+- "privatelink.vaultcore.azure.net"
+private_dns_links:
+  privatelink.azurewebsites.net:
+  - db-test
+  - test
+  - test-02
+  privatelink.mysql.database.azure.com:
+  - db-test
+  - test
+  privatelink.vaultcore.azure.net:
+  - test-02
 resource_group_name: website
 resource_group_name_override: "WebsiteAppService"
+virtual_networks:
+  db-test:
+    address_space:
+      dev:
+      - "10.1.0.0/16"
+    name: db-test
+    name_override: cnxweb-vnet-db-test
+    subnets:
+      cnxweb-subnet-db-test: 10.1.0.0/27
+    subnet_delegations: {}
+    subnet_private_service_policies_enabled:
+      cnxweb-subnet-db-test: true
+  test:
+    address_space:
+      dev:
+      - "10.2.0.0/16"
+    name: test
+    name_override: cnxweb-vnet-test
+    subnets:
+      cnx-vnet-appservices: 10.2.1.0/24
+    subnet_delegations: {}
+    subnet_private_service_policies_enabled:
+      cnx-vnet-appservices: true
+  test-02:
+    address_space:
+      dev:
+      - "10.3.0.0/16"
+    name: test-02
+    name_override: cnxweb-vnet-test-02
+    subnets:
+      default: 10.3.0.0/24
+      AppServiceSubnet: 10.3.1.0/24
+      PrivateEndpointSubnet: 10.3.2.0/24
+    subnet_delegations:
+      AppServiceSubnet:
+        delegation:
+          service_name: "Microsoft.Web/serverFarms"
+          service_actions:
+          - "Microsoft.Network/virtualNetworks/subnets/action"
+    subnet_private_service_policies_enabled:
+      AppServiceSubnet: true
+      default: true
+      PrivateEndpointSubnet: true
+vnet_peerings:
+  appservices2db:
+    network: "db-test"
+    remote_network: "test"
+    allow_remote_network_access: true
+  Backend2FrontEnd:
+    network: "db-test"
+    remote_network: "test-02"
+    allow_remote_network_access: true
+  db2appservices:
+    network: "test"
+    remote_network: "db-test"
+    allow_remote_network_access: true
+  Frontend2Backend:
+    network: "test-02"
+    remote_network: "db-test"
+    allow_remote_network_access: true
 tags: {}

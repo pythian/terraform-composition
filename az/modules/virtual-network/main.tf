@@ -40,7 +40,7 @@ variable "subnet_delegations" {
 }
 
 variable "subnet_private_endpoint_policies_enabled" {
-  description = "Map of subnet names and service endpoint policies (defaults to false)"
+  description = "Map of subnet names and service endpoint policies (defaults to Disabled)"
   type        = map(string)
 
   default = {}
@@ -83,7 +83,7 @@ resource "azurerm_subnet" "main" {
   name                                          = each.key
   resource_group_name                           = var.resource_group
   virtual_network_name                          = azurerm_virtual_network.main.name
-  private_endpoint_network_policies_enabled     = lookup(var.subnet_private_endpoint_policies_enabled, each.key, false)
+  private_endpoint_network_policies             = lookup(var.subnet_private_endpoint_policies_enabled, each.key, "Disabled")
   private_link_service_network_policies_enabled = lookup(var.subnet_private_service_policies_enabled, each.key, false)
   service_endpoints                             = lookup(var.subnet_services, each.key, null)
 

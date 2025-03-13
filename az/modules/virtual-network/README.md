@@ -32,7 +32,7 @@ No modules.
 | <a name="input_name"></a> [name](#input\_name) | Name of the virtual network to create | `string` | n/a | yes |
 | <a name="input_resource_group"></a> [resource\_group](#input\_resource\_group) | Name of the resource group in which to deploy the virtual network | `string` | n/a | yes |
 | <a name="input_subnet_delegations"></a> [subnet\_delegations](#input\_subnet\_delegations) | A map of subnet name to delegation block for the subnet | `map(map(any))` | `{}` | no |
-| <a name="input_subnet_private_endpoint_policies_enabled"></a> [subnet\_private\_endpoint\_policies\_enabled](#input\_subnet\_private\_endpoint\_policies\_enabled) | Map of subnet names and service endpoint policies (defaults to false) | `map(string)` | `{}` | no |
+| <a name="input_subnet_private_endpoint_policies_enabled"></a> [subnet\_private\_endpoint\_policies\_enabled](#input\_subnet\_private\_endpoint\_policies\_enabled) | Map of subnet names and service endpoint policies (defaults to Disabled) | `map(string)` | `{}` | no |
 | <a name="input_subnet_private_service_policies_enabled"></a> [subnet\_private\_service\_policies\_enabled](#input\_subnet\_private\_service\_policies\_enabled) | Map of subnet names and service link policies (defaults to false) | `map(string)` | `{}` | no |
 | <a name="input_subnet_services"></a> [subnet\_services](#input\_subnet\_services) | Map of subnet names and service endpoints | `map(set(string))` | `{}` | no |
 | <a name="input_subnets"></a> [subnets](#input\_subnets) | Map of subnet names and address spaces | `map(string)` | `{}` | no |
