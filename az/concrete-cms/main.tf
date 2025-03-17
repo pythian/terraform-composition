@@ -49,11 +49,11 @@ module "vnet_peerings" {
   source   = "../modules/virtual-network-peering"
   for_each = local.inputs.vnet_peerings
 
+  allow_remote_network_access = each.value.allow_remote_network_access
   name                        = each.key
   network_name                = module.vnet[each.value.network].name
   remote_network_id           = module.vnet[each.value.remote_network].id
   resource_group              = module.resource_group.name
-  allow_remote_network_access = each.value.allow_remote_network_access
 }
 
 module "private_dns_zones" {
@@ -64,6 +64,44 @@ module "private_dns_zones" {
   resource_group = module.resource_group.name
   vnet_id        = [for network_name in lookup(local.inputs.private_dns_links, each.key, []) : module.vnet[network_name].id]
   tags           = merge(local.inputs.tags, local.env.tags)
+}
+
+module "public_ip" {
+  source = "../modules/public-ip"
+
+  location = local.env.location
+  name = coalesce(local.inputs.public_ip_name_override,
+    format("%s-%s-%s-%s",
+      local.az.prefix,
+      local.env.environment,
+      local.env.location_short,
+      local.inputs.public_ip_name,
+    )
+  )
+  resource_group = module.resource_group.name
+  tags           = merge(local.inputs.tags, local.env.tags)
+}
+
+module "app_service" {
+  source = "../modules/app-service"
+
+  client_certificate_mode = local.inputs.app_service_client_certificate_mode
+  hostnames               = local.inputs.app_service_hostnames
+  location                = local.env.location
+  name = coalesce(local.inputs.app_service_name_override,
+    format("%s-%s-%s-%s",
+      local.az.prefix,
+      local.env.environment,
+      local.env.location_short,
+      local.inputs.app_service_name,
+    )
+  )
+  resource_group            = module.resource_group.name
+  site_config               = local.inputs.app_service_site_config
+  sku                       = local.inputs.app_service_sku
+  tags                      = merge(local.inputs.tags, local.env.tags)
+  virtual_network_subnet_id = { for k, v in local.inputs.app_service_virtual_network_subnet_id : k => module.vnet[v.virtual_network].subnet_ids[v.subnet] }
+  webapps                   = local.inputs.app_service_webapps
 }
 
 output "private_dns_zone_names" {

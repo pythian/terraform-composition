@@ -1,4 +1,105 @@
 ---
+app_service_client_certificate_mode:
+  connexusenergytest: "Optional"
+app_service_hostnames:
+  connexusenergytest.com:
+    ssl_state: SniEnabled
+    thumbprint: FF3D6BC61D8081E0AED5BF6A5A4C2A08C5A3BAB6 #This should be later replaced by a data block after all resources were imported
+    webapp_name: connexusenergytest
+app_service_ip_restriction: {}
+app_service_name: website
+app_service_name_override: ASP-WebsiteAppService-b2c3
+app_service_site_config:
+  connexusenergydev:
+    always_on: "true"
+    api_definition_url:
+    api_management_api_id:
+    app_command_line: "cp /home/site/wwwroot/default /etc/nginx/sites-available/default && service nginx reload"
+    auto_heal_action_type:
+    auto_heal_minimum_process_execution_time:
+    auto_heal_trigger_requests_count:
+    auto_heal_trigger_requests_interval:
+    auto_heal_trigger_slow_request_count:
+    auto_heal_trigger_slow_request_interval:
+    auto_heal_trigger_slow_request_time_taken:
+    auto_heal_trigger_status_code_count:
+    auto_heal_trigger_status_code_interval:
+    auto_heal_trigger_status_code_range:
+    cors_allowed_origins:
+    cors_support_credentials: "false"
+    default_documents:
+    docker_image_name:
+    docker_registry_password:
+    docker_registry_url:
+    docker_registry_username:
+    dotnet_version:
+    ftps_state: "FtpsOnly"
+    go_version:
+    health_check_eviction_time_in_min:
+    health_check_path:
+    http2_enabled: "false"
+    ip_restriction_default_action: "Allow"
+    java_server:
+    java_server_version:
+    java_version:
+    load_balancing_mode: "LeastRequests"
+    node_version:
+    php_version: "8.3"
+    python_version:
+    ruby_version:
+    use_32_bit_worker: "true"
+    vnet_route_all_enabled: "true"
+    websockets_enabled: "false"
+    worker_count: "1"
+  connexusenergytest:
+    always_on: "true"
+    api_definition_url:
+    api_management_api_id:
+    app_command_line: "cp /home/site/wwwroot/default /etc/nginx/sites-available/default && cp /home/site/wwwroot/php.ini /usr/local/etc/php.ini-production && service nginx reload"
+    auto_heal_action_type:
+    auto_heal_minimum_process_execution_time:
+    auto_heal_trigger_requests_count:
+    auto_heal_trigger_requests_interval:
+    auto_heal_trigger_slow_request_count:
+    auto_heal_trigger_slow_request_interval:
+    auto_heal_trigger_slow_request_time_taken:
+    auto_heal_trigger_status_code_count:
+    auto_heal_trigger_status_code_interval:
+    auto_heal_trigger_status_code_range:
+    cors_allowed_origins:
+    cors_support_credentials: "false"
+    default_documents:
+    docker_image_name:
+    docker_registry_password:
+    docker_registry_url:
+    docker_registry_username:
+    dotnet_version:
+    ftps_state: "FtpsOnly"
+    go_version:
+    health_check_eviction_time_in_min:
+    health_check_path:
+    http2_enabled: "false"
+    ip_restriction_default_action: "Allow"
+    java_server:
+    java_server_version:
+    java_version:
+    load_balancing_mode: "LeastRequests"
+    node_version:
+    php_version: "8.3"
+    python_version:
+    ruby_version:
+    use_32_bit_worker: "true"
+    vnet_route_all_enabled: "true"
+    websockets_enabled: "false"
+    worker_count: "1"
+app_service_sku: P0v3
+app_service_virtual_network_subnet_id:
+  connexusenergytest:
+    virtual_network: test-02
+    subnet: AppServiceSubnet
+app_service_webapps:
+- connexusenergydev
+- connexusenergytest
 private_dns_zones:
 - "privatelink.azurewebsites.net"
 - "privatelink.mysql.database.azure.com"
@@ -13,8 +114,10 @@ private_dns_links:
   - test
   privatelink.vaultcore.azure.net:
   - test-02
+public_ip_name: pip
+public_ip_name_override: "connexusenergytest.pip"
 resource_group_name: website
-resource_group_name_override: "WebsiteAppService"
+resource_group_name_override: WebsiteAppService
 virtual_networks:
   db-test:
     address_space:

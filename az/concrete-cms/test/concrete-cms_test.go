@@ -167,6 +167,10 @@ func TestAzProject(t *testing.T) {
 
 	// Test private dns zone links
 
+	// Test public ip
+
+	//Test app service plan and websites
+
 	// // Get the state in json format
 	// moduleJson := gojsonq.New().JSONString(terraform.Show(t, terraformOptions)).From("values.root_module.child_modules").
 	// 	Where("address", "eq", "module.project_factory").

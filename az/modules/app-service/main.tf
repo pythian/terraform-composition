@@ -1,3 +1,26 @@
+variable "client_certificate_mode" {
+  description = "Client certificate mode for web app"
+  type        = map(string)
+}
+
+variable "hostnames" {
+  description = "Hostnames associated with the App Service"
+  type = map(object({
+    webapp_name = string
+    ssl_state   = string
+    thumbprint  = string
+  }))
+
+  default = {}
+}
+
+variable "ip_restriction" {
+  description = "IP restriction for applications"
+  type        = map(map(any))
+
+  default = {}
+}
+
 variable "location" {
   description = "Location of the App Service Plan to create"
   type        = string
@@ -13,18 +36,6 @@ variable "resource_group" {
   type        = string
 }
 
-variable "sku" {
-  description = "SKU name of the App Service Plan to create"
-  type        = string
-
-  default = "P0v3"
-}
-
-variable "webapps" {
-  description = "Web Applications to be deployed in this App Service Plan"
-  type        = set(string)
-}
-
 variable "site_config" {
   description = "Site configurations for each web app"
   type        = map(map(any))
@@ -32,8 +43,34 @@ variable "site_config" {
   default = {}
 }
 
+variable "sku" {
+  description = "SKU name of the App Service Plan to create"
+  type        = string
+
+  default = "P0v3"
+}
+
+variable "tags" {
+  description = "Tags to be applied to the resources"
+  type        = map(string)
+
+  default = {}
+}
+
+variable "virtual_network_subnet_id" {
+  description = "Virtual Network to attach the website into"
+  type        = map(string)
+
+  default = {}
+}
+
+variable "webapps" {
+  description = "Web Applications to be deployed in this App Service Plan"
+  type        = set(string)
+}
+
 locals {
-  os_type = "linux"
+  os_type = "Linux"
 }
 
 resource "azurerm_service_plan" "main" {
@@ -42,51 +79,133 @@ resource "azurerm_service_plan" "main" {
   resource_group_name = var.resource_group
   os_type             = local.os_type
   sku_name            = var.sku
+  tags                = var.tags
 }
 
 resource "azurerm_linux_web_app" "main" {
   for_each = var.webapps
 
-  name                = each.key
-  resource_group_name = azurerm_service_plan.main.resource_group_name
-  location            = azurerm_service_plan.main.location
-  service_plan_id     = azurerm_service_plan.main.id
+  client_certificate_mode   = lookup(var.client_certificate_mode, each.key, null)
+  name                      = each.key
+  resource_group_name       = azurerm_service_plan.main.resource_group_name
+  location                  = azurerm_service_plan.main.location
+  service_plan_id           = azurerm_service_plan.main.id
+  tags                      = var.tags
+  virtual_network_subnet_id = lookup(var.virtual_network_subnet_id, each.key, null)
 
   dynamic "site_config" {
-    for_each = lookup(var.site_config, each.key, {})
+    for_each = tomap({ "config" = lookup(var.site_config, each.key, {}) })
 
     content {
-      always_on = lookup(site_config.value, "always_on", true)
+      always_on             = lookup(site_config.value, "always_on", true)
+      api_definition_url    = lookup(site_config.value, "api_definition_url", null)
+      api_management_api_id = lookup(site_config.value, "api_management_api_id", null)
+      app_command_line      = lookup(site_config.value, "app_command_line", null)
+      application_stack {
+        docker_image_name        = lookup(site_config.value, "docker_image_name", null)
+        docker_registry_url      = lookup(site_config.value, "docker_registry_url", null)
+        docker_registry_username = lookup(site_config.value, "docker_registry_username", null)
+        docker_registry_password = lookup(site_config.value, "docker_registry_password", null)
+        dotnet_version           = lookup(site_config.value, "dotnet_version", null)
+        go_version               = lookup(site_config.value, "go_version", null)
+        java_version             = lookup(site_config.value, "java_version", null)
+        java_server              = lookup(site_config.value, "java_server", null)
+        java_server_version      = lookup(site_config.value, "java_server_version", null)
+        node_version             = lookup(site_config.value, "node_version", null)
+        php_version              = lookup(site_config.value, "php_version", null)
+        python_version           = lookup(site_config.value, "python_version", null)
+        ruby_version             = lookup(site_config.value, "ruby_version", null)
+      }
+      dynamic "auto_heal_setting" {
+        for_each = lookup(site_config.value, "auto_heal_action_type", null) != null ? [site_config.value] : []
+        content {
+          action {
+            action_type                    = lookup(auto_heal_setting.value, "auto_heal_action_type", null)
+            minimum_process_execution_time = lookup(auto_heal_setting.value, "auto_heal_minimum_process_execution_time", null)
+          }
+          trigger {
+            requests {
+              count    = lookup(auto_heal_setting.value, "auto_heal_trigger_requests_count", null)
+              interval = lookup(auto_heal_setting.value, "auto_heal_trigger_requests_interval", null)
+            }
+            slow_request {
+              count      = lookup(auto_heal_setting.value, "auto_heal_trigger_slow_request_count", null)
+              interval   = lookup(auto_heal_setting.value, "auto_heal_trigger_slow_request_interval", null)
+              time_taken = lookup(auto_heal_setting.value, "auto_heal_trigger_slow_request_time_taken", null)
+            }
+            status_code {
+              count             = lookup(auto_heal_setting.value, "auto_heal_trigger_status_code_count", null)
+              interval          = lookup(auto_heal_setting.value, "auto_heal_trigger_status_code_interval", null)
+              status_code_range = lookup(auto_heal_setting.value, "auto_heal_trigger_status_code_range", null)
+            }
+          }
+        }
+      }
+      cors {
+        allowed_origins     = lookup(site_config.value, "cors_allowed_origins", null) != null ? toset(split(",", replace(lookup(site_config.value, "cors_allowed_origins"), " ", ""))) : null
+        support_credentials = lookup(site_config.value, "cors_support_credentials", false)
+      }
+      default_documents                 = lookup(site_config.value, "default_documents", null) != null ? tolist(split(",", replace(lookup(site_config.value, "default_documents"), " ", ""))) : null
+      ftps_state                        = lookup(site_config.value, "ftps_state", "Disabled")
+      health_check_path                 = lookup(site_config.value, "health_check_path", null)
+      health_check_eviction_time_in_min = lookup(site_config.value, "health_check_eviction_time_in_min", null)
+      http2_enabled                     = lookup(site_config.value, "http2_enabled", false)
+      dynamic "ip_restriction" {
+        for_each = lookup(var.ip_restriction, each.key, {})
+        content {
+          action                    = ip_restriction.value.action
+          ip_address                = ip_restriction.value.ip_address
+          priority                  = ip_restriction.value.priority
+          service_tag               = lookup(ip_restriction.value, "service_tag", null)
+          virtual_network_subnet_id = lookup(ip_restriction.value, "virtual_network_subnet_id", null)
+        }
+      }
+      ip_restriction_default_action = lookup(site_config.value, "ip_restriction_default_action", "Allow")
+      load_balancing_mode           = lookup(site_config.value, "load_balancing_mode", "LeastRequests")
+      use_32_bit_worker             = lookup(site_config.value, "use_32_bit_worker", true)
+      vnet_route_all_enabled        = lookup(site_config.value, "vnet_route_all_enabled", false)
+      websockets_enabled            = lookup(site_config.value, "websockets_enabled", false)
+      worker_count                  = lookup(site_config.value, "worker_count", 1)
     }
   }
 }
 
+resource "azurerm_app_service_custom_hostname_binding" "main" {
+  for_each = var.hostnames
+
+  hostname            = each.key
+  app_service_name    = azurerm_linux_web_app.main[each.value.webapp_name].name
+  resource_group_name = azurerm_linux_web_app.main[each.value.webapp_name].resource_group_name
+  ssl_state           = each.value.ssl_state
+  thumbprint          = each.value.thumbprint
+}
+
 output "id" {
   description = "App Service Plan ID"
-  value       = azurerm_app_service_plan.main
+  value       = azurerm_service_plan.main.id
 }
 
 output "location" {
   description = "App Service Plan location"
-  value       = azurerm_app_service_plan.main.location
+  value       = azurerm_service_plan.main.location
 }
 
 output "name" {
   description = "App Service Plan name"
-  value       = azurerm_app_service_plan.main.name
+  value       = azurerm_service_plan.main.name
 }
 
 output "resource_group" {
   description = "App Service Plan parent resource group"
-  value       = azurerm_app_service_plan.main.resource_group_name
+  value       = azurerm_service_plan.main.resource_group_name
 }
 
 output "webapp_names" {
   description = "Web Applications deployed names"
-  value       = [for w in azurermazurerm_linux_web_app.main : w.name]
+  value       = [for w in azurerm_linux_web_app.main : w.name]
 }
 
 output "webapp_ids" {
   description = "Web Applications deployed ids"
-  value       = [for w in azurermazurerm_linux_web_app.main : w.id]
+  value       = [for w in azurerm_linux_web_app.main : w.id]
 }

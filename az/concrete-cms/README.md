@@ -16,7 +16,9 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
+| <a name="module_app_service"></a> [app\_service](#module\_app\_service) | ../modules/app-service | n/a |
 | <a name="module_private_dns_zones"></a> [private\_dns\_zones](#module\_private\_dns\_zones) | ../modules/private-dns | n/a |
+| <a name="module_public_ip"></a> [public\_ip](#module\_public\_ip) | ../modules/public-ip | n/a |
 | <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | ../modules/resource-group | n/a |
 | <a name="module_vnet"></a> [vnet](#module\_vnet) | ../modules/virtual-network | n/a |
 | <a name="module_vnet_peerings"></a> [vnet\_peerings](#module\_vnet\_peerings) | ../modules/virtual-network-peering | n/a |
