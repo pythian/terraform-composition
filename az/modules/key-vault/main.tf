@@ -113,6 +113,8 @@ resource "azurerm_key_vault_secret" "secrets" {
   key_vault_id = azurerm_key_vault.main.id
   name         = each.key
   value        = var.secrets[each.key]
+
+  depends_on = [azurerm_role_assignment.roles]
 }
 
 output "id" {
@@ -133,6 +135,11 @@ output "name" {
 output "resource_group" {
   description = "Key vault parent resource group"
   value       = azurerm_key_vault.main.resource_group_name
+}
+
+output "secret_ids" {
+  description = "Key Vault secrets ids"
+  value       = { for k, v in azurerm_key_vault_secret.secrets : k => v.versionless_id }
 }
 
 output "uri" {

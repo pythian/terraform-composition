@@ -200,12 +200,22 @@ output "resource_group" {
   value       = azurerm_service_plan.main.resource_group_name
 }
 
-output "webapp_names" {
-  description = "Web Applications deployed names"
-  value       = [for w in azurerm_linux_web_app.main : w.name]
+output "webapp_hostnames" {
+  description = "Web Applications deployed fqdns"
+  value = {
+    for k, w in azurerm_linux_web_app.main : k => concat(
+      [w.default_hostname],
+      [for binding in azurerm_app_service_custom_hostname_binding.main : binding.hostname if binding.app_service_name == w.name]
+    )
+  }
 }
 
 output "webapp_ids" {
   description = "Web Applications deployed ids"
   value       = [for w in azurerm_linux_web_app.main : w.id]
+}
+
+output "webapp_names" {
+  description = "Web Applications deployed names"
+  value       = [for w in azurerm_linux_web_app.main : w.name]
 }

@@ -171,6 +171,12 @@ func TestAzProject(t *testing.T) {
 
 	//Test app service plan and websites
 
+	//Test app gateway
+
+	//Test key vault resource group
+
+	//Test key vault
+
 	// // Get the state in json format
 	// moduleJson := gojsonq.New().JSONString(terraform.Show(t, terraformOptions)).From("values.root_module.child_modules").
 	// 	Where("address", "eq", "module.project_factory").

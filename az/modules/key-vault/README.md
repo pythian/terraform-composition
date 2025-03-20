@@ -49,5 +49,6 @@ No modules.
 | <a name="output_location"></a> [location](#output\_location) | Key vault location |
 | <a name="output_name"></a> [name](#output\_name) | Key vault name |
 | <a name="output_resource_group"></a> [resource\_group](#output\_resource\_group) | Key vault parent resource group |
+| <a name="output_secret_ids"></a> [secret\_ids](#output\_secret\_ids) | Key Vault secrets ids |
 | <a name="output_uri"></a> [uri](#output\_uri) | Key vault URI |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
