@@ -1,146 +1,14 @@
 locals {
-  env       = yamldecode(file("../env.yaml"))
-  inputs    = yamldecode(file("./inputs.yaml"))
   az        = fileexists("../local.az.yaml") ? yamldecode(file("../local.az.yaml")) : yamldecode(file("../az.yaml"))
+  env       = yamldecode(file("../env.yaml"))
   hostnames = flatten([for k, v in local.inputs.application_gateway_backend_settings : module.app_service.webapp_hostnames[k]])
+  inputs    = yamldecode(file("./inputs.yaml"))
+  networks  = yamldecode((file("../networks.yaml")))
 }
 
 provider "azurerm" {
   subscription_id = local.env.subscription
   features {}
-}
-
-module "key_vault_resource_group" {
-  source = "../modules/resource-group"
-
-  location = local.env.location
-  name = coalesce(local.inputs.key_vault_resource_group_name_override,
-    format("%s-%s-%s-%s",
-      local.az.prefix,
-      local.env.environment,
-      local.env.location_short,
-      local.inputs.key_vault_resource_group_name,
-    )
-  )
-  tags = merge(local.inputs.tags, local.env.tags)
-}
-
-module "key_vault" {
-  source = "../modules/key-vault"
-
-  key_vault_roles = local.inputs.key_vault_roles
-  location        = local.env.location
-  name = coalesce(local.inputs.key_vault_name_override,
-    format("%s-%s-%s-%s",
-      local.az.prefix,
-      local.env.environment,
-      local.env.location_short,
-      local.inputs.key_vault_name,
-    )
-  )
-  public_network_access_enabled = local.inputs.key_vault_public_network_access_enabled
-  purge_protection              = local.inputs.key_vault_purge_protection
-  resource_group                = module.key_vault_resource_group.name
-  retention_days                = local.inputs.key_vault_retention_days
-  secret_keys                   = local.inputs.key_vault_secret_keys
-  secrets                       = local.inputs.key_vault_secrets
-  sku                           = local.inputs.key_vault_sku
-  tags                          = merge(local.inputs.tags, local.env.tags)
-}
-
-module "resource_group" {
-  source = "../modules/resource-group"
-
-  location = local.env.location
-  name = coalesce(local.inputs.resource_group_name_override,
-    format("%s-%s-%s-%s",
-      local.az.prefix,
-      local.env.environment,
-      local.env.location_short,
-      local.inputs.resource_group_name,
-    )
-  )
-  tags = merge(local.inputs.tags, local.env.tags)
-}
-
-module "vnet" {
-  source   = "../modules/virtual-network"
-  for_each = local.inputs.virtual_networks
-
-  address_space = lookup(each.value.address_space, local.env.environment)
-  location      = local.env.location
-  name = coalesce(each.value.name_override,
-    format("%s-%s-%s-%s",
-      local.az.prefix,
-      local.env.environment,
-      local.env.location_short,
-      each.value.name,
-    )
-  )
-  resource_group                          = module.resource_group.name
-  subnets                                 = each.value.subnets
-  subnet_delegations                      = each.value.subnet_delegations
-  subnet_private_service_policies_enabled = each.value.subnet_private_service_policies_enabled
-  tags                                    = merge(local.inputs.tags, local.env.tags)
-}
-
-module "vnet_peerings" {
-  source   = "../modules/virtual-network-peering"
-  for_each = local.inputs.vnet_peerings
-
-  allow_remote_network_access = each.value.allow_remote_network_access
-  name                        = each.key
-  network_name                = module.vnet[each.value.network].name
-  remote_network_id           = module.vnet[each.value.remote_network].id
-  resource_group              = module.resource_group.name
-}
-
-module "private_dns_zones" {
-  source   = "../modules/private-dns"
-  for_each = toset(local.inputs.private_dns_zones)
-
-  name           = each.key
-  resource_group = module.resource_group.name
-  vnet_id        = [for network_name in lookup(local.inputs.private_dns_links, each.key, []) : module.vnet[network_name].id]
-  tags           = merge(local.inputs.tags, local.env.tags)
-}
-
-module "public_ip" {
-  source = "../modules/public-ip"
-
-  location = local.env.location
-  name = coalesce(local.inputs.public_ip_name_override,
-    format("%s-%s-%s-%s",
-      local.az.prefix,
-      local.env.environment,
-      local.env.location_short,
-      local.inputs.public_ip_name
-    )
-  )
-  resource_group = module.resource_group.name
-  tags           = merge(local.inputs.tags, local.env.tags)
-}
-
-module "app_service" {
-  source = "../modules/app-service"
-
-  client_certificate_mode = local.inputs.app_service_client_certificate_mode
-  hostnames               = local.inputs.app_service_hostnames
-  location                = local.env.location
-  name = coalesce(local.inputs.app_service_name_override,
-    format("%s-%s-%s-%s",
-      local.az.prefix,
-      local.env.environment,
-      local.env.location_short,
-      local.inputs.app_service_name,
-    )
-  )
-  resource_group            = module.resource_group.name
-  site_config               = local.inputs.app_service_site_config
-  sku                       = local.inputs.app_service_sku
-  tags                      = merge(local.inputs.tags, local.env.tags)
-  virtual_network_subnet_id = { for k, v in local.inputs.app_service_virtual_network_subnet : k => module.vnet[v.virtual_network].subnet_ids[v.subnet] }
-  webapps                   = local.inputs.app_service_webapps
 }
 
 module "application_gateway" {
@@ -172,10 +40,233 @@ module "application_gateway" {
   resource_group = module.resource_group.name
   routing_rules  = local.inputs.application_gateway_routing_rules
   ssl_configuration = merge(local.inputs.application_gateway_ssl_configuration, {
-    key_vault_secret_id = module.key_vault.secret_ids["public-website-certificate"]
+    key_vault_secret_id = module.key_vault.secret_ids["${local.inputs.application_gateway_secret_name}"]
   })
   subnet_id = module.vnet[local.inputs.application_gateway_virtual_network].subnet_ids[local.inputs.application_gateway_subnet]
   tags      = merge(local.inputs.tags, local.env.tags)
+}
+
+module "app_service" {
+  source = "../modules/app-service"
+
+  client_certificate_mode = local.inputs.app_service_client_certificate_mode
+  hostnames               = local.inputs.app_service_hostnames
+  location                = local.env.location
+  name = coalesce(local.inputs.app_service_name_override,
+    format("%s-%s-%s-%s",
+      local.az.prefix,
+      local.env.environment,
+      local.env.location_short,
+      local.inputs.app_service_name,
+    )
+  )
+  resource_group            = module.resource_group.name
+  site_config               = local.inputs.app_service_site_config
+  sku                       = local.inputs.app_service_sku
+  tags                      = merge(local.inputs.tags, local.env.tags)
+  virtual_network_subnet_id = { for k, v in local.inputs.app_service_virtual_network_subnet : k => module.vnet[v.virtual_network].subnet_ids[v.subnet] }
+  webapps                   = local.inputs.app_service_webapps
+}
+
+module "key_vault" {
+  source = "../modules/key-vault"
+
+  key_vault_roles = local.inputs.key_vault_roles
+  location        = local.env.location
+  name = coalesce(local.inputs.key_vault_name_override,
+    format("%s-%s-%s-%s",
+      local.az.prefix,
+      local.env.environment,
+      local.env.location_short,
+      local.inputs.key_vault_name,
+    )
+  )
+  public_network_access_enabled = local.inputs.key_vault_public_network_access_enabled
+  purge_protection              = local.inputs.key_vault_purge_protection
+  resource_group                = module.key_vault_resource_group.name
+  retention_days                = local.inputs.key_vault_retention_days
+  secret_keys                   = local.inputs.key_vault_secret_keys
+  secrets                       = local.inputs.key_vault_secrets
+  sku                           = local.inputs.key_vault_sku
+  tags                          = merge(local.inputs.tags, local.env.tags)
+  use_precreated_secrets        = local.inputs.key_vault_use_precreated_secrets
+}
+
+module "key_vault_resource_group" {
+  source = "../modules/resource-group"
+
+  location = local.env.location
+  name = coalesce(local.inputs.key_vault_resource_group_name_override,
+    format("%s-%s-%s-%s",
+      local.az.prefix,
+      local.env.environment,
+      local.env.location_short,
+      local.inputs.key_vault_resource_group_name,
+    )
+  )
+  tags = merge(local.inputs.tags, local.env.tags)
+}
+
+module "mysql" {
+  source = "../modules/mysql-flexible"
+
+  administrator_login   = local.inputs.mysql_administrator_login
+  backup_retention_days = local.inputs.mysql_backup_retention_days
+  databases             = local.inputs.mysql_databases
+  location              = local.env.location
+  name = coalesce(local.inputs.mysql_name_override,
+    format("%s-%s-%s-%s",
+      local.az.prefix,
+      local.env.environment,
+      local.env.location_short,
+      local.inputs.mysql_name,
+    )
+  )
+  resource_group = module.resource_group.name
+  sku            = local.inputs.mysql_sku
+  tags           = merge(local.inputs.tags, local.env.tags)
+  zone           = local.inputs.mysql_zone
+}
+
+module "private_dns_zones" {
+  source   = "../modules/private-dns"
+  for_each = toset(local.inputs.private_dns_zones)
+
+  name           = each.key
+  resource_group = module.resource_group.name
+  vnet_id        = [for network_name in lookup(local.inputs.private_dns_links, each.key, []) : module.vnet[network_name].id]
+  tags           = merge(local.inputs.tags, local.env.tags)
+}
+
+### Private Endpoints
+module "app_service_private-endpoints" {
+  source   = "../modules/private-endpoint"
+  for_each = local.inputs.app_service_private_endpoints
+
+  location = local.env.location
+  name = coalesce(each.value.name_override,
+    format("%s-%s-%s-%s",
+      local.az.prefix,
+      local.env.environment,
+      local.env.location_short,
+      each.value.name,
+    )
+  )
+  private_dns_zone_id = [module.private_dns_zones[each.value.private_dns_zone].id]
+  private_service_connection = merge(each.value.private_service_connection, {
+    private_connection_resource_id = module.app_service.webapp_ids_map[each.value.name]
+  })
+  resource_group = module.resource_group.name
+  subnet_id      = module.vnet[local.inputs.private_endpoints_virtual_network].subnet_ids[local.inputs.private_endpoints_subnet]
+  tags           = merge(local.inputs.tags, local.env.tags)
+}
+
+module "key_vault_private-endpoints" {
+  source   = "../modules/private-endpoint"
+  for_each = local.inputs.key_vault_private_endpoints
+
+  location = local.env.location
+  name = coalesce(each.value.name_override,
+    format("%s-%s-%s-%s",
+      local.az.prefix,
+      local.env.environment,
+      local.env.location_short,
+      each.value.name,
+    )
+  )
+  private_dns_zone_id = [module.private_dns_zones[each.value.private_dns_zone].id]
+  private_service_connection = merge(each.value.private_service_connection, {
+    private_connection_resource_id = module.key_vault.id
+  })
+  resource_group = module.resource_group.name
+  subnet_id      = module.vnet[local.inputs.private_endpoints_virtual_network].subnet_ids[local.inputs.private_endpoints_subnet]
+  tags           = merge(local.inputs.tags, local.env.tags)
+}
+
+module "mysql_private-endpoints" {
+  source   = "../modules/private-endpoint"
+  for_each = local.inputs.mysql_private_endpoints
+
+  location = local.env.location
+  name = coalesce(each.value.name_override,
+    format("%s-%s-%s-%s",
+      local.az.prefix,
+      local.env.environment,
+      local.env.location_short,
+      each.value.name,
+    )
+  )
+  private_dns_zone_id = [module.private_dns_zones[each.value.private_dns_zone].id]
+  private_service_connection = merge(each.value.private_service_connection, {
+    private_connection_resource_id = module.mysql.id
+  })
+  resource_group = module.resource_group.name
+  subnet_id      = module.vnet[local.inputs.private_endpoints_virtual_network].subnet_ids[local.inputs.private_endpoints_subnet]
+  tags           = merge(local.inputs.tags, local.env.tags)
+}
+###
+
+module "public_ip" {
+  source = "../modules/public-ip"
+
+  location = local.env.location
+  name = coalesce(local.inputs.public_ip_name_override,
+    format("%s-%s-%s-%s",
+      local.az.prefix,
+      local.env.environment,
+      local.env.location_short,
+      local.inputs.public_ip_name
+    )
+  )
+  resource_group = module.resource_group.name
+  tags           = merge(local.inputs.tags, local.env.tags)
+}
+
+module "resource_group" {
+  source = "../modules/resource-group"
+
+  location = local.env.location
+  name = coalesce(local.inputs.resource_group_name_override,
+    format("%s-%s-%s-%s",
+      local.az.prefix,
+      local.env.environment,
+      local.env.location_short,
+      local.inputs.resource_group_name,
+    )
+  )
+  tags = merge(local.inputs.tags, local.env.tags)
+}
+
+module "vnet" {
+  source   = "../modules/virtual-network"
+  for_each = local.inputs.virtual_networks
+
+  address_space = lookup(lookup(local.networks, local.env.environment), each.key).address_space
+  location      = local.env.location
+  name = coalesce(each.value.name_override,
+    format("%s-%s-%s-%s",
+      local.az.prefix,
+      local.env.environment,
+      local.env.location_short,
+      each.value.name,
+    )
+  )
+  resource_group                          = module.resource_group.name
+  subnets                                 = lookup(lookup(local.networks, local.env.environment), each.key).subnets
+  subnet_delegations                      = each.value.subnet_delegations
+  subnet_private_service_policies_enabled = each.value.subnet_private_service_policies_enabled
+  tags                                    = merge(local.inputs.tags, local.env.tags)
+}
+
+module "vnet_peerings" {
+  source   = "../modules/virtual-network-peering"
+  for_each = local.inputs.vnet_peerings
+
+  allow_remote_network_access = each.value.allow_remote_network_access
+  name                        = each.key
+  network_name                = module.vnet[each.value.network].name
+  remote_network_id           = module.vnet[each.value.remote_network].id
+  resource_group              = module.resource_group.name
 }
 
 output "application_gateway_id" {
@@ -226,6 +317,16 @@ output "key_vault_id" {
 output "key_vault_name" {
   description = "Key Vault name"
   value       = module.key_vault.name
+}
+
+output "mysql_id" {
+  description = "MySQL Flexible Server ID"
+  value       = module.mysql.id
+}
+
+output "mysql_name" {
+  description = "MySQL Flexible Server name"
+  value       = module.mysql.name
 }
 
 output "private_dns_zone_names" {

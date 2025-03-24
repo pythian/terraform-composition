@@ -23,6 +23,7 @@ No modules.
 | [azurerm_key_vault_secret.secrets](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
 | [azurerm_role_assignment.roles](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
+| [azurerm_key_vault_secret.secrets](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault_secret) | data source |
 
 ## Inputs
 
@@ -40,6 +41,7 @@ No modules.
 | <a name="input_sku"></a> [sku](#input\_sku) | SKU name of the key vault to create | `string` | `"standard"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the key vault | `map(string)` | `{}` | no |
 | <a name="input_tenant_id"></a> [tenant\_id](#input\_tenant\_id) | ID of the tenant with which to associate the key vault | `string` | `null` | no |
+| <a name="input_use_precreated_secrets"></a> [use\_precreated\_secrets](#input\_use\_precreated\_secrets) | Uses a datasource for secrets instead of create them in the IaC | `bool` | `false` | no |
 
 ## Outputs
 

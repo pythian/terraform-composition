@@ -10,7 +10,6 @@ No requirements.
 | Name | Version |
 |------|---------|
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | n/a |
-| <a name="provider_random"></a> [random](#provider\_random) | n/a |
 
 ## Modules
 
@@ -22,7 +21,6 @@ No modules.
 |------|------|
 | [azurerm_mysql_flexible_database.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mysql_flexible_database) | resource |
 | [azurerm_mysql_flexible_server.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mysql_flexible_server) | resource |
-| [random_password.main](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
 
 ## Inputs
 
@@ -37,6 +35,8 @@ No modules.
 | <a name="input_private_dns_zone_id"></a> [private\_dns\_zone\_id](#input\_private\_dns\_zone\_id) | Private DNS zone to be used by the MySQL Flexible Server | `string` | `null` | no |
 | <a name="input_resource_group"></a> [resource\_group](#input\_resource\_group) | Name of the resource group in which to create the MySQL Flexible Server | `string` | n/a | yes |
 | <a name="input_sku"></a> [sku](#input\_sku) | SKU name of the MySQL Flexible Server to create | `string` | `"GP_Standard_D2ads_v5"` | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | Tags to be used by MySQL Flexible Server | `map(string)` | `{}` | no |
+| <a name="input_zone"></a> [zone](#input\_zone) | Zone to be used by MySQL Flexible Server | `string` | `"1"` | no |
 
 ## Outputs
 

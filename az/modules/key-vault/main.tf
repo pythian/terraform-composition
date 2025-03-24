@@ -77,6 +77,13 @@ variable "tenant_id" {
   default = null
 }
 
+variable "use_precreated_secrets" {
+  description = "Uses a datasource for secrets instead of create them in the IaC"
+  type        = bool
+
+  default = false
+}
+
 locals {
   enable_rbac_authorization = true
   key_vault_roles = { for role in var.key_vault_roles : "${role}" => {
@@ -108,11 +115,20 @@ resource "azurerm_role_assignment" "roles" {
 }
 
 resource "azurerm_key_vault_secret" "secrets" {
-  for_each = var.secret_keys
+  for_each = var.use_precreated_secrets != true ? var.secret_keys : []
 
   key_vault_id = azurerm_key_vault.main.id
   name         = each.key
   value        = var.secrets[each.key]
+
+  depends_on = [azurerm_role_assignment.roles]
+}
+
+data "azurerm_key_vault_secret" "secrets" {
+  for_each = var.use_precreated_secrets ? var.secret_keys : []
+
+  name         = each.key
+  key_vault_id = azurerm_key_vault.main.id
 
   depends_on = [azurerm_role_assignment.roles]
 }
@@ -139,7 +155,7 @@ output "resource_group" {
 
 output "secret_ids" {
   description = "Key Vault secrets ids"
-  value       = { for k, v in azurerm_key_vault_secret.secrets : k => v.versionless_id }
+  value       = var.use_precreated_secrets ? { for k, v in data.azurerm_key_vault_secret.secrets : k => v.versionless_id } : { for k, v in azurerm_key_vault_secret.secrets : k => v.versionless_id }
 }
 
 output "uri" {

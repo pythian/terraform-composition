@@ -54,27 +54,43 @@ variable "sku" {
   default = "GP_Standard_D2ads_v5"
 }
 
+variable "tags" {
+  description = "Tags to be used by MySQL Flexible Server"
+  type        = map(string)
+
+  default = {}
+}
+
+variable "zone" {
+  description = "Zone to be used by MySQL Flexible Server"
+  type        = string
+
+  default = "1"
+}
+
 locals {
   password_length        = 14
   password_special_chars = "@!"
 }
 
-resource "random_password" "main" {
-  length           = local.password_length
-  override_special = local.password_special_chars
-}
+# resource "random_password" "main" {
+#   length           = local.password_length
+#   override_special = local.password_special_chars
+# }
 
 
 resource "azurerm_mysql_flexible_server" "main" {
-  administrator_login    = var.administrator_login
-  administrator_password = random_password.main.result
-  backup_retention_days  = var.backup_retention_days
-  delegated_subnet_id    = var.delegated_subnet_id
-  location               = var.location
-  name                   = var.name
-  private_dns_zone_id    = var.private_dns_zone_id
-  resource_group_name    = var.resource_group
-  sku_name               = var.sku
+  administrator_login = var.administrator_login
+  # administrator_password = random_password.main.result
+  backup_retention_days = var.backup_retention_days
+  delegated_subnet_id   = var.delegated_subnet_id
+  location              = var.location
+  name                  = var.name
+  private_dns_zone_id   = var.private_dns_zone_id
+  resource_group_name   = var.resource_group
+  sku_name              = var.sku
+  tags                  = var.tags
+  zone                  = var.zone
 }
 
 resource "azurerm_mysql_flexible_database" "main" {

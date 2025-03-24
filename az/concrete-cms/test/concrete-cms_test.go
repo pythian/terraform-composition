@@ -4,7 +4,7 @@ import (
 	"flag"
 	"os"
 	"runtime"
-	// "strings"
+	"strings"
 	"testing"
 
 	"gopkg.in/yaml.v3"
@@ -100,6 +100,23 @@ func TestAzProject(t *testing.T) {
 		t.Fail()
 	}
 
+	// Check for networks.yaml file
+	if !assert.FileExists(t, terraformOptions.TerraformDir+"/../networks.yaml") {
+		t.Fail()
+	}
+
+	// Read and store the inputs.yaml
+	yfile, err = os.ReadFile(terraformOptions.TerraformDir + "/../networks.yaml")
+	if err != nil {
+		t.Fail()
+	}
+
+	networks := make(map[string]interface{})
+	err = yaml.Unmarshal(yfile, &networks)
+	if err != nil {
+		t.Fail()
+	}
+
 	// Sanity test
 	terraform.Validate(t, terraformOptions)
 
@@ -134,17 +151,86 @@ func TestAzProject(t *testing.T) {
 	// Store outputs
 	outputs := terraform.OutputAll(t, terraformOptions)
 
+	//Test app gateway
+	expectedAppGatewayName := az["prefix"].(string) + "-" + env["environment"].(string) + "-" + env["location_short"].(string) + "-" + inputs["application_gateway_name"].(string)
+	if override, exists := inputs["application_gateway_name_override"]; exists && override != nil {
+		expectedAppGatewayName = override.(string)
+	}
+
+	if assert.Equal(t, expectedAppGatewayName, outputs["application_gateway_name"].(string)) {
+		t.Logf("Application gateway name test PASSED. Expected application gateway name %s, got %s.", expectedAppGatewayName, outputs["application_gateway_name"].(string))
+	} else {
+		t.Errorf("Application gateway name test FAILED. Expected application gateway name %s, got %s.", expectedAppGatewayName, outputs["application_gateway_name"].(string))
+	}
+
+	//Test app service plan and websites
+	expectedAppServicePlanName := az["prefix"].(string) + "-" + env["environment"].(string) + "-" + env["location_short"].(string) + "-" + inputs["app_service_name"].(string)
+	if override, exists := inputs["app_service_name_override"]; exists && override != nil {
+		expectedAppServicePlanName = override.(string)
+	}
+
+	if assert.Equal(t, expectedAppServicePlanName, outputs["app_service_plan_name"].(string)) {
+		t.Logf("App service plan name test PASSED. Expected app service plan name %s, got %s.", expectedAppServicePlanName, outputs["app_service_plan_name"].(string))
+	} else {
+		t.Errorf("App service plan name test FAILED. Expected app service plan name %s, got %s.", expectedAppServicePlanName, outputs["app_service_plan_name"].(string))
+	}
+	if webapps, ok := inputs["app_service_webapps"].([]interface{}); ok && webapps != nil {
+		for i := 0; i < len(webapps); i++ {
+			expectedWebAppName := webapps[i].(string)
+			if assert.Contains(t, outputs["app_service_webapp_names"].([]interface{}), expectedWebAppName) {
+				t.Logf("App service webapp name test PASSED. Expected app service webapp name %s, got %s.", expectedWebAppName, outputs["app_service_webapp_names"].([]interface{}))
+			} else {
+				t.Errorf("App service webapp name test FAILED. Expected app service webapp name %s, got %s.", expectedWebAppName, outputs["app_service_webapp_names"].([]interface{}))
+			}
+		}
+	} else {
+		t.Errorf("App service webapps input is not properly configured in inputs.yaml")
+	}
+
+	//Test key vault resource group
+	expectedKeyVaultRgName := az["prefix"].(string) + "-" + env["environment"].(string) + "-" + env["location_short"].(string) + "-" + inputs["key_vault_resource_group_name"].(string)
+	if override, exists := inputs["key_vault_resource_group_name_override"]; exists && override != nil {
+		expectedKeyVaultRgName = override.(string)
+	}
+
+	if assert.Equal(t, expectedKeyVaultRgName, outputs["key_vault_resource_group_name"].(string)) {
+		t.Logf("Key vault resource group name test PASSED. Expected key vault resource group name %s, got %s.", expectedKeyVaultRgName, outputs["key_vault_resource_group_name"].(string))
+	} else {
+		t.Errorf("Key vault resource group name test FAILED. Expected key vault resource group name %s, got %s.", expectedKeyVaultRgName, outputs["key_vault_resource_group_name"].(string))
+	}
+
+	//Test key vault
+	expectedKeyVaultName := az["prefix"].(string) + "-" + env["environment"].(string) + "-" + env["location_short"].(string) + "-" + inputs["key_vault_name"].(string)
+	if override, exists := inputs["key_vault_name_override"]; exists && override != nil {
+		expectedKeyVaultName = override.(string)
+	}
+	if assert.Equal(t, expectedKeyVaultName, outputs["key_vault_name"].(string)) {
+		t.Logf("Key vault name test PASSED. Expected key vault name %s, got %s.", expectedKeyVaultName, outputs["key_vault_name"].(string))
+	} else {
+		t.Errorf("Key vault name test FAILED. Expected key vault name %s, got %s.", expectedKeyVaultName, outputs["key_vault_name"].(string))
+	}
+
+	// test mysql
+	expectedMysqlName := az["prefix"].(string) + "-" + env["environment"].(string) + "-" + env["location_short"].(string) + "-" + inputs["mysql_name"].(string)
+	if override, exists := inputs["mysql_name_override"]; exists && override != nil {
+		expectedMysqlName = override.(string)
+	}
+	if assert.Equal(t, expectedMysqlName, outputs["mysql_name"].(string)) {
+		t.Logf("Mysql name test PASSED. Expected mysql name %s, got %s.", expectedMysqlName, outputs["mysql_name"].(string))
+	} else {
+		t.Errorf("Mysql name test FAILED. Expected mysql name %s, got %s.", expectedMysqlName, outputs["mysql_name"].(string))
+	}
+
 	// Test resource group name format
-	expectedRgName := outputs["resource_group_name"].(string)
+	expectedRgName := az["prefix"].(string) + "-" + env["environment"].(string) + "-" + env["location_short"].(string) + "-" + inputs["resource_group_name"].(string)
 	if override, exists := inputs["resource_group_name_override"]; exists && override != nil {
 		expectedRgName = override.(string)
-	} else {
-		expectedRgName = az["prefix"].(string) + "-" + env["environment"].(string) + "-" + env["location_short"].(string) + "-" + inputs["resource_group_name"].(string)
 	}
+
 	if assert.Equal(t, expectedRgName, outputs["resource_group_name"].(string)) {
-		t.Logf("Resource group name test PASSED. Expected resource group name %s, got %s.", az["prefix"].(string)+"-"+env["environment"].(string)+"-"+env["location_short"].(string)+"-"+inputs["resource_group_name"].(string), outputs["resource_group_name"].(string))
+		t.Logf("Resource group name test PASSED. Expected resource group name %s, got %s.", expectedRgName, outputs["resource_group_name"].(string))
 	} else {
-		t.Errorf("Resource group name test FAILED. Expected resource group name %s, got %s.", az["prefix"].(string)+"-"+env["environment"].(string)+"-"+env["location_short"].(string)+"-"+inputs["resource_group_name"].(string), outputs["resource_group_name"].(string))
+		t.Errorf("Resource group name test FAILED. Expected resource group name %s, got %s.", expectedRgName, outputs["resource_group_name"].(string))
 	}
 
 	// Test resource group location
@@ -154,28 +240,53 @@ func TestAzProject(t *testing.T) {
 		t.Errorf("Resource group location test FAILED. Expected resource group location %s, got %s.", env["location"].(string), outputs["resource_group_location"].(string))
 	}
 
-	// TODO: As we are focusing in the import of the resources the basic tests will be later added
-	// Tests to be added:
-
-	// Test virtual network names
-
-	// Test subnet names
-
-	// Test vnet peerings
-
 	// Test private dns zones
-
-	// Test private dns zone links
+	if privateDnsZones, ok := inputs["private_dns_zones"].([]interface{}); ok && privateDnsZones != nil {
+		for i := 0; i < len(privateDnsZones); i++ {
+			expectedPrivateDnsZoneName := privateDnsZones[i].(string)
+			if assert.Contains(t, outputs["private_dns_zone_names"].([]interface{}), expectedPrivateDnsZoneName) {
+				t.Logf("Private DNS zone name test PASSED. Expected private DNS zone name %s, got %s.", expectedPrivateDnsZoneName, outputs["private_dns_zone_names"].([]interface{}))
+			} else {
+				t.Errorf("Private DNS zone name test FAILED. Expected private DNS zone name %s, got %s.", expectedPrivateDnsZoneName, outputs["private_dns_zone_names"].([]interface{}))
+			}
+		}
+	} else {
+		t.Errorf("Private DNS zones input is not properly configured in inputs.yaml")
+	}
 
 	// Test public ip
+	expectedPublicIpName := az["prefix"].(string) + "-" + env["environment"].(string) + "-" + env["location_short"].(string) + "-" + inputs["public_ip_name"].(string)
+	if override, exists := inputs["public_ip_name_override"]; exists && override != nil {
+		expectedPublicIpName = override.(string)
+	}
+	// Split the public IP ID by "/" and get the last segment
+	publicIpIdParts := strings.Split(outputs["public_ip_id"].(string), "/")
+	actualPublicIpName := publicIpIdParts[len(publicIpIdParts)-1]
 
-	//Test app service plan and websites
+	if assert.Equal(t, expectedPublicIpName, actualPublicIpName) {
+		t.Logf("Public IP name test PASSED. Expected public IP name %s, got %s.", expectedPublicIpName, actualPublicIpName)
+	} else {
+		t.Errorf("Public IP name test FAILED. Expected public IP name %s, got %s.", expectedPublicIpName, actualPublicIpName)
+	}
 
-	//Test app gateway
-
-	//Test key vault resource group
-
-	//Test key vault
+	// Test virtual network names
+	if virtualNetworks, ok := inputs["virtual_networks"].(map[string]interface{}); ok && virtualNetworks != nil {
+		for _, network := range virtualNetworks {
+			if vnet, ok := network.(map[string]interface{}); ok {
+				expectedVnetName := vnet["name"].(string)
+				if override, exists := vnet["name_override"]; exists && override != nil {
+					expectedVnetName = override.(string)
+				}
+				if assert.Contains(t, outputs["virtual_networks_names"].([]interface{}), expectedVnetName) {
+					t.Logf("Virtual network name test PASSED. Expected virtual network name %s, got %s.", expectedVnetName, outputs["virtual_networks_names"].([]interface{}))
+				} else {
+					t.Errorf("Virtual network name test FAILED. Expected virtual network name %s, got %s.", expectedVnetName, outputs["virtual_networks_names"].([]interface{}))
+				}
+			}
+		}
+	} else {
+		t.Errorf("Virtual networks input is not properly configured in inputs.yaml")
+	}
 
 	// // Get the state in json format
 	// moduleJson := gojsonq.New().JSONString(terraform.Show(t, terraformOptions)).From("values.root_module.child_modules").

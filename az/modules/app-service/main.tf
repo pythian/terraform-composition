@@ -215,6 +215,11 @@ output "webapp_ids" {
   value       = [for w in azurerm_linux_web_app.main : w.id]
 }
 
+output "webapp_ids_map" {
+  description = "Web Applications deployed ids in map format"
+  value       = { for k, w in azurerm_linux_web_app.main : k => w.id }
+}
+
 output "webapp_names" {
   description = "Web Applications deployed names"
   value       = [for w in azurerm_linux_web_app.main : w.name]

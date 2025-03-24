@@ -1,0 +1,36 @@
+dev:
+  db-test:
+    address_space:
+      - "10.1.0.0/16"
+    subnets:
+      cnxweb-subnet-db-test: 10.1.0.0/27
+  test:
+    address_space:
+      - "10.2.0.0/16"
+    subnets:
+      cnx-vnet-appservices: 10.2.1.0/24
+  test-02:
+    address_space:
+      - "10.3.0.0/16"
+    subnets:
+      default: 10.3.0.0/24
+      AppServiceSubnet: 10.3.1.0/24
+      PrivateEndpointSubnet: 10.3.2.0/24
+prd:
+  db-test:
+    address_space:
+      - ""
+    subnets:
+      cnxweb-subnet-db-test: ""
+  test:
+    address_space:
+      - ""
+    subnets:
+      cnx-vnet-appservices: ""
+  test-02:
+    address_space:
+      - ""
+    subnets:
+      default: ""
+      AppServiceSubnet: ""
+      PrivateEndpointSubnet: ""

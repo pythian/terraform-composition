@@ -62,7 +62,7 @@ az_init_build: az_configure_build
 
 .PHONY: az_lint_build
 az_lint_build: az_init_build
-	@cd az/build/test && golangci-lint run --print-linter-name --verbose build_test.go
+	@cd az/build/test && golangci-lint run --verbose build_test.go
 
 .PHONY: az_plan_build
 az_plan_build: az_init_build
@@ -97,7 +97,7 @@ az_init:
 
 .PHONY: az_lint
 az_lint: az_init
-	@cd az/concrete-cms/test && golangci-lint run --print-linter-name --verbose concrete-cms_test.go
+	@cd az/concrete-cms/test && golangci-lint run --verbose concrete-cms_test.go
 
 .PHONY: az_plan
 az_plan: az_init

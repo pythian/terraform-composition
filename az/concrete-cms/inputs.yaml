@@ -29,8 +29,9 @@ application_gateway_routing_rules:
   #   priority: 100
   #   require_sni: true
 application_gateway_subnet: default
+application_gateway_secret_name: "cnx-cert-web-test-014fe78ad8-1dec-4898-aa1b-a5660c472c75"
 application_gateway_ssl_configuration:
-  ssl_certificate_name: testenvcert
+  ssl_certificate_name: website
 application_gateway_virtual_network: test-02
 ### App Service
 app_service_client_certificate_mode:
@@ -134,6 +135,30 @@ app_service_virtual_network_subnet:
 app_service_webapps: # we should redeploy to avoid use of overrides
 - connexusenergydev
 - connexusenergytest
+### key Vault
+key_vault_name: web-01
+key_vault_name_override: kv-cnx-web-01
+key_vault_public_network_access_enabled: true
+key_vault_roles:
+  - "Key Vault Secrets Officer"
+key_vault_purge_protection: true
+key_vault_retention_days: 90
+key_vault_secret_keys:
+  - "cnx-cert-web-test-014fe78ad8-1dec-4898-aa1b-a5660c472c75"
+key_vault_secrets:
+key_vault_sku: "standard"
+key_vault_use_precreated_secrets: true
+### MySQL
+mysql_administrator_login: CNXWebDBAdminTest
+mysql_backup_retention_days: 7
+mysql_name: webdb
+mysql_name_override: cnxwebdbtest
+mysql_databases:
+  connex-db-new:
+    charset: utf8mb3
+    collation: utf8mb3_unicode_ci
+mysql_sku: GP_Standard_D2ads_v5
+mysql_zone: "3"
 ### Private DNS
 private_dns_zones:
 - "privatelink.azurewebsites.net"
@@ -149,19 +174,48 @@ private_dns_links:
   - test
   privatelink.vaultcore.azure.net:
   - test-02
-### key Vault
-key_vault_name: web-01
-key_vault_name_override: kv-cnx-web-01
-key_vault_public_network_access_enabled: true
-key_vault_roles:
-  - "Key Vault Secrets Officer"
-key_vault_purge_protection: true
-key_vault_retention_days: 90
-key_vault_secret_keys:
-  - "public-website-certificate"
-key_vault_secrets:
-  public-website-certificate: "secret-to-be-replaces"
-key_vault_sku: "standard"
+### Private Endpoints
+app_service_private_endpoints:
+  connexusenergydev:
+    name: connexusenergydev #depends of the app_service_webapps variable
+    name_override: AppServiceDev-PE
+    private_dns_zone: privatelink.azurewebsites.net
+    private_service_connection:
+      name: connexusenergydev-pe
+      subresource_names:
+      - sites
+      is_manual_connection: false
+  connexusenergytest:
+    name: connexusenergytest #depends of the app_service_webapps variable
+    name_override: ConnexusTest-PE
+    private_dns_zone: privatelink.azurewebsites.net
+    private_service_connection:
+      name: connexusenergytest-pe
+      subresource_names:
+      - sites
+      is_manual_connection: false
+key_vault_private_endpoints:
+  web-01:
+    name: web-01 #depends of the key_vault_name
+    name_override: cnx-pe-web-vault-01
+    private_dns_zone: privatelink.vaultcore.azure.net
+    private_service_connection:
+      name: web-01-pe
+      subresource_names:
+      - vault
+      is_manual_connection: false
+mysql_private_endpoints:
+  webdb:
+    name: webdb #depends of the mysql_name
+    name_override: mysqldb-pe
+    private_dns_zone: privatelink.mysql.database.azure.com
+    private_service_connection:
+      name: webdb-pe
+      subresource_names:
+      - mysqlServer
+      is_manual_connection: false
+private_endpoints_virtual_network: test-02
+private_endpoints_subnet: PrivateEndpointSubnet
 ### Public IP
 public_ip_name: pip
 public_ip_name_override:
@@ -173,37 +227,20 @@ resource_group_name_override: WebsiteAppService # we should redeploy to avoid us
 ### Virtual Network
 virtual_networks:
   db-test:
-    address_space:
-      dev:
-      - "10.1.0.0/16"
     name: db-test # we should redeploy to avoid use of overrides
     name_override: cnxweb-vnet-db-test # we should redeploy to avoid use of overrides
-    subnets:
-      cnxweb-subnet-db-test: 10.1.0.0/27
     subnet_delegations: {}
     subnet_private_service_policies_enabled:
       cnxweb-subnet-db-test: true
   test:
-    address_space:
-      dev:
-      - "10.2.0.0/16"
     name: test # we should redeploy to avoid use of overrides
     name_override: cnxweb-vnet-test # we should redeploy to avoid use of overrides
-    subnets:
-      cnx-vnet-appservices: 10.2.1.0/24
     subnet_delegations: {}
     subnet_private_service_policies_enabled:
       cnx-vnet-appservices: true
   test-02:
-    address_space:
-      dev:
-      - "10.3.0.0/16"
     name: test-02 # we should redeploy to avoid use of overrides
     name_override: cnxweb-vnet-test-02 # we should redeploy to avoid use of overrides
-    subnets:
-      default: 10.3.0.0/24
-      AppServiceSubnet: 10.3.1.0/24
-      PrivateEndpointSubnet: 10.3.2.0/24
     subnet_delegations:
       AppServiceSubnet:
         delegation:

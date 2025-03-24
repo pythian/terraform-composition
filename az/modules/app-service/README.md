@@ -49,5 +49,6 @@ No modules.
 | <a name="output_resource_group"></a> [resource\_group](#output\_resource\_group) | App Service Plan parent resource group |
 | <a name="output_webapp_hostnames"></a> [webapp\_hostnames](#output\_webapp\_hostnames) | Web Applications deployed fqdns |
 | <a name="output_webapp_ids"></a> [webapp\_ids](#output\_webapp\_ids) | Web Applications deployed ids |
+| <a name="output_webapp_ids_map"></a> [webapp\_ids\_map](#output\_webapp\_ids\_map) | Web Applications deployed ids in map format |
 | <a name="output_webapp_names"></a> [webapp\_names](#output\_webapp\_names) | Web Applications deployed names |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
