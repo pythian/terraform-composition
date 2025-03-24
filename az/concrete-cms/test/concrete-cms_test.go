@@ -152,16 +152,16 @@ func TestAzProject(t *testing.T) {
 	outputs := terraform.OutputAll(t, terraformOptions)
 
 	//Test app gateway
-	expectedAppGatewayName := az["prefix"].(string) + "-" + env["environment"].(string) + "-" + env["location_short"].(string) + "-" + inputs["application_gateway_name"].(string)
-	if override, exists := inputs["application_gateway_name_override"]; exists && override != nil {
-		expectedAppGatewayName = override.(string)
-	}
+	// expectedAppGatewayName := az["prefix"].(string) + "-" + env["environment"].(string) + "-" + env["location_short"].(string) + "-" + inputs["application_gateway_name"].(string)
+	// if override, exists := inputs["application_gateway_name_override"]; exists && override != nil {
+	// 	expectedAppGatewayName = override.(string)
+	// }
 
-	if assert.Equal(t, expectedAppGatewayName, outputs["application_gateway_name"].(string)) {
-		t.Logf("Application gateway name test PASSED. Expected application gateway name %s, got %s.", expectedAppGatewayName, outputs["application_gateway_name"].(string))
-	} else {
-		t.Errorf("Application gateway name test FAILED. Expected application gateway name %s, got %s.", expectedAppGatewayName, outputs["application_gateway_name"].(string))
-	}
+	// if assert.Equal(t, expectedAppGatewayName, outputs["application_gateway_name"].(string)) {
+	// 	t.Logf("Application gateway name test PASSED. Expected application gateway name %s, got %s.", expectedAppGatewayName, outputs["application_gateway_name"].(string))
+	// } else {
+	// 	t.Errorf("Application gateway name test FAILED. Expected application gateway name %s, got %s.", expectedAppGatewayName, outputs["application_gateway_name"].(string))
+	// }
 
 	//Test app service plan and websites
 	expectedAppServicePlanName := az["prefix"].(string) + "-" + env["environment"].(string) + "-" + env["location_short"].(string) + "-" + inputs["app_service_name"].(string)

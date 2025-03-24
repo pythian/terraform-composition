@@ -11,40 +11,40 @@ provider "azurerm" {
   features {}
 }
 
-module "application_gateway" {
-  source = "../modules/app-gateway"
+# module "application_gateway" {
+#   source = "../modules/app-gateway"
 
-  autoscale_configuration = local.inputs.application_gateway_autoscale_configuration
-  backend_settings = { for k, v in local.inputs.application_gateway_backend_settings : k => {
-    fqdns        = module.app_service.webapp_hostnames[k]
-    http_setting = lookup(local.inputs.application_gateway_backend_settings[k], "http_setting")
-    }
-  }
-  frontend_settings = {
-    for k, v in local.inputs.application_gateway_frontend_settings :
-    k => merge(v, {
-      public_ip_id = module.public_ip.id
-      hostnames    = local.hostnames
-      },
-    )
-  }
-  location = local.env.location
-  name = coalesce(local.inputs.application_gateway_name_override,
-    format("%s-%s-%s-%s",
-      local.az.prefix,
-      local.env.environment,
-      local.env.location_short,
-      local.inputs.application_gateway_name,
-    )
-  )
-  resource_group = module.resource_group.name
-  routing_rules  = local.inputs.application_gateway_routing_rules
-  ssl_configuration = merge(local.inputs.application_gateway_ssl_configuration, {
-    key_vault_secret_id = module.key_vault.secret_ids["${local.inputs.application_gateway_secret_name}"]
-  })
-  subnet_id = module.vnet[local.inputs.application_gateway_virtual_network].subnet_ids[local.inputs.application_gateway_subnet]
-  tags      = merge(local.inputs.tags, local.env.tags)
-}
+#   autoscale_configuration = local.inputs.application_gateway_autoscale_configuration
+#   backend_settings = { for k, v in local.inputs.application_gateway_backend_settings : k => {
+#     fqdns        = module.app_service.webapp_hostnames[k]
+#     http_setting = lookup(local.inputs.application_gateway_backend_settings[k], "http_setting")
+#     }
+#   }
+#   frontend_settings = {
+#     for k, v in local.inputs.application_gateway_frontend_settings :
+#     k => merge(v, {
+#       public_ip_id = module.public_ip.id
+#       hostnames    = local.hostnames
+#       },
+#     )
+#   }
+#   location = local.env.location
+#   name = coalesce(local.inputs.application_gateway_name_override,
+#     format("%s-%s-%s-%s",
+#       local.az.prefix,
+#       local.env.environment,
+#       local.env.location_short,
+#       local.inputs.application_gateway_name,
+#     )
+#   )
+#   resource_group = module.resource_group.name
+#   routing_rules  = local.inputs.application_gateway_routing_rules
+#   ssl_configuration = merge(local.inputs.application_gateway_ssl_configuration, {
+#     key_vault_secret_id = module.key_vault.secret_ids["${local.inputs.application_gateway_secret_name}"]
+#   })
+#   subnet_id = module.vnet[local.inputs.application_gateway_virtual_network].subnet_ids[local.inputs.application_gateway_subnet]
+#   tags      = merge(local.inputs.tags, local.env.tags)
+# }
 
 module "app_service" {
   source = "../modules/app-service"
@@ -269,15 +269,15 @@ module "vnet_peerings" {
   resource_group              = module.resource_group.name
 }
 
-output "application_gateway_id" {
-  description = "Application gateway id"
-  value       = module.application_gateway.id
-}
+# output "application_gateway_id" {
+#   description = "Application gateway id"
+#   value       = module.application_gateway.id
+# }
 
-output "application_gateway_name" {
-  description = "Application gateway name"
-  value       = module.application_gateway.name
-}
+# output "application_gateway_name" {
+#   description = "Application gateway name"
+#   value       = module.application_gateway.name
+# }
 
 output "app_service_plan_id" {
   description = "App service plan id"
