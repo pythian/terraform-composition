@@ -4,9 +4,7 @@ application_gateway_autoscale_configuration:
   min_capacity: 1
   max_capacity: 10
 application_gateway_backend_settings:
-  connexusenergydev: #depends of the app_service_webapps variable
-    http_setting:
-  connexusenergytest: #depends of the app_service_webapps variable
+  connexusenergy:
     http_setting:
 application_gateway_frontend_settings:
   "443":
@@ -16,36 +14,30 @@ application_gateway_frontend_settings:
 application_gateway_name: gateway
 application_gateway_name_override:
 application_gateway_routing_rules:
-  "connexusenergytest":
-    backend_address_pool: connexusenergytest #depends of the app_service_webapps variable
-    backend_http_settings: connexusenergytest #depends of the app_service_webapps variable
+  "connexusenergy":
+    backend_address_pool: connexusenergy
+    backend_http_settings: connexusenergy
     http_listener: "443"
     priority: 110
     require_sni: true
-  # "connexusenergydev":
-  #   backend_address_pool: connexusenergydev #depends of the app_service_webapps variable
-  #   backend_http_settings: connexusenergydev #depends of the app_service_webapps variable
-  #   http_listener: "443"
-  #   priority: 100
-  #   require_sni: true
 application_gateway_subnet: default
-application_gateway_secret_name: "cnx-cert-web-test-014fe78ad8-1dec-4898-aa1b-a5660c472c75"
+application_gateway_secret_name: "cnx-cert-web"
 application_gateway_ssl_configuration:
   ssl_certificate_name: website
-application_gateway_virtual_network: test-02
+application_gateway_virtual_network: web
 ### App Service
 app_service_client_certificate_mode:
-  connexusenergytest: "Optional"
+  connexusenergy: "Optional"
 app_service_hostnames:
-  connexusenergytest.com: # we should redeploy to avoid use of overrides
-    ssl_state: SniEnabled
-    thumbprint: FF3D6BC61D8081E0AED5BF6A5A4C2A08C5A3BAB6 #This should be later replaced by a data block after all resources were imported
-    webapp_name: connexusenergytest #depends of the app_service_webapps variable
+  # connexusenergytest.com: # we should redeploy to avoid use of overrides
+  #   ssl_state: SniEnabled
+  #   thumbprint: FF3D6BC61D8081E0AED5BF6A5A4C2A08C5A3BAB6 #This should be later replaced by a data block after all resources were imported
+  #   webapp_name: connexusenergytest #depends of the app_service_webapps variable
 app_service_ip_restriction: {}
 app_service_name: website
-app_service_name_override: ASP-WebsiteAppService-b2c3 # we should redeploy to avoid use of overrides
+app_service_name_override:
 app_service_site_config:
-  connexusenergydev: #depends of the app_service_webapps variable
+  connexusenergy:
     always_on: "true"
     api_definition_url:
     api_management_api_id:
@@ -86,75 +78,33 @@ app_service_site_config:
     vnet_route_all_enabled: "true"
     websockets_enabled: "false"
     worker_count: "1"
-  connexusenergytest: #depends of the app_service_webapps variable
-    always_on: "true"
-    api_definition_url:
-    api_management_api_id:
-    app_command_line: "cp /home/site/wwwroot/default /etc/nginx/sites-available/default && cp /home/site/wwwroot/php.ini /usr/local/etc/php.ini-production && service nginx reload"
-    auto_heal_action_type:
-    auto_heal_minimum_process_execution_time:
-    auto_heal_trigger_requests_count:
-    auto_heal_trigger_requests_interval:
-    auto_heal_trigger_slow_request_count:
-    auto_heal_trigger_slow_request_interval:
-    auto_heal_trigger_slow_request_time_taken:
-    auto_heal_trigger_status_code_count:
-    auto_heal_trigger_status_code_interval:
-    auto_heal_trigger_status_code_range:
-    cors_allowed_origins:
-    cors_support_credentials: "false"
-    default_documents:
-    docker_image_name:
-    docker_registry_password:
-    docker_registry_url:
-    docker_registry_username:
-    dotnet_version:
-    ftps_state: "FtpsOnly"
-    go_version:
-    health_check_eviction_time_in_min:
-    health_check_path:
-    http2_enabled: "false"
-    ip_restriction_default_action: "Allow"
-    java_server:
-    java_server_version:
-    java_version:
-    load_balancing_mode: "LeastRequests"
-    node_version:
-    php_version: "8.3"
-    python_version:
-    ruby_version:
-    use_32_bit_worker: "true"
-    vnet_route_all_enabled: "true"
-    websockets_enabled: "false"
-    worker_count: "1"
 app_service_sku: P0v3
 app_service_virtual_network_subnet:
-  connexusenergytest:
-    virtual_network: test-02
+  connexusenergy:
+    virtual_network: web
     subnet: AppServiceSubnet
-app_service_webapps: # we should redeploy to avoid use of overrides
-- connexusenergydev
-- connexusenergytest
+app_service_webapps:
+- connexusenergy
 ### key Vault
 key_vault_name: web-01
-key_vault_name_override: kv-cnx-web-01
+key_vault_name_override:
 key_vault_public_network_access_enabled: true
 key_vault_roles:
   - "Key Vault Secrets Officer"
 key_vault_purge_protection: true
 key_vault_retention_days: 90
 key_vault_secret_keys:
-  - "cnx-cert-web-test-014fe78ad8-1dec-4898-aa1b-a5660c472c75"
+  - "cnx-cert-web"
 key_vault_secrets:
 key_vault_sku: "standard"
-key_vault_use_precreated_secrets: true
+key_vault_use_precreated_secrets: false
 ### MySQL
-mysql_administrator_login: CNXWebDBAdminTest
+mysql_administrator_login: CNXWebDBAdmin
 mysql_backup_retention_days: 7
 mysql_name: webdb
-mysql_name_override: cnxwebdbtest
+mysql_name_override:
 mysql_databases:
-  connex-db-new:
+  connex-db-live:
     charset: utf8mb3
     collation: utf8mb3_unicode_ci
 mysql_sku: GP_Standard_D2ads_v5
@@ -166,38 +116,27 @@ private_dns_zones:
 - "privatelink.vaultcore.azure.net"
 private_dns_links:
   privatelink.azurewebsites.net:
-  - db-test
-  - test
-  - test-02
+  - db
+  - web
   privatelink.mysql.database.azure.com:
-  - db-test
-  - test
+  - db
   privatelink.vaultcore.azure.net:
-  - test-02
+  - web
 ### Private Endpoints
 app_service_private_endpoints:
-  connexusenergydev:
-    name: connexusenergydev #depends of the app_service_webapps variable
-    name_override: AppServiceDev-PE
+  connexusenergy:
+    name: connexusenergy
+    name_override:
     private_dns_zone: privatelink.azurewebsites.net
     private_service_connection:
-      name: connexusenergydev-pe
-      subresource_names:
-      - sites
-      is_manual_connection: false
-  connexusenergytest:
-    name: connexusenergytest #depends of the app_service_webapps variable
-    name_override: ConnexusTest-PE
-    private_dns_zone: privatelink.azurewebsites.net
-    private_service_connection:
-      name: connexusenergytest-pe
+      name: connexusenergy-pe
       subresource_names:
       - sites
       is_manual_connection: false
 key_vault_private_endpoints:
   web-01:
-    name: web-01 #depends of the key_vault_name
-    name_override: cnx-pe-web-vault-01
+    name: web-01
+    name_override:
     private_dns_zone: privatelink.vaultcore.azure.net
     private_service_connection:
       name: web-01-pe
@@ -206,41 +145,35 @@ key_vault_private_endpoints:
       is_manual_connection: false
 mysql_private_endpoints:
   webdb:
-    name: webdb #depends of the mysql_name
-    name_override: mysqldb-pe
+    name: webdb
+    name_override:
     private_dns_zone: privatelink.mysql.database.azure.com
     private_service_connection:
       name: webdb-pe
       subresource_names:
       - mysqlServer
       is_manual_connection: false
-private_endpoints_virtual_network: test-02
+private_endpoints_virtual_network: web
 private_endpoints_subnet: PrivateEndpointSubnet
 ### Public IP
 public_ip_name: pip
 public_ip_name_override:
 ### Resource Groups
-key_vault_resource_group_name: websitekv
-key_vault_resource_group_name_override: AzureKeyVaultPublicWebsite # we should redeploy to avoid use of overrides
+key_vault_resource_group_name: keyvault
+key_vault_resource_group_name_override:
 resource_group_name: website
-resource_group_name_override: WebsiteAppService # we should redeploy to avoid use of overrides
+resource_group_name_override:
 ### Virtual Network
 virtual_networks:
-  db-test:
-    name: db-test # we should redeploy to avoid use of overrides
-    name_override: cnxweb-vnet-db-test # we should redeploy to avoid use of overrides
+  db:
+    name: db
+    name_override:
     subnet_delegations: {}
     subnet_private_service_policies_enabled:
-      cnxweb-subnet-db-test: true
-  test:
-    name: test # we should redeploy to avoid use of overrides
-    name_override: cnxweb-vnet-test # we should redeploy to avoid use of overrides
-    subnet_delegations: {}
-    subnet_private_service_policies_enabled:
-      cnx-vnet-appservices: true
-  test-02:
-    name: test-02 # we should redeploy to avoid use of overrides
-    name_override: cnxweb-vnet-test-02 # we should redeploy to avoid use of overrides
+      cnxweb-subnet-db: true
+  web:
+    name: web
+    name_override:
     subnet_delegations:
       AppServiceSubnet:
         delegation:
@@ -252,21 +185,13 @@ virtual_networks:
       default: true
       PrivateEndpointSubnet: true
 vnet_peerings:
-  appservices2db:
-    network: "db-test"
-    remote_network: "test"
-    allow_remote_network_access: true
   Backend2FrontEnd:
-    network: "db-test"
-    remote_network: "test-02"
-    allow_remote_network_access: true
-  db2appservices:
-    network: "test"
-    remote_network: "db-test"
+    network: "db"
+    remote_network: "web"
     allow_remote_network_access: true
   Frontend2Backend:
-    network: "test-02"
-    remote_network: "db-test"
+    network: "web"
+    remote_network: "db"
     allow_remote_network_access: true
 ### Common tags
 tags: {}
