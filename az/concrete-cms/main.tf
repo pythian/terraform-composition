@@ -134,7 +134,7 @@ module "private_dns_zones" {
 
   name           = each.key
   resource_group = module.resource_group.name
-  vnet_id        = [for network_name in lookup(local.inputs.private_dns_links, each.key, []) : module.vnet[network_name].id]
+  vnet_id        = { for network_name in lookup(local.inputs.private_dns_links, each.key, []) : network_name => module.vnet[network_name].id }
   tags           = merge(local.inputs.tags, local.env.tags)
 }
 

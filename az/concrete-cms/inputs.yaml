@@ -28,7 +28,7 @@ application_gateway_virtual_network: web
 ### App Service
 app_service_client_certificate_mode:
   connexusenergy: "Optional"
-app_service_hostnames:
+app_service_hostnames: {}
   # connexusenergytest.com: # we should redeploy to avoid use of overrides
   #   ssl_state: SniEnabled
   #   thumbprint: FF3D6BC61D8081E0AED5BF6A5A4C2A08C5A3BAB6 #This should be later replaced by a data block after all resources were imported
@@ -96,6 +96,7 @@ key_vault_retention_days: 90
 key_vault_secret_keys:
   - "cnx-cert-web"
 key_vault_secrets:
+  cnx-cert-web: 'replace me by the real certificate on portal'
 key_vault_sku: "standard"
 key_vault_use_precreated_secrets: false
 ### MySQL

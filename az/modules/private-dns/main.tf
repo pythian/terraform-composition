@@ -21,7 +21,7 @@ variable "resource_group" {
 
 variable "vnet_id" {
   description = "Id of the virtual network to link to the private dns zone."
-  type        = list(string)
+  type        = map(string)
 
   default = null
 }
@@ -46,7 +46,7 @@ resource "azurerm_private_dns_zone" "main" {
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "link" {
-  for_each = var.vnet_id == null ? {} : { for i in var.vnet_id : i => i }
+  for_each = var.vnet_id == null ? {} : { for k, v in var.vnet_id : k => v }
 
   name                  = replace("${var.name}-${basename(each.key)}", ".", "-")
   private_dns_zone_name = azurerm_private_dns_zone.main[0].name

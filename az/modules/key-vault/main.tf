@@ -122,6 +122,10 @@ resource "azurerm_key_vault_secret" "secrets" {
   value        = var.secrets[each.key]
 
   depends_on = [azurerm_role_assignment.roles]
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
 
 data "azurerm_key_vault_secret" "secrets" {

@@ -45,7 +45,6 @@ variable "tags" {
 }
 
 resource "azurerm_private_endpoint" "main" {
-  count               = var.subnet_id == "" ? 0 : 1
   location            = var.location
   name                = var.name
   resource_group_name = var.resource_group
@@ -66,20 +65,20 @@ resource "azurerm_private_endpoint" "main" {
 
 output "id" {
   description = "Private endpoint ID"
-  value       = length(azurerm_private_endpoint.main) > 0 ? azurerm_private_endpoint.main[0].id : null
+  value       = azurerm_private_endpoint.main.id
 }
 
 output "location" {
   description = "Private endpoint location"
-  value       = length(azurerm_private_endpoint.main) > 0 ? azurerm_private_endpoint.main[0].location : null
+  value       = azurerm_private_endpoint.main.location
 }
 
 output "name" {
   description = "Private endpoint name"
-  value       = length(azurerm_private_endpoint.main) > 0 ? azurerm_private_endpoint.main[0].name : null
+  value       = azurerm_private_endpoint.main.name
 }
 
 output "resource_group" {
   description = "Private endpoint parent resource group"
-  value       = length(azurerm_private_endpoint.main) > 0 ? azurerm_private_endpoint.main[0].resource_group_name : null
+  value       = azurerm_private_endpoint.main.resource_group_name
 }
