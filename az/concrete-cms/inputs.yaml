@@ -26,13 +26,13 @@ application_gateway_ssl_configuration:
   ssl_certificate_name: website
 application_gateway_virtual_network: web
 ### App Service
+app_domain_suffix: test
 app_service_client_certificate_mode:
   connexusenergy: "Optional"
-app_service_hostnames: {}
-  # connexusenergytest.com: # we should redeploy to avoid use of overrides
-  #   ssl_state: SniEnabled
-  #   thumbprint: FF3D6BC61D8081E0AED5BF6A5A4C2A08C5A3BAB6 #This should be later replaced by a data block after all resources were imported
-  #   webapp_name: connexusenergytest #depends of the app_service_webapps variable
+app_service_hostnames:
+  connexusenergy.com:
+    ssl_state: SniEnabled
+    webapp_name: connexusenergy
 app_service_ip_restriction: {}
 app_service_name: website
 app_service_name_override:
