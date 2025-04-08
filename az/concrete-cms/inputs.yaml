@@ -106,8 +106,10 @@ mysql_name: webdb
 mysql_name_override:
 mysql_databases:
   connex-db-live:
-    charset: utf8mb3
-    collation: utf8mb3_unicode_ci
+    charset: utf8
+    collation: utf8_unicode_ci
+mysql_server_configuration:
+  innodb_buffer_pool_size: 4294967296
 mysql_sku: GP_Standard_D2ads_v5
 mysql_zone: "3"
 ### Private DNS

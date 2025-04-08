@@ -113,6 +113,7 @@ module "mysql" {
   administrator_login   = local.inputs.mysql_administrator_login
   backup_retention_days = local.inputs.mysql_backup_retention_days
   databases             = local.inputs.mysql_databases
+  key_vault_id          = module.key_vault.id
   location              = local.env.location
   name = coalesce(local.inputs.mysql_name_override,
     format("%s-%s-%s-%s",
@@ -122,10 +123,11 @@ module "mysql" {
       local.inputs.mysql_name,
     )
   )
-  resource_group = module.resource_group.name
-  sku            = local.inputs.mysql_sku
-  tags           = merge(local.inputs.tags, local.env.tags)
-  zone           = local.inputs.mysql_zone
+  resource_group       = module.resource_group.name
+  server_configuration = local.inputs.mysql_server_configuration
+  sku                  = local.inputs.mysql_sku
+  tags                 = merge(local.inputs.tags, local.env.tags)
+  zone                 = local.inputs.mysql_zone
 }
 
 module "private_dns_zones" {

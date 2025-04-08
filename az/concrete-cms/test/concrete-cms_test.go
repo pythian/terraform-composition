@@ -176,7 +176,7 @@ func TestAzProject(t *testing.T) {
 	}
 	if webapps, ok := inputs["app_service_webapps"].([]interface{}); ok && webapps != nil {
 		for i := 0; i < len(webapps); i++ {
-			expectedWebAppName := webapps[i].(string)
+			expectedWebAppName := az["prefix"].(string) + "-" + env["environment"].(string) + "-" + env["location_short"].(string) + "-" + inputs["app_service_name"].(string) + "-" + webapps[i].(string)
 			if assert.Contains(t, outputs["app_service_webapp_names"].([]interface{}), expectedWebAppName) {
 				t.Logf("App service webapp name test PASSED. Expected app service webapp name %s, got %s.", expectedWebAppName, outputs["app_service_webapp_names"].([]interface{}))
 			} else {
@@ -273,7 +273,7 @@ func TestAzProject(t *testing.T) {
 	if virtualNetworks, ok := inputs["virtual_networks"].(map[string]interface{}); ok && virtualNetworks != nil {
 		for _, network := range virtualNetworks {
 			if vnet, ok := network.(map[string]interface{}); ok {
-				expectedVnetName := vnet["name"].(string)
+				expectedVnetName := az["prefix"].(string) + "-" + env["environment"].(string) + "-" + env["location_short"].(string) + "-" + vnet["name"].(string)
 				if override, exists := vnet["name_override"]; exists && override != nil {
 					expectedVnetName = override.(string)
 				}

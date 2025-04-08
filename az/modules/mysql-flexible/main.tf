@@ -25,6 +25,13 @@ variable "delegated_subnet_id" {
   default = null
 }
 
+variable "key_vault_id" {
+  description = "Key vault ID to save the secret"
+  type        = string
+
+  default = ""
+}
+
 variable "location" {
   description = "Location of the MySQL Flexible Server to create"
   type        = string
@@ -45,6 +52,13 @@ variable "private_dns_zone_id" {
 variable "resource_group" {
   description = "Name of the resource group in which to create the MySQL Flexible Server"
   type        = string
+}
+
+variable "server_configuration" {
+  description = "map of configurations to be applied"
+  type        = map(string)
+
+  default = {}
 }
 
 variable "sku" {
@@ -70,27 +84,27 @@ variable "zone" {
 
 locals {
   password_length        = 14
-  password_special_chars = "@!"
+  password_special_chars = "*^!"
 }
 
-# resource "random_password" "main" {
-#   length           = local.password_length
-#   override_special = local.password_special_chars
-# }
+resource "random_password" "main" {
+  length           = local.password_length
+  override_special = local.password_special_chars
+}
 
 
 resource "azurerm_mysql_flexible_server" "main" {
-  administrator_login = var.administrator_login
-  # administrator_password = random_password.main.result
-  backup_retention_days = var.backup_retention_days
-  delegated_subnet_id   = var.delegated_subnet_id
-  location              = var.location
-  name                  = var.name
-  private_dns_zone_id   = var.private_dns_zone_id
-  resource_group_name   = var.resource_group
-  sku_name              = var.sku
-  tags                  = var.tags
-  zone                  = var.zone
+  administrator_login    = var.administrator_login
+  administrator_password = random_password.main.result
+  backup_retention_days  = var.backup_retention_days
+  delegated_subnet_id    = var.delegated_subnet_id
+  location               = var.location
+  name                   = var.name
+  private_dns_zone_id    = var.private_dns_zone_id
+  resource_group_name    = var.resource_group
+  sku_name               = var.sku
+  tags                   = var.tags
+  zone                   = var.zone
 }
 
 resource "azurerm_mysql_flexible_database" "main" {
@@ -101,6 +115,23 @@ resource "azurerm_mysql_flexible_database" "main" {
   server_name         = azurerm_mysql_flexible_server.main.name
   charset             = each.value.charset
   collation           = each.value.collation
+}
+
+resource "azurerm_mysql_flexible_server_configuration" "configuration" {
+  for_each = var.server_configuration
+
+  name                = each.key
+  resource_group_name = azurerm_mysql_flexible_server.main.resource_group_name
+  server_name         = azurerm_mysql_flexible_server.main.name
+  value               = each.value
+}
+
+resource "azurerm_key_vault_secret" "password" {
+  count = var.key_vault_id == "" ? 0 : 1
+
+  key_vault_id = var.key_vault_id
+  name         = replace("${azurerm_mysql_flexible_server.main.name}-${azurerm_mysql_flexible_server.main.administrator_login}", "_", "-")
+  value        = random_password.main.result
 }
 
 output "administrator_password" {
