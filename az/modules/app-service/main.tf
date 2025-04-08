@@ -7,8 +7,7 @@ variable "hostnames" {
   description = "Hostnames associated with the App Service"
   type = map(object({
     webapp_name = string
-    ssl_state   = string
-    thumbprint  = string
+    create_cert = bool
   }))
 
   default = {}
@@ -31,6 +30,7 @@ variable "name" {
   type        = string
 }
 
+
 variable "resource_group" {
   description = "Name of the resource group in which to create the App Service Plan"
   type        = string
@@ -48,6 +48,14 @@ variable "sku" {
   type        = string
 
   default = "P0v3"
+}
+
+
+variable "suffix" {
+  description = "Suffix to be added to the domain"
+  type        = string
+
+  default = ""
 }
 
 variable "tags" {
@@ -173,11 +181,38 @@ resource "azurerm_linux_web_app" "main" {
 resource "azurerm_app_service_custom_hostname_binding" "main" {
   for_each = var.hostnames
 
-  hostname            = each.key
+  hostname = format("%s%s.%s",
+    split(".", each.key)[0],
+    var.suffix,
+    split(".", each.key)[1],
+
+  )
   app_service_name    = azurerm_linux_web_app.main[each.value.webapp_name].name
   resource_group_name = azurerm_linux_web_app.main[each.value.webapp_name].resource_group_name
-  ssl_state           = each.value.ssl_state
-  thumbprint          = each.value.thumbprint
+
+  lifecycle {
+    ignore_changes = [ssl_state, thumbprint]
+  }
+}
+
+resource "azurerm_app_service_managed_certificate" "main" {
+  for_each = {
+    for k, v in var.hostnames : k => v
+    if v.create_cert == true
+  }
+
+  custom_hostname_binding_id = azurerm_app_service_custom_hostname_binding.main[each.key].id
+}
+
+resource "azurerm_app_service_certificate_binding" "main" {
+  for_each = {
+    for k, v in var.hostnames : k => v
+    if v.create_cert == true
+  }
+
+  hostname_binding_id = azurerm_app_service_custom_hostname_binding.main[each.key].id
+  certificate_id      = azurerm_app_service_managed_certificate.main[each.key].id
+  ssl_state           = "SniEnabled"
 }
 
 output "id" {

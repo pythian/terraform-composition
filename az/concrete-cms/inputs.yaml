@@ -31,8 +31,8 @@ app_service_client_certificate_mode:
   connexusenergy: "Optional"
 app_service_hostnames:
   connexusenergy.com:
-    ssl_state: SniEnabled
     webapp_name: connexusenergy
+    create_cert: false
 app_service_ip_restriction: {}
 app_service_name: website
 app_service_name_override:
