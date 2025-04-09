@@ -26,6 +26,3 @@ go.sum
 # Local input YAML
 local*yaml
 local*yml
-
-# ignore database configuration files changes
-**/application/config/database.php
