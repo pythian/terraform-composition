@@ -28,4 +28,4 @@ local*yaml
 local*yml
 
 # ignore database configuration files changes
-# cnx-website/public_html/application/config/database.php
+cnx-website/public_html/application/config/database.php
