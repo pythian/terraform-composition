@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<schema version="0.3">
+
+    <table name="btManualPageFilter">
+
+        <field name="bID" type="I">
+            <key/>
+            <unsigned/>
+        </field>
+
+        <field name="title" type="C" size="255"></field>
+
+    </table>
+
+    <table name="btManualPageFilterEntries">
+
+        <field name="id" type="I">
+            <autoincrement/>
+            <unsigned/>
+            <key/>
+        </field>
+
+        <field name="bID" type="I">
+            <default value="0"/>
+            <unsigned/>
+        </field>
+
+        <field name="position" type="I">
+            <default value="0"/>
+            <unsigned/>
+        </field>
+
+        <field name="select_page" type="I">
+            <default value="0"/>
+            <unsigned/>
+        </field>
+        <field name="select_page_ending" type="C" size="255"></field>
+        <field name="select_page_text" type="C" size="255"></field>
+        <field name="select_page_title" type="C" size="255"></field>
+        <field name="select_page_new_window" type="I">
+            <default value="0"/>
+            <unsigned/>
+        </field>
+
+    </table>
+
+</schema>

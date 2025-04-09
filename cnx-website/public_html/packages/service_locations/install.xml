@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<concrete5-cif version="1.0">
+    <pagetemplates>
+        <pagetemplate handle="services_details" name="Service Detail Page" icon="left_sidebar.png" package="service_locations"/>
+    </pagetemplates>
+    <attributetypes>
+        <attributetype handle="fileset" name="Fileset" package="service_locations">
+            <categories>
+                <category handle="collection"/>
+                <category handle="user"/>
+                <category handle="file"/>
+                <category handle="site"/>
+                <category handle="event"/>
+                <category handle="site_type"/>
+                <category handle="express"/>
+            </categories>
+        </attributetype>
+    </attributetypes>
+    <singlepages>
+        <page name="Service Locations" path="/dashboard/service_locations" filename="/dashboard/service_locations.php" pagetype="" description="" package="service_locations"/>
+        <page name="Service List" path="/dashboard/service_locations/service_list" filename="/dashboard/service_locations/service_list.php" pagetype="" description="" package="service_locations"/>
+        <page name="Add Edit" path="/dashboard/service_locations/add_edit" filename="/dashboard/service_locations/add_edit.php" pagetype="" description="" package="service_locations"/>
+        <page name="Service Settings" path="/dashboard/service_locations/service_settings" filename="/dashboard/service_locations/service_settings.php" pagetype="" description="" package="service_locations"/>
+    </singlepages>
+    <attributekeys>
+        <attributekey handle="service_content" name="Service Content" package="service_locations" searchable="1" indexed="1" type="textarea" category="collection">
+            <type mode="rich_text"/>
+        </attributekey>
+        <attributekey handle="service_meta_keywords" name="Service Meta Keywords" package="service_locations" searchable="1" indexed="1" type="textarea" category="collection">
+            <type mode=""/>
+        </attributekey>
+        <attributekey handle="service_meta_description" name="Service Meta Description" package="service_locations" searchable="1" indexed="1" type="textarea" category="collection">
+            <type mode=""/>
+        </attributekey>
+        <attributekey handle="page_variable_value" name="Page Variable Value" package="service_locations" searchable="1" indexed="1" type="textarea" category="collection">
+            <type mode=""/>
+        </attributekey>
+        <attributekey handle="additional_service_content" name="Additional Service Content" package="service_locations" searchable="1" indexed="1" type="textarea" category="collection">
+            <type mode="rich_text"/>
+        </attributekey>
+        <attributekey handle="service_meta_title" name="Service Meta Title" package="service_locations" searchable="1" indexed="1" type="text" category="collection" />
+
+        <attributekey handle="page_title" name="Page Title" package="service_locations" searchable="1" indexed="1" type="text" category="collection" />
+
+        <attributekey handle="service_page_title" name="Service Page Title" package="service_locations" searchable="1" indexed="1" type="text" category="collection" />
+
+        <attributekey handle="service_locations_section" name="Service Locations Section" package="service_locations" searchable="1" indexed="1" type="boolean" category="collection">
+            <type checked="" checkbox-label="Service Locations Section"/>
+        </attributekey>
+        <attributekey handle="fileset_info" name="Fileset Info" package="service_locations" searchable="1" indexed="1" type="fileset" category="collection" />
+    </attributekeys>
+    <pages>
+        <page name="Locations" path="/locations" public-date="2021-08-20 15:36:55" filename="" pagetype="page" template="full" user="admin" description="" package="service_locations" >
+         <attributes>
+                <attributekey handle="service_locations_section">
+                    <value>1</value>
+                </attributekey>
+            </attributes>
+        <area name="Main">
+                <blocks>
+                    <block type="page_list" name="" custom-template="3_column.php">
+                        <data table="btPageList">
+                            <record>
+                                <num><![CDATA[10]]></num>
+                                <orderBy><![CDATA[display_asc]]></orderBy>
+                                <cParentID>{ccm:export:page:/locations}</cParentID>
+                                <cThis><![CDATA[0]]></cThis>
+                                <cThisParent><![CDATA[0]]></cThisParent>
+                                <useButtonForLink><![CDATA[0]]></useButtonForLink>
+                                <buttonLinkText><![CDATA[]]></buttonLinkText>
+                                <pageListTitle><![CDATA[]]></pageListTitle>
+                                <filterByRelated><![CDATA[0]]></filterByRelated>
+                                <filterByCustomTopic><![CDATA[0]]></filterByCustomTopic>
+                                <filterDateOption><![CDATA[all]]></filterDateOption>
+                                <filterDateDays><![CDATA[0]]></filterDateDays>
+                                <filterDateStart><![CDATA[]]></filterDateStart>
+                                <filterDateEnd><![CDATA[]]></filterDateEnd>
+                                <relatedTopicAttributeKeyHandle><![CDATA[]]></relatedTopicAttributeKeyHandle>
+                                <customTopicAttributeKeyHandle><![CDATA[]]></customTopicAttributeKeyHandle>
+                                <customTopicTreeNodeID><![CDATA[0]]></customTopicTreeNodeID>
+                                <includeName><![CDATA[1]]></includeName>
+                                <includeDescription><![CDATA[1]]></includeDescription>
+                                <includeDate><![CDATA[0]]></includeDate>
+                                <includeAllDescendents><![CDATA[0]]></includeAllDescendents>
+                                <paginate><![CDATA[0]]></paginate>
+                                <displayAliases><![CDATA[1]]></displayAliases>
+                                <displaySystemPages><![CDATA[0]]></displaySystemPages>
+                                <ignorePermissions><![CDATA[0]]></ignorePermissions>
+                                <enableExternalFiltering><![CDATA[0]]></enableExternalFiltering>
+                                <ptID><![CDATA[0]]></ptID>
+                                <pfID/>
+                                <truncateSummaries><![CDATA[1]]></truncateSummaries>
+                                <displayFeaturedOnly><![CDATA[0]]></displayFeaturedOnly>
+                                <noResultsMessage><![CDATA[]]></noResultsMessage>
+                                <displayThumbnail><![CDATA[0]]></displayThumbnail>
+                                <truncateChars><![CDATA[128]]></truncateChars>
+                                <titleFormat><![CDATA[h5]]></titleFormat>
+                            </record>
+                        </data>
+                    </block>
+                </blocks>
+            </area>
+        </page>
+    </pages>
+</concrete5-cif>

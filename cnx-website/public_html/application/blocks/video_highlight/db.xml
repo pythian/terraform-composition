@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<schema version="0.3">
+
+    <table name="btVideoHighlight">
+
+        <field name="bID" type="I">
+            <key/>
+            <unsigned/>
+        </field>
+
+        <field name="image_left" type="I">
+            <default value="0"/>
+            <unsigned/>
+        </field>
+        <field name="image_left_alt" type="C" size="255"></field>
+        <field name="image_left_data" type="X2"></field>
+
+        <field name="image_right" type="I">
+            <default value="0"/>
+            <unsigned/>
+        </field>
+        <field name="image_right_alt" type="C" size="255"></field>
+        <field name="image_right_data" type="X2"></field>
+
+        <field name="title" type="C" size="255"></field>
+
+        <field name="content" type="X2"></field>
+
+        <field name="link" type="X2"></field>
+
+        <field name="video_url" type="C" size="255"></field>
+
+    </table>
+
+</schema>

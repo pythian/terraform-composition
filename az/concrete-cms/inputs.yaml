@@ -110,6 +110,7 @@ mysql_databases:
     collation: utf8_unicode_ci
 mysql_server_configuration:
   innodb_buffer_pool_size: 4294967296
+  require_secure_transport: "OFF"
 mysql_sku: GP_Standard_D2ads_v5
 mysql_zone: "3"
 ### Private DNS

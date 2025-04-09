@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<concrete5-cif version="1.0">
+    <blocktypes>
+
+    </blocktypes>
+    <blocktypesets>
+ <blocktypeset handle="prime" name="Prime:Prime Advertising" package="prime">
+
+       </blocktypeset>
+    </blocktypesets>
+</concrete5-cif>

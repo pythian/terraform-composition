@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="460px" height="416px" viewBox="0 0 460 416" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <path d="M0 0L460 0L460 416L0 416L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="x-twitter-yellow">
+    <path d="M0 0L460 0L460 416L0 416L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+    <g clip-path="url(#mask_1)">
+      <path d="M362.2 0L432.8 0L278.6 176.2L460 416L318 416L206.7 270.6L79.5 416L8.80005 416L173.7 227.5L-0.199951 0L145.4 0L245.9 132.9L362.2 0L362.2 0ZM337.4 373.8L376.5 373.8L124.1 40L82.1001 40L337.4 373.8L337.4 373.8Z" id="Shape" fill="#FDC82F" fill-rule="evenodd" stroke="none" />
+    </g>
+  </g>
+</svg>
