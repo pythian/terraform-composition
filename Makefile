@@ -35,6 +35,8 @@ help:
 	@echo '    az_plan_build      Show deployment plan'
 	@echo '    az_test_build      Run tests'
 	@echo ''
+	@echo '    website_deploy     Deploy website over FTPS'
+	@echo ''
 
 #### RUN ENTIRE PROJECT ####
 .PHONY: az_project_deploy
@@ -125,3 +127,13 @@ az_install:
 	@chmod +x ./scripts/install_terraform.sh
 	@sudo ./scripts/install_terraform.sh -v ./az/versions.yaml
 	@sudo ./scripts/install_go.sh -v ./az/versions.yaml
+
+#### WEBSITE DEPLOY ####
+.PHONY: website_deploy
+website_deploy:
+	@echo 'zip the package'
+	@cd cnx-website/public_html && zip -r ../cnx-website.zip .
+	@echo 'use website deployment via azure cli'
+	@az webapp deploy --resource-group cnx-dev-cus-website --name cnx-dev-cus-website-connexusenergy --src-path cnx-website/cnx-website.zip
+
+# @az webapp config appsettings set --resource-group cnx-dev-cus-website --name cnx-dev-cus-website-connexusenergy --settings WEBSITE_RUN_FROM_PACKAGE="1"
