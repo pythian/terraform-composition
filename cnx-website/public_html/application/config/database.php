@@ -5,7 +5,7 @@ return [
     'connections' => [
         'concrete' => [
             'driver' => 'concrete_pdo_mysql',
-            'server' => 'localhost',
+            'server' => 'cnx-dev-cus-webdb.mysql.database.azure.com',
             'database' => 'connex-db-live',
             'username' => 'connexusenergy_user_2024',
             'password' => 'REPLACEME',
