@@ -85,6 +85,10 @@ app_service_virtual_network_subnet:
     subnet: AppServiceSubnet
 app_service_webapps:
 - connexusenergy
+### container registry
+container_registry_name: registry
+container_registry_name_override:
+container_registry_sku: Basic
 ### key Vault
 key_vault_name: web-01
 key_vault_name_override:

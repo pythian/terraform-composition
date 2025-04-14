@@ -132,7 +132,7 @@ az_install:
 .PHONY: website_deploy
 website_deploy:
 	@echo 'zip the package'
-	@cd cnx-website/public_html && zip -r ../cnx-website.zip .
+	@cd cnx-website/public-html && zip -r ../cnx-website.zip .
 	@echo 'use website deployment via azure cli'
 	@az webapp deploy --resource-group cnx-dev-cus-website --name cnx-dev-cus-website-connexusenergy --src-path cnx-website/cnx-website.zip
 

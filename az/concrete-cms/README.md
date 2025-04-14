@@ -18,6 +18,7 @@ No providers.
 |------|--------|---------|
 | <a name="module_app_service"></a> [app\_service](#module\_app\_service) | ../modules/app-service | n/a |
 | <a name="module_app_service_private-endpoints"></a> [app\_service\_private-endpoints](#module\_app\_service\_private-endpoints) | ../modules/private-endpoint | n/a |
+| <a name="module_container_registry"></a> [container\_registry](#module\_container\_registry) | ../modules/container-registry | n/a |
 | <a name="module_key_vault"></a> [key\_vault](#module\_key\_vault) | ../modules/key-vault | n/a |
 | <a name="module_key_vault_private-endpoints"></a> [key\_vault\_private-endpoints](#module\_key\_vault\_private-endpoints) | ../modules/private-endpoint | n/a |
 | <a name="module_key_vault_resource_group"></a> [key\_vault\_resource\_group](#module\_key\_vault\_resource\_group) | ../modules/resource-group | n/a |

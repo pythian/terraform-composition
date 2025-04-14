@@ -11,6 +11,7 @@ provider "azurerm" {
   features {}
 }
 
+
 # module "application_gateway" {
 #   source = "../modules/app-gateway"
 
@@ -67,6 +68,23 @@ module "app_service" {
   tags                      = merge(local.inputs.tags, local.env.tags)
   virtual_network_subnet_id = { for k, v in local.inputs.app_service_virtual_network_subnet : k => module.vnet[v.virtual_network].subnet_ids[v.subnet] }
   webapps                   = local.inputs.app_service_webapps
+}
+
+module "container_registry" {
+  source = "../modules/container-registry"
+
+  location = local.env.location
+  name = coalesce(local.inputs.container_registry_name_override,
+    format("%s%s%s%s",
+      local.az.prefix,
+      local.env.environment,
+      local.env.location_short,
+      local.inputs.container_registry_name,
+    )
+  )
+  resource_group = module.resource_group.name
+  sku            = local.inputs.container_registry_sku
+  tags           = merge(local.inputs.tags, local.env.tags)
 }
 
 module "key_vault" {
