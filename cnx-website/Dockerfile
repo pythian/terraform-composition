@@ -1,4 +1,14 @@
-FROM httpd:2.4
-RUN echo "LoadModule rewrite_module modules/mod_rewrite.so" >> /usr/local/apache2/conf/httpd.conf
-RUN echo "LoadModule headers_module modules/mod_headers.so" >> /usr/local/apache2/conf/httpd.conf
-COPY ./public-html/ /usr/local/apache2/htdocs/
+FROM php:8.2-apache
+
+RUN apt-get update \
+    && apt-get install -y git curl libmcrypt-dev default-mysql-client \
+    && docker-php-ext-install mysqli
+
+
+RUN a2enmod rewrite
+RUN a2enmod headers
+RUN a2enmod ssl
+
+COPY ./public-html/ /var/www/html/
+
+RUN service apache2 restart

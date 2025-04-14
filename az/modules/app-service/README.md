@@ -23,12 +23,14 @@ No modules.
 | [azurerm_app_service_custom_hostname_binding.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/app_service_custom_hostname_binding) | resource |
 | [azurerm_app_service_managed_certificate.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/app_service_managed_certificate) | resource |
 | [azurerm_linux_web_app.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_web_app) | resource |
+| [azurerm_role_assignment.push_pull](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_service_plan.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/service_plan) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_acr_id"></a> [acr\_id](#input\_acr\_id) | Azure Container Registry ID | `string` | `""` | no |
 | <a name="input_client_certificate_mode"></a> [client\_certificate\_mode](#input\_client\_certificate\_mode) | Client certificate mode for web app | `map(string)` | n/a | yes |
 | <a name="input_hostnames"></a> [hostnames](#input\_hostnames) | Hostnames associated with the App Service | <pre>map(object({<br/>    webapp_name = string<br/>    create_cert = bool<br/>  }))</pre> | `{}` | no |
 | <a name="input_ip_restriction"></a> [ip\_restriction](#input\_ip\_restriction) | IP restriction for applications | `map(map(any))` | `{}` | no |

@@ -129,11 +129,22 @@ az_install:
 	@sudo ./scripts/install_go.sh -v ./az/versions.yaml
 
 #### WEBSITE DEPLOY ####
-.PHONY: website_deploy
-website_deploy:
+.PHONY: website_deploy_zip
+website_deploy_zip:
 	@echo 'zip the package'
 	@cd cnx-website/public-html && zip -r ../cnx-website.zip .
 	@echo 'use website deployment via azure cli'
 	@az webapp deploy --resource-group cnx-dev-cus-website --name cnx-dev-cus-website-connexusenergy --src-path cnx-website/cnx-website.zip
 
 # @az webapp config appsettings set --resource-group cnx-dev-cus-website --name cnx-dev-cus-website-connexusenergy --settings WEBSITE_RUN_FROM_PACKAGE="1"
+
+.PHONY: website_deploy_docker
+website_deploy_docker:
+	@echo 'docker build'
+	tag=$(shell date +%Y%m%d%H%M)
+	@cd cnx-website && sudo docker build -t cnx-website:$tag .
+	@echo 'docker login'
+	@sudo az acr login --name cnxdevcusregistry
+	@echo 'docker push'
+	@sudo docker tag cnx-website:$tag cnxdevcusregistry.azurecr.io/cnx-website:$tag
+	@sudo docker push cnxdevcusregistry.azurecr.io/cnx-website:$tag

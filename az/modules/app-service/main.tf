@@ -1,3 +1,10 @@
+variable "acr_id" {
+  description = "Azure Container Registry ID"
+  type        = string
+
+  default = ""
+}
+
 variable "client_certificate_mode" {
   description = "Client certificate mode for web app"
   type        = map(string)
@@ -101,14 +108,19 @@ resource "azurerm_linux_web_app" "main" {
   tags                      = var.tags
   virtual_network_subnet_id = lookup(var.virtual_network_subnet_id, each.key, null)
 
+  identity {
+    type = "SystemAssigned"
+  }
+
   dynamic "site_config" {
     for_each = tomap({ "config" = lookup(var.site_config, each.key, {}) })
 
     content {
-      always_on             = lookup(site_config.value, "always_on", true)
-      api_definition_url    = lookup(site_config.value, "api_definition_url", null)
-      api_management_api_id = lookup(site_config.value, "api_management_api_id", null)
-      app_command_line      = lookup(site_config.value, "app_command_line", null)
+      always_on                               = lookup(site_config.value, "always_on", true)
+      api_definition_url                      = lookup(site_config.value, "api_definition_url", null)
+      api_management_api_id                   = lookup(site_config.value, "api_management_api_id", null)
+      app_command_line                        = lookup(site_config.value, "app_command_line", null)
+      container_registry_use_managed_identity = lookup(site_config.value, "container_registry_use_managed_identity", true)
       application_stack {
         docker_image_name        = lookup(site_config.value, "docker_image_name", null)
         docker_registry_url      = lookup(site_config.value, "docker_registry_url", null)
@@ -213,6 +225,14 @@ resource "azurerm_app_service_certificate_binding" "main" {
   hostname_binding_id = azurerm_app_service_custom_hostname_binding.main[each.key].id
   certificate_id      = azurerm_app_service_managed_certificate.main[each.key].id
   ssl_state           = "SniEnabled"
+}
+
+resource "azurerm_role_assignment" "push_pull" {
+  for_each = var.acr_id != "" ? { for k, w in azurerm_linux_web_app.main : k => w } : {}
+
+  scope                = var.acr_id
+  role_definition_name = "AcrPull"
+  principal_id         = each.value.identity[0].principal_id
 }
 
 output "id" {

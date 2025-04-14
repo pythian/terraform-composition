@@ -32,6 +32,8 @@ variable "tags" {
   default = {}
 }
 
+data "azurerm_client_config" "current" {}
+
 resource "azurerm_container_registry" "main" {
   location                      = var.location
   name                          = var.name
@@ -39,6 +41,12 @@ resource "azurerm_container_registry" "main" {
   resource_group_name           = var.resource_group
   sku                           = var.sku
   tags                          = var.tags
+}
+
+resource "azurerm_role_assignment" "push_pull" {
+  principal_id         = data.azurerm_client_config.current.object_id
+  role_definition_name = "AcrPull"
+  scope                = azurerm_container_registry.main.id
 }
 
 output "id" {

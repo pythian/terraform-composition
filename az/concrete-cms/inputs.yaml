@@ -55,9 +55,9 @@ app_service_site_config:
     cors_allowed_origins:
     cors_support_credentials: "false"
     default_documents:
-    docker_image_name:
+    docker_image_name: cnx-website:202504141619
     docker_registry_password:
-    docker_registry_url:
+    docker_registry_url: https://cnxdevcusregistry.azurecr.io
     docker_registry_username:
     dotnet_version:
     ftps_state: "FtpsOnly"
@@ -71,7 +71,7 @@ app_service_site_config:
     java_version:
     load_balancing_mode: "LeastRequests"
     node_version:
-    php_version: "8.3"
+    php_version:
     python_version:
     ruby_version:
     use_32_bit_worker: "true"

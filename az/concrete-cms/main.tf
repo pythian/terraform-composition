@@ -50,6 +50,7 @@ provider "azurerm" {
 module "app_service" {
   source = "../modules/app-service"
 
+  acr_id                  = module.container_registry.id
   client_certificate_mode = local.inputs.app_service_client_certificate_mode
   hostnames               = local.inputs.app_service_hostnames
   location                = local.env.location
@@ -313,6 +314,16 @@ output "app_service_plan_name" {
 output "app_service_webapp_ids" {
   description = "App service plan deployed web applications ids"
   value       = module.app_service.webapp_ids
+}
+
+output "container_registry_id" {
+  description = "Container registry id"
+  value       = module.container_registry.id
+}
+
+output "container_registry_name" {
+  description = "Container registry name"
+  value       = module.container_registry.name
 }
 
 output "app_service_webapp_names" {
