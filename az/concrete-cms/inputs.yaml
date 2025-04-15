@@ -41,7 +41,7 @@ app_service_site_config:
     always_on: "true"
     api_definition_url:
     api_management_api_id:
-    app_command_line: "cp /home/site/wwwroot/default /etc/nginx/sites-available/default && service nginx reload"
+    app_command_line:
     auto_heal_action_type:
     auto_heal_minimum_process_execution_time:
     auto_heal_trigger_requests_count:
@@ -55,16 +55,20 @@ app_service_site_config:
     cors_allowed_origins:
     cors_support_credentials: "false"
     default_documents:
-    docker_image_name: cnx-website:202504141619
+    detailed_error_messages: true
+    docker_image_name: cnx-website:20250415
     docker_registry_password:
     docker_registry_url: https://cnxdevcusregistry.azurecr.io
     docker_registry_username:
     dotnet_version:
+    failed_request_tracing: true
     ftps_state: "FtpsOnly"
     go_version:
     health_check_eviction_time_in_min:
     health_check_path:
     http2_enabled: "false"
+    http_logging_retention_in_days: 7
+    http_logging_retention_in_mb: 35
     ip_restriction_default_action: "Allow"
     java_server:
     java_server_version:

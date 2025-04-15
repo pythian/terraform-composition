@@ -141,10 +141,9 @@ website_deploy_zip:
 .PHONY: website_deploy_docker
 website_deploy_docker:
 	@echo 'docker build'
-	tag=$(shell date +%Y%m%d%H%M)
-	@cd cnx-website && sudo docker build -t cnx-website:$tag .
+	@tag=$(shell date +%Y%m%d) && cd cnx-website && sudo docker build -t cnx-website:$$tag .
 	@echo 'docker login'
 	@sudo az acr login --name cnxdevcusregistry
 	@echo 'docker push'
-	@sudo docker tag cnx-website:$tag cnxdevcusregistry.azurecr.io/cnx-website:$tag
-	@sudo docker push cnxdevcusregistry.azurecr.io/cnx-website:$tag
+	@tag=$(shell date +%Y%m%d) && sudo docker tag cnx-website:$$tag cnxdevcusregistry.azurecr.io/cnx-website:$$tag
+	@tag=$(shell date +%Y%m%d) && sudo docker push cnxdevcusregistry.azurecr.io/cnx-website:$$tag

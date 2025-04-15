@@ -13,11 +13,11 @@ Header set Cross-Origin-Resource-Policy "cross-origin"
 </IfModule>
 
 RewriteEngine On
-RewriteCond %{HTTP_HOST} !^www\.
-RewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]
+# RewriteCond %{HTTP_HOST} !^www\.
+# RewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]
 
-RewriteCond %{SERVER_PORT} 80
-RewriteRule ^(.*)$ https://www.connexusenergy.com/$1 [R,L]
+# RewriteCond %{SERVER_PORT} 80
+# RewriteRule ^(.*)$ https://www.connexusenergy.com/$1 [R,L]
 
 # -- concrete5 urls start --
 <IfModule mod_rewrite.c>

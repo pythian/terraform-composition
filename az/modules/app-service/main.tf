@@ -170,6 +170,8 @@ resource "azurerm_linux_web_app" "main" {
       health_check_path                 = lookup(site_config.value, "health_check_path", null)
       health_check_eviction_time_in_min = lookup(site_config.value, "health_check_eviction_time_in_min", null)
       http2_enabled                     = lookup(site_config.value, "http2_enabled", false)
+
+
       dynamic "ip_restriction" {
         for_each = lookup(var.ip_restriction, each.key, {})
         content {
@@ -186,6 +188,17 @@ resource "azurerm_linux_web_app" "main" {
       vnet_route_all_enabled        = lookup(site_config.value, "vnet_route_all_enabled", false)
       websockets_enabled            = lookup(site_config.value, "websockets_enabled", false)
       worker_count                  = lookup(site_config.value, "worker_count", 1)
+    }
+  }
+
+  logs {
+    detailed_error_messages = lookup(lookup(var.site_config, each.key, {}), "detailed_error_messages", false)
+    failed_request_tracing  = lookup(lookup(var.site_config, each.key, {}), "failed_request_tracing", false)
+    http_logs {
+      file_system {
+        retention_in_days = lookup(lookup(var.site_config, each.key, {}), "http_logging_retention_in_days", 7)
+        retention_in_mb   = lookup(lookup(var.site_config, each.key, {}), "http_logging_retention_in_mb", 35)
+      }
     }
   }
 }
