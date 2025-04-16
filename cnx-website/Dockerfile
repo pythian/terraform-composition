@@ -10,7 +10,6 @@ RUN a2enmod headers
 
 COPY ./public-html/ /var/www/html/
 RUN chmod -R 775 /var/www/html && chown -R www-data:www-data /var/www/html
-RUN chmod -R 775 /var/www/html/*
 RUN mkdir -p /var/php/sessions/ea-php82 && chown -R www-data:www-data /var/php/sessions/ea-php82 && chmod -R 775 /var/php/sessions/ea-php82
 
 

@@ -96,7 +96,8 @@ variable "webapps" {
 }
 
 locals {
-  os_type = "Linux"
+  os_type    = "Linux"
+  https_only = true
 }
 
 data "azurerm_key_vault_certificate" "main" {
@@ -123,6 +124,7 @@ resource "azurerm_linux_web_app" "main" {
   for_each = var.webapps
 
   client_certificate_mode   = lookup(var.client_certificate_mode, each.key, null)
+  https_only                = local.https_only
   name                      = "${var.name}-${each.key}"
   resource_group_name       = azurerm_service_plan.main.resource_group_name
   location                  = azurerm_service_plan.main.location
