@@ -62,10 +62,10 @@ module "app_service" {
       local.inputs.app_service_name,
     )
   )
+  prefix                    = local.env.environment != "prod" ? local.env.environment : ""
   resource_group            = module.resource_group.name
   site_config               = local.inputs.app_service_site_config
   sku                       = local.inputs.app_service_sku
-  suffix                    = local.env.environment == "prd" ? "" : local.inputs.app_domain_suffix
   tags                      = merge(local.inputs.tags, local.env.tags)
   virtual_network_subnet_id = { for k, v in local.inputs.app_service_virtual_network_subnet : k => module.vnet[v.virtual_network].subnet_ids[v.subnet] }
   webapps                   = local.inputs.app_service_webapps

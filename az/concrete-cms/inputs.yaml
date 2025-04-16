@@ -26,7 +26,6 @@ application_gateway_ssl_configuration:
   ssl_certificate_name: website
 application_gateway_virtual_network: web
 ### App Service
-app_domain_suffix: test
 app_service_client_certificate_mode:
   connexusenergy: "Optional"
 app_service_hostnames:
@@ -56,7 +55,7 @@ app_service_site_config:
     cors_support_credentials: "false"
     default_documents:
     detailed_error_messages: true
-    docker_image_name: cnx-website:20250415
+    docker_image_name: cnx-website:20250416
     docker_registry_password:
     docker_registry_url: https://cnxdevcusregistry.azurecr.io
     docker_registry_username:

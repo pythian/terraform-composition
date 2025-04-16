@@ -17,8 +17,8 @@ return [
             'name' => 'Connexus Energy',
             'timezone' => 'America/Chicago',
             'seo' => [
-                'canonical_url' => 'http://www.connexusenergy.com/',
-                'canonical_url_alternative' => 'https://www.connexusenergy.com/',
+                'canonical_url' => 'https://dev.connexusenergy.com/',
+                'canonical_url_alternative' => 'https://cnx-dev-cus-website-connexusenergy.azurewebsites.net/',
                 'canonical_tag' => [
                     'enabled' => true,
                 ],

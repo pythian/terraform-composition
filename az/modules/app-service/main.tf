@@ -37,6 +37,12 @@ variable "name" {
   type        = string
 }
 
+variable "prefix" {
+  description = "Prefix to be added to the domain"
+  type        = string
+
+  default = ""
+}
 
 variable "resource_group" {
   description = "Name of the resource group in which to create the App Service Plan"
@@ -55,14 +61,6 @@ variable "sku" {
   type        = string
 
   default = "P0v3"
-}
-
-
-variable "suffix" {
-  description = "Suffix to be added to the domain"
-  type        = string
-
-  default = ""
 }
 
 variable "tags" {
@@ -206,12 +204,10 @@ resource "azurerm_linux_web_app" "main" {
 resource "azurerm_app_service_custom_hostname_binding" "main" {
   for_each = var.hostnames
 
-  hostname = format("%s%s.%s",
-    split(".", each.key)[0],
-    var.suffix,
-    split(".", each.key)[1],
-
-  )
+  hostname = var.prefix != "" ? format("%s.%s",
+    var.prefix,
+    each.key,
+  ) : each.key
   app_service_name    = azurerm_linux_web_app.main[each.value.webapp_name].name
   resource_group_name = azurerm_linux_web_app.main[each.value.webapp_name].resource_group_name
 

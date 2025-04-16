@@ -36,10 +36,10 @@ No modules.
 | <a name="input_ip_restriction"></a> [ip\_restriction](#input\_ip\_restriction) | IP restriction for applications | `map(map(any))` | `{}` | no |
 | <a name="input_location"></a> [location](#input\_location) | Location of the App Service Plan to create | `string` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | Name of the App Service Plan to create | `string` | n/a | yes |
+| <a name="input_prefix"></a> [prefix](#input\_prefix) | Prefix to be added to the domain | `string` | `""` | no |
 | <a name="input_resource_group"></a> [resource\_group](#input\_resource\_group) | Name of the resource group in which to create the App Service Plan | `string` | n/a | yes |
 | <a name="input_site_config"></a> [site\_config](#input\_site\_config) | Site configurations for each web app | `map(map(any))` | `{}` | no |
 | <a name="input_sku"></a> [sku](#input\_sku) | SKU name of the App Service Plan to create | `string` | `"P0v3"` | no |
-| <a name="input_suffix"></a> [suffix](#input\_suffix) | Suffix to be added to the domain | `string` | `""` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to be applied to the resources | `map(string)` | `{}` | no |
 | <a name="input_virtual_network_subnet_id"></a> [virtual\_network\_subnet\_id](#input\_virtual\_network\_subnet\_id) | Virtual Network to attach the website into | `map(string)` | `{}` | no |
 | <a name="input_webapps"></a> [webapps](#input\_webapps) | Web Applications to be deployed in this App Service Plan | `set(string)` | n/a | yes |
