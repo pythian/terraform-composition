@@ -31,7 +31,8 @@ app_service_client_certificate_mode:
 app_service_hostnames:
   connexusenergy.com:
     webapp_name: connexusenergy
-    create_cert: false
+app_service_key_vault_certificates:
+  connexusenergy.com: Wildcard-Connexusenergy-Com
 app_service_ip_restriction: {}
 app_service_name: website
 app_service_name_override:
@@ -98,6 +99,7 @@ key_vault_name_override:
 key_vault_public_network_access_enabled: true
 key_vault_roles:
   - "Key Vault Secrets Officer"
+  - "Key Vault Certificates Officer"
 key_vault_purge_protection: true
 key_vault_retention_days: 90
 key_vault_secret_keys:

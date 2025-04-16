@@ -53,6 +53,8 @@ module "app_service" {
   acr_id                  = module.container_registry.id
   client_certificate_mode = local.inputs.app_service_client_certificate_mode
   hostnames               = local.inputs.app_service_hostnames
+  key_vault_id            = module.key_vault.id
+  key_vault_certificate   = local.inputs.app_service_key_vault_certificates
   location                = local.env.location
   name = coalesce(local.inputs.app_service_name_override,
     format("%s-%s-%s-%s",

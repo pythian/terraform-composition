@@ -14,7 +14,6 @@ variable "hostnames" {
   description = "Hostnames associated with the App Service"
   type = map(object({
     webapp_name = string
-    create_cert = bool
   }))
 
   default = {}
@@ -23,6 +22,20 @@ variable "hostnames" {
 variable "ip_restriction" {
   description = "IP restriction for applications"
   type        = map(map(any))
+
+  default = {}
+}
+
+variable "key_vault_id" {
+  description = "Key Vault ID for the web app"
+  type        = string
+
+  default = ""
+}
+
+variable "key_vault_certificate" {
+  description = "Key Vault certificate name for the web app"
+  type        = map(string)
 
   default = {}
 }
@@ -84,6 +97,17 @@ variable "webapps" {
 
 locals {
   os_type = "Linux"
+}
+
+data "azurerm_key_vault_certificate" "main" {
+  for_each = var.key_vault_id != "" ? { for k, v in var.hostnames : k => v } : {}
+
+  name         = var.key_vault_certificate[each.key]
+  key_vault_id = var.key_vault_id
+
+  depends_on = [
+    azurerm_role_assignment.kv
+  ]
 }
 
 resource "azurerm_service_plan" "main" {
@@ -210,30 +234,22 @@ resource "azurerm_app_service_custom_hostname_binding" "main" {
   ) : each.key
   app_service_name    = azurerm_linux_web_app.main[each.value.webapp_name].name
   resource_group_name = azurerm_linux_web_app.main[each.value.webapp_name].resource_group_name
-
-  lifecycle {
-    ignore_changes = [ssl_state, thumbprint]
-  }
+  thumbprint          = var.key_vault_id != "" ? azurerm_app_service_certificate.kv[each.key].thumbprint : null
+  ssl_state           = var.key_vault_id != "" ? "SniEnabled" : "Disabled"
 }
 
-resource "azurerm_app_service_managed_certificate" "main" {
+
+resource "azurerm_app_service_certificate" "kv" {
   for_each = {
     for k, v in var.hostnames : k => v
-    if v.create_cert == true
+    if var.key_vault_id != ""
   }
 
-  custom_hostname_binding_id = azurerm_app_service_custom_hostname_binding.main[each.key].id
-}
-
-resource "azurerm_app_service_certificate_binding" "main" {
-  for_each = {
-    for k, v in var.hostnames : k => v
-    if v.create_cert == true
-  }
-
-  hostname_binding_id = azurerm_app_service_custom_hostname_binding.main[each.key].id
-  certificate_id      = azurerm_app_service_managed_certificate.main[each.key].id
-  ssl_state           = "SniEnabled"
+  name                = each.key
+  resource_group_name = var.resource_group
+  location            = var.location
+  key_vault_secret_id = data.azurerm_key_vault_certificate.main[each.key].versionless_id
+  tags                = var.tags
 }
 
 resource "azurerm_role_assignment" "push_pull" {
@@ -241,6 +257,14 @@ resource "azurerm_role_assignment" "push_pull" {
 
   scope                = var.acr_id
   role_definition_name = "AcrPull"
+  principal_id         = each.value.identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "kv" {
+  for_each = var.key_vault_id != "" ? { for k, w in azurerm_linux_web_app.main : k => w } : {}
+
+  scope                = var.key_vault_id
+  role_definition_name = "Key Vault Certificate User"
   principal_id         = each.value.identity[0].principal_id
 }
 

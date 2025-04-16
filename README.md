@@ -4,6 +4,15 @@
 the file `cnx-website/public_html/application/config/database.php` does not contain the database password checked out in git and it is ignored for changes
 retrieve the database user password on key vault or reset it on the mysql server and replace the value `REPLACEME` by it before run the website deployment
 
+# app service identity access to the key vaults
+
+The app service identity must have access to the key vaults to be able to retrieve the secrets and certificates during the instalation. As we are not using terraform azureAD resources to avoid grant too much permissions to the app service identity, we need to assign the access policies manually.
+
+ ```bash
+ az role assignment create --role "Key Vault Certificate User" --assignee "abfa0a7c-a6b6-4736-8310-5855508787cd" --scope "/subscriptions/9712bfef-07af-4a61-804e-b2fa08462f70/re
+sourcegroups/cnx-dev-cus-keyvault/providers/Microsoft.KeyVault/vaults/cnx-dev-cus-web-01"
+```
+
 # terraform-docs
 
 [![Build Status](https://github.com/terraform-docs/terraform-docs/workflows/ci/badge.svg)](https://github.com/terraform-docs/terraform-docs/actions) [![GoDoc](https://pkg.go.dev/badge/github.com/terraform-docs/terraform-docs)](https://pkg.go.dev/github.com/terraform-docs/terraform-docs) [![Go Report Card](https://goreportcard.com/badge/github.com/terraform-docs/terraform-docs)](https://goreportcard.com/report/github.com/terraform-docs/terraform-docs) [![Codecov Report](https://codecov.io/gh/terraform-docs/terraform-docs/branch/master/graph/badge.svg)](https://codecov.io/gh/terraform-docs/terraform-docs) [![License](https://img.shields.io/github/license/terraform-docs/terraform-docs)](https://github.com/terraform-docs/terraform-docs/blob/master/LICENSE) [![Latest release](https://img.shields.io/github/v/release/terraform-docs/terraform-docs)](https://github.com/terraform-docs/terraform-docs/releases)

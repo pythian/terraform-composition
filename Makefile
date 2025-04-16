@@ -81,6 +81,13 @@ az_configure_dev:
 	@cd az && ./scripts/configure.sh -a 9712bfef-07af-4a61-804e-b2fa08462f70 -e dev -o connexus -p centralus -ps cus -t devops -z concrete-cms
 
 
+#### PROD ENVIRONMENT ####
+
+.PHONY: az_configure_prd
+az_configure_prd:
+	@cd az && ./scripts/configure.sh -a 9712bfef-07af-4a61-804e-b2fa08462f70 -e prd -o connexus -p centralus -ps cus -t devops -z concrete-cms
+
+
 #### DEPLOYMENTS ALL APPLICATION ENVIRONMENTS ####
 
 .PHONY: az_clean
