@@ -13,7 +13,7 @@ import { SharedArray } from 'k6/data';
 import { scenario } from 'k6/execution';
 import papaparse from 'https://jslib.k6.io/papaparse/5.1.1/index.js';
 
-const baseURL = 'connexusenergytest.com'
+const baseURL = 'dev.connexusenergy.com'
 const getErrorRate = new Rate('get_errors');
 const getTrend = new Trend('get_response_time');
 

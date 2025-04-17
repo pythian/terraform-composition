@@ -37,7 +37,7 @@ return [
             'x_frame_options' => 'SAMEORIGIN',
         ],
         'trusted_proxies' => [
-            'headers' => 0b001000,
+            'headers' => 0,
             'ips' => [
                 '173.245.48.0/20',
                 '103.21.244.0/22',

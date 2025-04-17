@@ -1,12 +1,6 @@
-BUCKET="pythian-k6-scenario-data"
-
 install-docker-compose:
 	@echo 'Installing docker-compose'
 	chmod +x scripts/install_docker_compose.sh && ./scripts/install_docker_compose.sh
-
-retrieve-data-csv:
-	@echo 'Download data from storage account into local data.csv'
-	gsutil cp ${BUCKET}/origin-destination-list-v4.csv ./scenarios/data.csv
 
 base-load-test:
 	@echo 'Running Base Load Test Scenario'
