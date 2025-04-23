@@ -197,11 +197,8 @@ storage_account_shares:
   assets:
     name: assets
     enabled_protocol: "NFS"
-    quota: 20
-    acl:
-      1:
-        id: "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI"
-        permissions: "rwdl"
+    quota: 100
+    acl: {}
 storage_account_tier: "Premium"
 ### Resource Groups
 key_vault_resource_group_name: keyvault
