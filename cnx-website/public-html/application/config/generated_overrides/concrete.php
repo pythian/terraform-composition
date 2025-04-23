@@ -58,7 +58,7 @@ return [
         ],
     ],
     'seo' => [
-        'redirect_to_canonical_url' => true,
+        'redirect_to_canonical_url' => false,
         'url_rewriting' => true,
     ],
     'cache' => [

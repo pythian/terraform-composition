@@ -58,7 +58,7 @@ app_service_site_config:
     cors_support_credentials: "false"
     default_documents:
     detailed_error_messages: true
-    docker_image_name: cnx-website:20250417
+    docker_image_name: cnx-website:20250423
     docker_registry_password:
     docker_registry_url: https://cnxdevcusregistry.azurecr.io
     docker_registry_username:

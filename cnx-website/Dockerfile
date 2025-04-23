@@ -1,9 +1,10 @@
 FROM php:8.2-apache
 
 RUN apt-get update \
-    && apt-get install -y git gzip curl libmcrypt-dev default-mysql-client \
+    && apt-get install -y git gzip curl libmcrypt-dev default-mysql-client samba smbclient libsmbclient-dev \
     && docker-php-ext-install mysqli pdo pdo_mysql opcache \
-    && docker-php-ext-enable pdo_mysql opcache
+    && pecl install smbclient \
+    && docker-php-ext-enable pdo_mysql opcache smbclient
 
 RUN a2enmod rewrite
 RUN a2enmod headers
