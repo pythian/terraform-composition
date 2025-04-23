@@ -6,7 +6,7 @@
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.5 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.20.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.26.0 |
 
 ## Providers
 
@@ -18,6 +18,7 @@ No providers.
 |------|--------|---------|
 | <a name="module_app_service"></a> [app\_service](#module\_app\_service) | ../modules/app-service | n/a |
 | <a name="module_app_service_private-endpoints"></a> [app\_service\_private-endpoints](#module\_app\_service\_private-endpoints) | ../modules/private-endpoint | n/a |
+| <a name="module_application_gateway"></a> [application\_gateway](#module\_application\_gateway) | ../modules/app-gateway | n/a |
 | <a name="module_container_registry"></a> [container\_registry](#module\_container\_registry) | ../modules/container-registry | n/a |
 | <a name="module_key_vault"></a> [key\_vault](#module\_key\_vault) | ../modules/key-vault | n/a |
 | <a name="module_key_vault_private-endpoints"></a> [key\_vault\_private-endpoints](#module\_key\_vault\_private-endpoints) | ../modules/private-endpoint | n/a |
@@ -27,6 +28,8 @@ No providers.
 | <a name="module_private_dns_zones"></a> [private\_dns\_zones](#module\_private\_dns\_zones) | ../modules/private-dns | n/a |
 | <a name="module_public_ip"></a> [public\_ip](#module\_public\_ip) | ../modules/public-ip | n/a |
 | <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | ../modules/resource-group | n/a |
+| <a name="module_storage_account"></a> [storage\_account](#module\_storage\_account) | ../modules/storage-account | n/a |
+| <a name="module_storage_account_private-endpoints"></a> [storage\_account\_private-endpoints](#module\_storage\_account\_private-endpoints) | ../modules/private-endpoint | n/a |
 | <a name="module_vnet"></a> [vnet](#module\_vnet) | ../modules/virtual-network | n/a |
 | <a name="module_vnet_peerings"></a> [vnet\_peerings](#module\_vnet\_peerings) | ../modules/virtual-network-peering | n/a |
 
@@ -59,6 +62,7 @@ No inputs.
 | <a name="output_resource_group_id"></a> [resource\_group\_id](#output\_resource\_group\_id) | Resource group ID |
 | <a name="output_resource_group_location"></a> [resource\_group\_location](#output\_resource\_group\_location) | Resource group location |
 | <a name="output_resource_group_name"></a> [resource\_group\_name](#output\_resource\_group\_name) | Resource group name |
+| <a name="output_storage_account_name"></a> [storage\_account\_name](#output\_storage\_account\_name) | Storage account name |
 | <a name="output_subnets"></a> [subnets](#output\_subnets) | List of subnets created |
 | <a name="output_virtual_network_peerings_ids"></a> [virtual\_network\_peerings\_ids](#output\_virtual\_network\_peerings\_ids) | List of Virtual Network peerings ids |
 | <a name="output_virtual_network_peerings_names"></a> [virtual\_network\_peerings\_names](#output\_virtual\_network\_peerings\_names) | List of Virtual Network peerings names |

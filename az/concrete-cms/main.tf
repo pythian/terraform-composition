@@ -1,9 +1,10 @@
 locals {
-  az        = fileexists("../local.az.yaml") ? yamldecode(file("../local.az.yaml")) : yamldecode(file("../az.yaml"))
-  env       = yamldecode(file("../env.yaml"))
-  hostnames = flatten([for k, v in local.inputs.application_gateway_backend_settings : module.app_service.webapp_hostnames[k]])
-  inputs    = yamldecode(file("./inputs.yaml"))
-  networks  = yamldecode((file("../networks.yaml")))
+  az           = fileexists("../local.az.yaml") ? yamldecode(file("../local.az.yaml")) : yamldecode(file("../az.yaml"))
+  env          = yamldecode(file("../env.yaml"))
+  hostnames    = flatten([for k, v in local.inputs.application_gateway_backend_settings : module.app_service.webapp_hostnames[k]])
+  inputs       = yamldecode(file("./inputs.yaml"))
+  networks     = yamldecode((file("../networks.yaml")))
+  storage_type = "AzureFiles"
 }
 
 provider "azurerm" {
@@ -12,40 +13,39 @@ provider "azurerm" {
 }
 
 
-# module "application_gateway" {
-#   source = "../modules/app-gateway"
+module "application_gateway" {
+  source = "../modules/app-gateway"
 
-#   autoscale_configuration = local.inputs.application_gateway_autoscale_configuration
-#   backend_settings = { for k, v in local.inputs.application_gateway_backend_settings : k => {
-#     fqdns        = module.app_service.webapp_hostnames[k]
-#     http_setting = lookup(local.inputs.application_gateway_backend_settings[k], "http_setting")
-#     }
-#   }
-#   frontend_settings = {
-#     for k, v in local.inputs.application_gateway_frontend_settings :
-#     k => merge(v, {
-#       public_ip_id = module.public_ip.id
-#       hostnames    = local.hostnames
-#       },
-#     )
-#   }
-#   location = local.env.location
-#   name = coalesce(local.inputs.application_gateway_name_override,
-#     format("%s-%s-%s-%s",
-#       local.az.prefix,
-#       local.env.environment,
-#       local.env.location_short,
-#       local.inputs.application_gateway_name,
-#     )
-#   )
-#   resource_group = module.resource_group.name
-#   routing_rules  = local.inputs.application_gateway_routing_rules
-#   ssl_configuration = merge(local.inputs.application_gateway_ssl_configuration, {
-#     key_vault_secret_id = module.key_vault.secret_ids["${local.inputs.application_gateway_secret_name}"]
-#   })
-#   subnet_id = module.vnet[local.inputs.application_gateway_virtual_network].subnet_ids[local.inputs.application_gateway_subnet]
-#   tags      = merge(local.inputs.tags, local.env.tags)
-# }
+  autoscale_configuration = local.inputs.application_gateway_autoscale_configuration
+  backend_settings = { for k, v in local.inputs.application_gateway_backend_settings : k => {
+    fqdns        = module.app_service.webapp_hostnames[k]
+    http_setting = lookup(local.inputs.application_gateway_backend_settings[k], "http_setting")
+    }
+  }
+  frontend_settings = {
+    for k, v in local.inputs.application_gateway_frontend_settings :
+    k => merge(v, {
+      public_ip_id = module.public_ip.id
+      hostnames    = local.hostnames
+      },
+    )
+  }
+  key_vault_id = module.key_vault.id
+  location     = local.env.location
+  name = coalesce(local.inputs.application_gateway_name_override,
+    format("%s-%s-%s-%s",
+      local.az.prefix,
+      local.env.environment,
+      local.env.location_short,
+      local.inputs.application_gateway_name,
+    )
+  )
+  resource_group    = module.resource_group.name
+  routing_rules     = local.inputs.application_gateway_routing_rules
+  ssl_configuration = local.inputs.application_gateway_ssl_configuration
+  subnet_id         = module.vnet[local.inputs.application_gateway_virtual_network].subnet_ids[local.inputs.application_gateway_subnet]
+  tags              = merge(local.inputs.tags, local.env.tags)
+}
 
 module "app_service" {
   source = "../modules/app-service"
@@ -55,7 +55,14 @@ module "app_service" {
   hostnames               = local.inputs.app_service_hostnames
   key_vault_id            = module.key_vault.id
   key_vault_certificate   = local.inputs.app_service_key_vault_certificates
-  location                = local.env.location
+  ip_restriction = local.inputs.app_service_ip_restriction != {} ? {
+    for app, rules in local.inputs.app_service_ip_restriction : app => {
+      for name, rule in rules : name => merge(rule, {
+        ip_address = "${module.public_ip.ip_address}/32"
+      })
+    }
+  } : {}
+  location = local.env.location
   name = coalesce(local.inputs.app_service_name_override,
     format("%s-%s-%s-%s",
       local.az.prefix,
@@ -64,10 +71,21 @@ module "app_service" {
       local.inputs.app_service_name,
     )
   )
-  prefix                    = local.env.environment != "prod" ? local.env.environment : ""
-  resource_group            = module.resource_group.name
-  site_config               = local.inputs.app_service_site_config
-  sku                       = local.inputs.app_service_sku
+  prefix         = local.env.environment != "prod" ? local.env.environment : "www"
+  resource_group = module.resource_group.name
+  site_config    = local.inputs.app_service_site_config
+  sku            = local.inputs.app_service_sku
+  storage_account = { for k, v in local.inputs.app_service_storage_mount_path : k => {
+    account_id   = module.storage_account.id
+    account_key  = module.storage_account.access_key
+    access_key   = module.storage_account.access_key
+    account_name = module.storage_account.name
+    name         = module.storage_account.name
+    share_name   = module.storage_account.share_names[0]
+    type         = local.storage_type
+    mount_path   = v
+    }
+  }
   tags                      = merge(local.inputs.tags, local.env.tags)
   virtual_network_subnet_id = { for k, v in local.inputs.app_service_virtual_network_subnet : k => module.vnet[v.virtual_network].subnet_ids[v.subnet] }
   webapps                   = local.inputs.app_service_webapps
@@ -228,6 +246,29 @@ module "mysql_private-endpoints" {
   subnet_id      = module.vnet[local.inputs.private_endpoints_virtual_network].subnet_ids[local.inputs.private_endpoints_subnet]
   tags           = merge(local.inputs.tags, local.env.tags)
 }
+
+module "storage_account_private-endpoints" {
+  source   = "../modules/private-endpoint"
+  for_each = local.inputs.storage_account_private_endpoints
+
+  location = local.env.location
+  name = coalesce(each.value.name_override,
+    format("%s-%s-%s-%s",
+      local.az.prefix,
+      local.env.environment,
+      local.env.location_short,
+      each.value.name,
+    )
+  )
+  private_dns_zone_id = [module.private_dns_zones[each.value.private_dns_zone].id]
+  private_service_connection = merge(each.value.private_service_connection, {
+    private_connection_resource_id = module.storage_account.id
+  })
+  resource_group = module.resource_group.name
+  subnet_id      = module.vnet[local.inputs.private_endpoints_virtual_network].subnet_ids[local.inputs.private_endpoints_subnet]
+  tags           = merge(local.inputs.tags, local.env.tags)
+}
+
 ###
 
 module "public_ip" {
@@ -261,6 +302,26 @@ module "resource_group" {
   tags = merge(local.inputs.tags, local.env.tags)
 }
 
+module "storage_account" {
+  source = "../modules/storage-account"
+
+  kind     = local.inputs.storage_account_kind
+  location = local.env.location
+  name = coalesce(local.inputs.resource_group_name_override,
+    format("%s%s%s%s",
+      local.az.prefix,
+      local.env.environment,
+      local.env.location_short,
+      local.inputs.storage_account_name,
+    )
+  )
+  public_network_access_enabled = local.inputs.storage_account_public_network_access_enabled
+  resource_group                = module.resource_group.name
+  shares                        = local.inputs.storage_account_shares
+  tags                          = merge(local.inputs.tags, local.env.tags)
+  tier                          = local.inputs.storage_account_tier
+}
+
 module "vnet" {
   source   = "../modules/virtual-network"
   for_each = local.inputs.virtual_networks
@@ -278,6 +339,7 @@ module "vnet" {
   resource_group                          = module.resource_group.name
   subnets                                 = lookup(lookup(local.networks, local.env.environment), each.key).subnets
   subnet_delegations                      = each.value.subnet_delegations
+  subnet_services                         = each.value.subnet_services
   subnet_private_service_policies_enabled = each.value.subnet_private_service_policies_enabled
   tags                                    = merge(local.inputs.tags, local.env.tags)
 }
@@ -391,6 +453,11 @@ output "resource_group_name" {
 output "subnets" {
   description = "List of subnets created"
   value       = { for k, v in module.vnet : v.name => v.subnet_ids }
+}
+
+output "storage_account_name" {
+  description = "Storage account name"
+  value       = module.storage_account.name
 }
 
 output "virtual_networks_ids" {

@@ -48,6 +48,22 @@ variable "resource_group" {
   type        = string
 }
 
+variable "shares" {
+  description = "List of shares to create in the storage account"
+  type = map(object({
+    name             = string
+    enabled_protocol = string
+    quota            = number
+    acl = map(object({
+      id          = string
+      permissions = string
+    }))
+  }))
+
+  default = {}
+
+}
+
 variable "tags" {
   description = "Tags to apply to the storage account"
   type        = map(string)
@@ -80,11 +96,34 @@ resource "azurerm_storage_container" "main" {
   storage_account_id = azurerm_storage_account.main.id
 }
 
+resource "azurerm_storage_share" "main" {
+  for_each           = var.shares
+  name               = each.value.name
+  storage_account_id = azurerm_storage_account.main.id
+  enabled_protocol   = each.value.enabled_protocol
+  quota              = each.value.quota
+
+  dynamic "acl" {
+    for_each = each.value.acl
+    content {
+      id = acl.value.id
+      access_policy {
+        permissions = acl.value.permissions
+      }
+    }
+  }
+}
+
 resource "azurerm_storage_data_lake_gen2_filesystem" "main" {
   count = var.hierarchical_namespace_enabled ? 1 : 0
 
   name               = format("%s-filesystem", var.name)
   storage_account_id = azurerm_storage_account.main.id
+}
+
+output "access_key" {
+  description = "Storage account access key"
+  value       = azurerm_storage_account.main.primary_access_key
 }
 
 output "container_ids" {
@@ -145,6 +184,16 @@ output "replication_type" {
 output "resource_group" {
   description = "Storage account parent resource group"
   value       = azurerm_storage_account.main.resource_group_name
+}
+
+output "share_ids" {
+  description = "Shares created under the storage account"
+  value       = [for s in azurerm_storage_share.main : s.id]
+}
+
+output "share_names" {
+  description = "Shares created under the storage account"
+  value       = [for s in azurerm_storage_share.main : s.name]
 }
 
 output "tier" {

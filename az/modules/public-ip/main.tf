@@ -66,6 +66,11 @@ output "location" {
   value       = azurerm_public_ip.main.location
 }
 
+output "ip_address" {
+  description = "The public IP address"
+  value       = azurerm_public_ip.main.ip_address
+}
+
 output "name" {
   description = "The name of the public IP"
   value       = azurerm_public_ip.main.name

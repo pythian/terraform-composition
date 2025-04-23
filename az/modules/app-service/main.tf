@@ -76,6 +76,20 @@ variable "sku" {
   default = "P0v3"
 }
 
+variable "storage_account" {
+  description = "Storage account to be used for the web app"
+  type = map(object({
+    access_key   = optional(string, null)
+    account_name = optional(string, null)
+    name         = optional(string, null)
+    share_name   = optional(string, null)
+    type         = optional(string, null)
+    mount_path   = optional(string, null)
+  }))
+
+  default = {}
+}
+
 variable "tags" {
   description = "Tags to be applied to the resources"
   type        = map(string)
@@ -200,7 +214,8 @@ resource "azurerm_linux_web_app" "main" {
         for_each = lookup(var.ip_restriction, each.key, {})
         content {
           action                    = ip_restriction.value.action
-          ip_address                = ip_restriction.value.ip_address
+          ip_address                = lookup(ip_restriction.value, "ip_address", null)
+          name                      = ip_restriction.value.name
           priority                  = ip_restriction.value.priority
           service_tag               = lookup(ip_restriction.value, "service_tag", null)
           virtual_network_subnet_id = lookup(ip_restriction.value, "virtual_network_subnet_id", null)
@@ -223,6 +238,18 @@ resource "azurerm_linux_web_app" "main" {
         retention_in_days = lookup(lookup(var.site_config, each.key, {}), "http_logging_retention_in_days", 7)
         retention_in_mb   = lookup(lookup(var.site_config, each.key, {}), "http_logging_retention_in_mb", 35)
       }
+    }
+  }
+
+  dynamic "storage_account" {
+    for_each = var.storage_account
+    content {
+      access_key   = storage_account.value.access_key
+      account_name = storage_account.value.name
+      name         = storage_account.value.name
+      share_name   = storage_account.value.share_name
+      type         = storage_account.value.type
+      mount_path   = storage_account.value.mount_path
     }
   }
 }

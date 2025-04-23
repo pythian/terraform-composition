@@ -22,6 +22,7 @@ No modules.
 | [azurerm_storage_account.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
 | [azurerm_storage_container.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_data_lake_gen2_filesystem.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_filesystem) | resource |
+| [azurerm_storage_share.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) | resource |
 
 ## Inputs
 
@@ -35,6 +36,7 @@ No modules.
 | <a name="input_public_network_access_enabled"></a> [public\_network\_access\_enabled](#input\_public\_network\_access\_enabled) | Whether or not public network access is allowed for the storage account. When false, only private endpoints can access the storage account. | `bool` | `true` | no |
 | <a name="input_replication_type"></a> [replication\_type](#input\_replication\_type) | Type of replication to use (LRS, GRS, RAGRS, ZRS, GZRS, RAGZRS) | `string` | `"LRS"` | no |
 | <a name="input_resource_group"></a> [resource\_group](#input\_resource\_group) | Name of the resource group in which to create the storage account | `string` | n/a | yes |
+| <a name="input_shares"></a> [shares](#input\_shares) | List of shares to create in the storage account | <pre>map(object({<br/>    name             = string<br/>    enabled_protocol = string<br/>    quota            = number<br/>    acl = map(object({<br/>      id          = string<br/>      permissions = string<br/>    }))<br/>  }))</pre> | `{}` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the storage account | `map(string)` | `{}` | no |
 | <a name="input_tier"></a> [tier](#input\_tier) | Account tier for the resource (Standard, Premium) | `string` | `"Standard"` | no |
 
@@ -42,6 +44,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_access_key"></a> [access\_key](#output\_access\_key) | Storage account access key |
 | <a name="output_container_ids"></a> [container\_ids](#output\_container\_ids) | Containers created under the storage account |
 | <a name="output_container_names"></a> [container\_names](#output\_container\_names) | Containers created under the storage account |
 | <a name="output_hierarchical_namespaces_enabled"></a> [hierarchical\_namespaces\_enabled](#output\_hierarchical\_namespaces\_enabled) | Whether hierarchical namespaces are enabled |
@@ -53,6 +56,8 @@ No modules.
 | <a name="output_primary_queue_endpoint"></a> [primary\_queue\_endpoint](#output\_primary\_queue\_endpoint) | Storage account primary queue endpoint |
 | <a name="output_replication_type"></a> [replication\_type](#output\_replication\_type) | Storage account replication type |
 | <a name="output_resource_group"></a> [resource\_group](#output\_resource\_group) | Storage account parent resource group |
+| <a name="output_share_ids"></a> [share\_ids](#output\_share\_ids) | Shares created under the storage account |
+| <a name="output_share_names"></a> [share\_names](#output\_share\_names) | Shares created under the storage account |
 | <a name="output_storage_data_lake_filesystem_id"></a> [storage\_data\_lake\_filesystem\_id](#output\_storage\_data\_lake\_filesystem\_id) | Data lake filesystem created under the storage account |
 | <a name="output_tier"></a> [tier](#output\_tier) | Storage account tier |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

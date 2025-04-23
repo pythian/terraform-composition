@@ -232,6 +232,17 @@ func TestAzProject(t *testing.T) {
 		t.Errorf("Mysql name test FAILED. Expected mysql name %s, got %s.", expectedMysqlName, outputs["mysql_name"].(string))
 	}
 
+	// test storage account
+	expectedStorageAccountName := az["prefix"].(string) + env["environment"].(string) + env["location_short"].(string) + inputs["storage_account_name"].(string)
+	if override, exists := inputs["storage_account_name_override"]; exists && override != nil {
+		expectedStorageAccountName = override.(string)
+	}
+	if assert.Equal(t, expectedStorageAccountName, outputs["storage_account_name"].(string)) {
+		t.Logf("Storage account name test PASSED. Expected storage account name %s, got %s.", expectedStorageAccountName, outputs["storage_account_name"].(string))
+	} else {
+		t.Errorf("Storage account name test FAILED. Expected storage account name %s, got %s.", expectedStorageAccountName, outputs["storage_account_name"].(string))
+	}
+
 	// Test resource group name format
 	expectedRgName := az["prefix"].(string) + "-" + env["environment"].(string) + "-" + env["location_short"].(string) + "-" + inputs["resource_group_name"].(string)
 	if override, exists := inputs["resource_group_name_override"]; exists && override != nil {

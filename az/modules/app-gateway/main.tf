@@ -13,6 +13,7 @@ variable "backend_settings" {
     http_setting = optional(object({
       affinity_cookie_name                = optional(string, "ApplicationGatewayAffinity")
       cookie_based_affinity               = optional(string, "Disabled")
+      host_name                           = optional(string, null)
       path                                = optional(string, "/")
       port                                = optional(number, 443)
       protocol                            = optional(string, "Https")
@@ -38,6 +39,13 @@ variable "frontend_settings" {
     public_ip_id = string
     require_sni  = optional(bool, false)
   }))
+}
+
+variable "key_vault_id" {
+  description = "Key Vault ID for the web app"
+  type        = string
+
+  default = ""
 }
 
 variable "location" {
@@ -78,7 +86,7 @@ variable "ssl_configuration" {
   type = object({
     ssl_certificate_name = string
     ssl_certificate_path = optional(string, null)
-    key_vault_secret_id  = optional(string, null)
+    ssl_secret_name      = optional(string, null)
   })
 }
 
@@ -116,6 +124,16 @@ locals {
   listener_name                     = "${var.name}-httplstn"
   request_routing_rule_name         = "${var.name}-rqrt"
   redirect_configuration_name       = "${var.name}-rdrcfg"
+}
+
+data "azurerm_key_vault_certificate" "main" {
+
+  name         = var.ssl_configuration.ssl_secret_name
+  key_vault_id = var.key_vault_id
+
+  depends_on = [
+    azurerm_role_assignment.kv
+  ]
 }
 
 resource "azurerm_application_gateway" "main" {
@@ -220,7 +238,7 @@ resource "azurerm_application_gateway" "main" {
   ssl_certificate {
     name                = var.ssl_configuration.ssl_certificate_name
     data                = var.ssl_configuration.ssl_certificate_path != null ? filebase64(var.ssl_configuration.ssl_certificate_path) : null
-    key_vault_secret_id = var.ssl_configuration.key_vault_secret_id != null ? var.ssl_configuration.key_vault_secret_id : null
+    key_vault_secret_id = var.ssl_configuration.ssl_secret_name != null ? data.azurerm_key_vault_certificate.main.versionless_secret_id : null
   }
 }
 
@@ -230,6 +248,13 @@ resource "azurerm_user_assigned_identity" "main" {
   resource_group_name = var.resource_group
   tags                = var.tags
 }
+
+resource "azurerm_role_assignment" "kv" {
+  scope                = var.key_vault_id
+  role_definition_name = "Key Vault Certificate User"
+  principal_id         = azurerm_user_assigned_identity.main.principal_id
+}
+
 
 output "id" {
   description = "Application Gateway ID"

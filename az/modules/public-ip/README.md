@@ -38,6 +38,7 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_id"></a> [id](#output\_id) | The id of the public IP |
+| <a name="output_ip_address"></a> [ip\_address](#output\_ip\_address) | The public IP address |
 | <a name="output_location"></a> [location](#output\_location) | The location of the public IP |
 | <a name="output_name"></a> [name](#output\_name) | The name of the public IP |
 | <a name="output_resource_group"></a> [resource\_group](#output\_resource\_group) | public IP parent resource group |

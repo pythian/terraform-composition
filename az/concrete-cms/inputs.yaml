@@ -6,6 +6,8 @@ application_gateway_autoscale_configuration:
 application_gateway_backend_settings:
   connexusenergy:
     http_setting:
+      cookie_based_affinity: "Enabled"
+      affinity_cookie_name: "ARRAffinity"
 application_gateway_frontend_settings:
   "443":
     protocol: Https
@@ -21,9 +23,9 @@ application_gateway_routing_rules:
     priority: 110
     require_sni: true
 application_gateway_subnet: default
-application_gateway_secret_name: "cnx-cert-web"
 application_gateway_ssl_configuration:
   ssl_certificate_name: website
+  ssl_secret_name: "Wildcard-Connexusenergy-Com"
 application_gateway_virtual_network: web
 ### App Service
 app_service_client_certificate_mode:
@@ -83,6 +85,8 @@ app_service_site_config:
     websockets_enabled: "false"
     worker_count: "1"
 app_service_sku: P0v3
+app_service_storage_mount_path:
+  assets: /var/www/html/application/files
 app_service_virtual_network_subnet:
   connexusenergy:
     virtual_network: web
@@ -127,6 +131,7 @@ private_dns_zones:
 - "privatelink.azurewebsites.net"
 - "privatelink.mysql.database.azure.com"
 - "privatelink.vaultcore.azure.net"
+- "privatelink.file.core.windows.net"
 private_dns_links:
   privatelink.azurewebsites.net:
   - db
@@ -134,6 +139,8 @@ private_dns_links:
   privatelink.mysql.database.azure.com:
   - db
   privatelink.vaultcore.azure.net:
+  - web
+  privatelink.file.core.windows.net:
   - web
 ### Private Endpoints
 app_service_private_endpoints:
@@ -166,11 +173,36 @@ mysql_private_endpoints:
       subresource_names:
       - mysqlServer
       is_manual_connection: false
+storage_account_private_endpoints:
+  website:
+    name: website
+    name_override:
+    private_dns_zone: privatelink.file.core.windows.net
+    private_service_connection:
+      name: website-pe
+      subresource_names:
+      - file
+      is_manual_connection: false
 private_endpoints_virtual_network: web
 private_endpoints_subnet: PrivateEndpointSubnet
 ### Public IP
 public_ip_name: pip
 public_ip_name_override:
+### Storage Account
+storage_account_kind: FileStorage
+storage_account_name: website
+storage_account_name_override:
+storage_account_public_network_access_enabled: true
+storage_account_shares:
+  assets:
+    name: assets
+    enabled_protocol: "NFS"
+    quota: 20
+    acl:
+      1:
+        id: "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI"
+        permissions: "rwdl"
+storage_account_tier: "Premium"
 ### Resource Groups
 key_vault_resource_group_name: keyvault
 key_vault_resource_group_name_override:
@@ -184,6 +216,7 @@ virtual_networks:
     subnet_delegations: {}
     subnet_private_service_policies_enabled:
       cnxweb-subnet-db: true
+    subnet_services: {}
   web:
     name: web
     name_override:
@@ -197,6 +230,7 @@ virtual_networks:
       AppServiceSubnet: true
       default: true
       PrivateEndpointSubnet: true
+    subnet_services: {}
 vnet_peerings:
   Backend2FrontEnd:
     network: "db"
