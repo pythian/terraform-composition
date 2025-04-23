@@ -189,17 +189,17 @@ private_endpoints_subnet: PrivateEndpointSubnet
 public_ip_name: pip
 public_ip_name_override:
 ### Storage Account
-storage_account_kind: FileStorage
+storage_account_kind: StorageV2
 storage_account_name: website
 storage_account_name_override:
 storage_account_public_network_access_enabled: true
 storage_account_shares:
   assets:
     name: assets
-    enabled_protocol: "NFS"
+    enabled_protocol: "SMB"
     quota: 100
     acl: {}
-storage_account_tier: "Premium"
+storage_account_tier: "Standard"
 ### Resource Groups
 key_vault_resource_group_name: keyvault
 key_vault_resource_group_name_override:
