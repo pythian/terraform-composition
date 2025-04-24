@@ -12,6 +12,8 @@ help:
 	@echo ''
 	@echo '    az_configure_build Configure the deployment for build'
 	@echo '    az_configure_dev   Configure the deployment for dev'
+	@echo '    az_configure_uat   Configure the deployment for uat'
+	@echo '    az_configure_prd   Configure the deployment for prd'
 	@echo ''
 	@echo 'All application environments'
 	@echo ''
@@ -79,6 +81,13 @@ az_test_build: az_init_build
 .PHONY: az_configure_dev
 az_configure_dev:
 	@cd az && ./scripts/configure.sh -a 9712bfef-07af-4a61-804e-b2fa08462f70 -e dev -o connexus -p centralus -ps cus -t devops -z concrete-cms
+
+
+#### UAT ENVIRONMENT ####
+
+.PHONY: az_configure_uat
+az_configure_uat:
+	@cd az && ./scripts/configure.sh -a 9712bfef-07af-4a61-804e-b2fa08462f70 -e uat -o connexus -p centralus -ps cus -t devops -z concrete-cms
 
 
 #### PROD ENVIRONMENT ####

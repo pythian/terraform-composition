@@ -28,6 +28,9 @@ application_gateway_ssl_configuration:
   ssl_secret_name: "Wildcard-Connexusenergy-Com"
 application_gateway_virtual_network: web
 ### App Service
+app_service_app_settings:
+  connexusenergy:
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE: true
 app_service_client_certificate_mode:
   connexusenergy: "Optional"
 app_service_hostnames:
@@ -58,7 +61,7 @@ app_service_site_config:
     cors_support_credentials: "false"
     default_documents:
     detailed_error_messages: true
-    docker_image_name: cnx-website:20250423
+    docker_image_name: cnx-website:20250424
     docker_registry_password:
     docker_registry_url: https://cnxdevcusregistry.azurecr.io
     docker_registry_username:
@@ -189,9 +192,17 @@ private_endpoints_subnet: PrivateEndpointSubnet
 public_ip_name: pip
 public_ip_name_override:
 ### Storage Account
+storage_account_bypass:
+  - "AzureServices"
+  - "Logging"
+  - "Metrics"
+storage_account_default_action: "Deny"
 storage_account_kind: StorageV2
+storage_account_ip_rules: []
 storage_account_name: website
 storage_account_name_override:
+storage_account_virtual_networks_allowed:
+  - web
 storage_account_public_network_access_enabled: true
 storage_account_shares:
   assets:

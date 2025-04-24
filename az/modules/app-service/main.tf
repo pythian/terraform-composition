@@ -5,6 +5,13 @@ variable "acr_id" {
   default = ""
 }
 
+variable "app_settings" {
+  description = "App settings for each web app"
+  type        = map(map(string))
+
+  default = {}
+}
+
 variable "client_certificate_mode" {
   description = "Client certificate mode for web app"
   type        = map(string)
@@ -137,6 +144,7 @@ resource "azurerm_service_plan" "main" {
 resource "azurerm_linux_web_app" "main" {
   for_each = var.webapps
 
+  app_settings              = var.app_settings[each.key]
   client_certificate_mode   = lookup(var.client_certificate_mode, each.key, null)
   https_only                = local.https_only
   name                      = "${var.name}-${each.key}"

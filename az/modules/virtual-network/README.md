@@ -47,5 +47,6 @@ No modules.
 | <a name="output_location"></a> [location](#output\_location) | The location of the virtual network |
 | <a name="output_name"></a> [name](#output\_name) | The name of the virtual network |
 | <a name="output_resource_group"></a> [resource\_group](#output\_resource\_group) | Virtual network parent resource group |
-| <a name="output_subnet_ids"></a> [subnet\_ids](#output\_subnet\_ids) | A list of subnet ids associated with the virtual network |
+| <a name="output_subnet_ids"></a> [subnet\_ids](#output\_subnet\_ids) | A map of subnet ids associated with the virtual network |
+| <a name="output_subnet_ids_list"></a> [subnet\_ids\_list](#output\_subnet\_ids\_list) | A list of subnet ids associated with the virtual network |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

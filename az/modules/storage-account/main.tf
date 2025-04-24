@@ -29,6 +29,18 @@ variable "name" {
   type        = string
 }
 
+variable "network_rules" {
+  description = "Network rules for the storage account"
+  type = map(object({
+    ip_rules                   = optional(list(string), [])
+    virtual_network_subnet_ids = optional(list(string), [])
+    bypass                     = optional(list(string), [])
+    default_action             = optional(string, "Deny")
+  }))
+
+  default = {}
+}
+
 variable "public_network_access_enabled" {
   description = "Whether or not public network access is allowed for the storage account. When false, only private endpoints can access the storage account."
   type        = bool
@@ -88,6 +100,16 @@ resource "azurerm_storage_account" "main" {
   public_network_access_enabled = var.public_network_access_enabled
   resource_group_name           = var.resource_group
   tags                          = var.tags
+
+  dynamic "network_rules" {
+    for_each = var.network_rules
+    content {
+      default_action             = network_rules.value.default_action
+      bypass                     = network_rules.value.bypass
+      ip_rules                   = network_rules.value.ip_rules
+      virtual_network_subnet_ids = network_rules.value.virtual_network_subnet_ids
+    }
+  }
 }
 
 resource "azurerm_storage_container" "main" {

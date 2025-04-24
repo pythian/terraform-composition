@@ -127,6 +127,11 @@ output "resource_group" {
 }
 
 output "subnet_ids" {
-  description = "A list of subnet ids associated with the virtual network"
+  description = "A map of subnet ids associated with the virtual network"
   value       = { for k, s in azurerm_subnet.main : k => s.id }
+}
+
+output "subnet_ids_list" {
+  description = "A list of subnet ids associated with the virtual network"
+  value       = [for s in azurerm_subnet.main : s.id]
 }

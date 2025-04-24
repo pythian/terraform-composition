@@ -670,18 +670,24 @@ class Controller extends BlockController
                         $thumbnailCrop   = $options['thumbnailCrop'];
 
                         if ($fileObject->canEdit() AND (($width > $thumbnailWidth AND $thumbnailWidth!=false) OR ($height > $thumbnailHeight AND $thumbnailHeight!=false))) {
-
-                            $thumbnail       = $this->app->make('helper/image')->getThumbnail($fileObject, $thumbnailWidth, $thumbnailHeight, $thumbnailCrop);
-                            $thumbnailLink   = $thumbnail->src;
-                            $thumbnailWidth  = $thumbnail->width;
-                            $thumbnailHeight = $thumbnail->height;
-
+                            try {
+                                $thumbnail       = $this->app->make('helper/image')->getThumbnail($fileObject, $thumbnailWidth, $thumbnailHeight, $thumbnailCrop);
+                                if ($thumbnail && isset($thumbnail->src)) {
+                                    $thumbnailLink   = $thumbnail->src;
+                                    $thumbnailWidth  = $thumbnail->width;
+                                    $thumbnailHeight = $thumbnail->height;
+                                } else {
+                                    throw new \Exception('Thumbnail generation failed');
+                                }
+                            } catch (\Exception $e) {
+                                $thumbnailLink   = $link;
+                                $thumbnailWidth  = $width;
+                                $thumbnailHeight = $height;
+                            }
                         } else {
-
                             $thumbnailLink   = $link;
                             $thumbnailWidth  = $width;
                             $thumbnailHeight = $height;
-
                         }
 
                     }

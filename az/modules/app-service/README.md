@@ -32,6 +32,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_acr_id"></a> [acr\_id](#input\_acr\_id) | Azure Container Registry ID | `string` | `""` | no |
+| <a name="input_app_settings"></a> [app\_settings](#input\_app\_settings) | App settings for each web app | `map(map(string))` | `{}` | no |
 | <a name="input_client_certificate_mode"></a> [client\_certificate\_mode](#input\_client\_certificate\_mode) | Client certificate mode for web app | `map(string)` | n/a | yes |
 | <a name="input_hostnames"></a> [hostnames](#input\_hostnames) | Hostnames associated with the App Service | <pre>map(object({<br/>    webapp_name = string<br/>  }))</pre> | `{}` | no |
 | <a name="input_ip_restriction"></a> [ip\_restriction](#input\_ip\_restriction) | IP restriction for applications | `map(map(any))` | `{}` | no |

@@ -33,6 +33,7 @@ No modules.
 | <a name="input_kind"></a> [kind](#input\_kind) | Type of storage account to create (BlobStorage, BlockBlobStorage, FileStorage, Storage, StorageV2) | `string` | `"StorageV2"` | no |
 | <a name="input_location"></a> [location](#input\_location) | Location of the storage account to create | `string` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | Name of the storage account to create | `string` | n/a | yes |
+| <a name="input_network_rules"></a> [network\_rules](#input\_network\_rules) | Network rules for the storage account | <pre>map(object({<br/>    ip_rules                   = optional(list(string), [])<br/>    virtual_network_subnet_ids = optional(list(string), [])<br/>    bypass                     = optional(list(string), [])<br/>    default_action             = optional(string, "Deny")<br/>  }))</pre> | `{}` | no |
 | <a name="input_public_network_access_enabled"></a> [public\_network\_access\_enabled](#input\_public\_network\_access\_enabled) | Whether or not public network access is allowed for the storage account. When false, only private endpoints can access the storage account. | `bool` | `true` | no |
 | <a name="input_replication_type"></a> [replication\_type](#input\_replication\_type) | Type of replication to use (LRS, GRS, RAGRS, ZRS, GZRS, RAGZRS) | `string` | `"LRS"` | no |
 | <a name="input_resource_group"></a> [resource\_group](#input\_resource\_group) | Name of the resource group in which to create the storage account | `string` | n/a | yes |

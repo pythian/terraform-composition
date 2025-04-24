@@ -51,6 +51,7 @@ module "app_service" {
   source = "../modules/app-service"
 
   acr_id                  = module.container_registry.id
+  app_settings            = local.inputs.app_service_app_settings
   client_certificate_mode = local.inputs.app_service_client_certificate_mode
   hostnames               = local.inputs.app_service_hostnames
   key_vault_id            = module.key_vault.id
@@ -315,6 +316,13 @@ module "storage_account" {
       local.inputs.storage_account_name,
     )
   )
+  network_rules = {
+    for k, v in local.inputs.storage_account_virtual_networks_allowed : k => {
+      bypass         = local.inputs.storage_account_bypass
+      default_action = local.inputs.storage_account_default_action
+      ip_rules       = local.inputs.storage_account_ip_rules
+    }
+  }
   public_network_access_enabled = local.inputs.storage_account_public_network_access_enabled
   resource_group                = module.resource_group.name
   shares                        = local.inputs.storage_account_shares
