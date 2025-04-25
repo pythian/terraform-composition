@@ -10,7 +10,9 @@
 
 ## Providers
 
-No providers.
+| Name | Version |
+|------|---------|
+| <a name="provider_terraform"></a> [terraform](#provider\_terraform) | n/a |
 
 ## Modules
 
@@ -19,7 +21,6 @@ No providers.
 | <a name="module_app_service"></a> [app\_service](#module\_app\_service) | ../modules/app-service | n/a |
 | <a name="module_app_service_private-endpoints"></a> [app\_service\_private-endpoints](#module\_app\_service\_private-endpoints) | ../modules/private-endpoint | n/a |
 | <a name="module_application_gateway"></a> [application\_gateway](#module\_application\_gateway) | ../modules/app-gateway | n/a |
-| <a name="module_container_registry"></a> [container\_registry](#module\_container\_registry) | ../modules/container-registry | n/a |
 | <a name="module_key_vault"></a> [key\_vault](#module\_key\_vault) | ../modules/key-vault | n/a |
 | <a name="module_key_vault_private-endpoints"></a> [key\_vault\_private-endpoints](#module\_key\_vault\_private-endpoints) | ../modules/private-endpoint | n/a |
 | <a name="module_key_vault_resource_group"></a> [key\_vault\_resource\_group](#module\_key\_vault\_resource\_group) | ../modules/resource-group | n/a |
@@ -35,7 +36,9 @@ No providers.
 
 ## Resources
 
-No resources.
+| Name | Type |
+|------|------|
+| [terraform_remote_state.shared](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/data-sources/remote_state) | data source |
 
 ## Inputs
 
@@ -49,8 +52,6 @@ No inputs.
 | <a name="output_app_service_plan_name"></a> [app\_service\_plan\_name](#output\_app\_service\_plan\_name) | App service plan name |
 | <a name="output_app_service_webapp_ids"></a> [app\_service\_webapp\_ids](#output\_app\_service\_webapp\_ids) | App service plan deployed web applications ids |
 | <a name="output_app_service_webapp_names"></a> [app\_service\_webapp\_names](#output\_app\_service\_webapp\_names) | App service plan deployed web applications names |
-| <a name="output_container_registry_id"></a> [container\_registry\_id](#output\_container\_registry\_id) | Container registry id |
-| <a name="output_container_registry_name"></a> [container\_registry\_name](#output\_container\_registry\_name) | Container registry name |
 | <a name="output_key_vault_id"></a> [key\_vault\_id](#output\_key\_vault\_id) | Key Vault ID |
 | <a name="output_key_vault_name"></a> [key\_vault\_name](#output\_key\_vault\_name) | Key Vault name |
 | <a name="output_key_vault_resource_group_id"></a> [key\_vault\_resource\_group\_id](#output\_key\_vault\_resource\_group\_id) | Key Vault resource group ID |

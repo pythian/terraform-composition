@@ -12,6 +12,36 @@ variable "app_settings" {
   default = {}
 }
 
+variable "auto_scale_profile" {
+  description = "Auto scale profile for the App Service Plan"
+  type = map(object({
+    capacity = object({
+      default = number
+      minimum = number
+      maximum = number
+    })
+    rules = list(object({
+      metric_trigger = object({
+        metric_name      = string
+        time_grain       = string
+        statistic        = string
+        time_window      = string
+        time_aggregation = string
+        operator         = string
+        threshold        = number
+      })
+      scale_action = object({
+        direction = string
+        type      = string
+        value     = string
+        cooldown  = string
+      })
+    }))
+  }))
+
+  default = {}
+}
+
 variable "client_certificate_mode" {
   description = "Client certificate mode for web app"
   type        = map(string)
@@ -36,8 +66,6 @@ variable "ip_restriction" {
 variable "key_vault_id" {
   description = "Key Vault ID for the web app"
   type        = string
-
-  default = ""
 }
 
 variable "key_vault_certificate" {
@@ -50,6 +78,20 @@ variable "key_vault_certificate" {
 variable "location" {
   description = "Location of the App Service Plan to create"
   type        = string
+}
+
+variable "mysql_password_secret_name" {
+  description = "MySQL password secret name in Key Vault"
+  type        = string
+
+  default = ""
+}
+
+variable "mysql_server_address" {
+  description = "MySQL server address"
+  type        = string
+
+  default = ""
 }
 
 variable "name" {
@@ -119,12 +161,25 @@ variable "webapps" {
 locals {
   os_type    = "Linux"
   https_only = true
+  key_vault_roles = [
+    "Key Vault Secrets User",
+    "Key Vault Certificates Officer"
+  ]
 }
 
 data "azurerm_key_vault_certificate" "main" {
-  for_each = var.key_vault_id != "" ? { for k, v in var.hostnames : k => v } : {}
+  for_each = { for k, v in var.hostnames : k => v }
 
   name         = var.key_vault_certificate[each.key]
+  key_vault_id = var.key_vault_id
+
+  depends_on = [
+    azurerm_role_assignment.kv
+  ]
+}
+
+data "azurerm_key_vault_secret" "main" {
+  name         = var.mysql_password_secret_name
   key_vault_id = var.key_vault_id
 
   depends_on = [
@@ -141,10 +196,22 @@ resource "azurerm_service_plan" "main" {
   tags                = var.tags
 }
 
+resource "azurerm_user_assigned_identity" "app" {
+  for_each = var.webapps
+
+  name                = "${var.name}-${each.key}-id"
+  location            = azurerm_service_plan.main.location
+  resource_group_name = azurerm_service_plan.main.resource_group_name
+  tags                = var.tags
+}
+
 resource "azurerm_linux_web_app" "main" {
   for_each = var.webapps
 
-  app_settings              = var.app_settings[each.key]
+  app_settings = merge(var.app_settings[each.key], {
+    MYSQL_PASSWORD = "@Microsoft.KeyVault(SecretUri=${data.azurerm_key_vault_secret.main.versionless_id})"
+    MYSQL_ADDR     = var.mysql_server_address
+  })
   client_certificate_mode   = lookup(var.client_certificate_mode, each.key, null)
   https_only                = local.https_only
   name                      = "${var.name}-${each.key}"
@@ -155,7 +222,10 @@ resource "azurerm_linux_web_app" "main" {
   virtual_network_subnet_id = lookup(var.virtual_network_subnet_id, each.key, null)
 
   identity {
-    type = "SystemAssigned"
+    type = "UserAssigned"
+    identity_ids = [
+      azurerm_user_assigned_identity.app[each.key].id
+    ]
   }
 
   dynamic "site_config" {
@@ -277,16 +347,15 @@ resource "azurerm_app_service_custom_hostname_binding" "main" {
 
 
 resource "azurerm_app_service_certificate" "kv" {
-  for_each = {
-    for k, v in var.hostnames : k => v
-    if var.key_vault_id != ""
-  }
+  for_each = { for k, v in var.hostnames : k => v }
 
   name                = each.key
   resource_group_name = var.resource_group
   location            = var.location
   key_vault_secret_id = data.azurerm_key_vault_certificate.main[each.key].versionless_id
   tags                = var.tags
+
+  depends_on = [azurerm_role_assignment.kv]
 }
 
 resource "azurerm_role_assignment" "push_pull" {
@@ -294,15 +363,68 @@ resource "azurerm_role_assignment" "push_pull" {
 
   scope                = var.acr_id
   role_definition_name = "AcrPull"
-  principal_id         = each.value.identity[0].principal_id
+  principal_id         = azurerm_user_assigned_identity.app[each.key].principal_id
 }
 
 resource "azurerm_role_assignment" "kv" {
-  for_each = var.key_vault_id != "" ? { for k, w in azurerm_linux_web_app.main : k => w } : {}
+  for_each = merge([
+    for k, v in var.hostnames : {
+      for role in local.key_vault_roles :
+      "${k}-${role}" => {
+        principal_id         = azurerm_user_assigned_identity.app[v.webapp_name].principal_id
+        role_definition_name = role
+      }
+    }
+  ]...)
 
   scope                = var.key_vault_id
-  role_definition_name = "Key Vault Certificate User"
-  principal_id         = each.value.identity[0].principal_id
+  role_definition_name = each.value.role_definition_name
+  principal_id         = each.value.principal_id
+}
+
+
+
+resource "azurerm_monitor_autoscale_setting" "main" {
+  name                = var.name
+  resource_group_name = azurerm_service_plan.main.resource_group_name
+  location            = azurerm_service_plan.main.location
+  target_resource_id  = azurerm_service_plan.main.id
+  tags                = var.tags
+
+  dynamic "profile" {
+    for_each = var.auto_scale_profile
+    content {
+      name = profile.key
+
+      capacity {
+        default = profile.value.capacity.default
+        minimum = profile.value.capacity.minimum
+        maximum = profile.value.capacity.maximum
+      }
+
+      dynamic "rule" {
+        for_each = profile.value.rules
+        content {
+          metric_trigger {
+            operator           = rule.value.metric_trigger.operator
+            metric_name        = rule.value.metric_trigger.metric_name
+            metric_resource_id = azurerm_app_service_plan.main.id
+            statistic          = rule.value.metric_trigger.statistic
+            threshold          = rule.value.metric_trigger.threshold
+            time_aggregation   = rule.value.metric_trigger.time_aggregation
+            time_grain         = rule.value.metric_trigger.time_grain
+            time_window        = rule.value.metric_trigger.time_window
+          }
+          scale_action {
+            direction = rule.value.scale_action.direction
+            type      = rule.value.scale_action.type
+            value     = rule.value.scale_action.value
+            cooldown  = rule.value.scale_action.cooldown
+          }
+        }
+      }
+    }
+  }
 }
 
 output "id" {

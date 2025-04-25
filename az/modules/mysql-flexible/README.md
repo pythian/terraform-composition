@@ -34,7 +34,7 @@ No modules.
 | <a name="input_backup_retention_days"></a> [backup\_retention\_days](#input\_backup\_retention\_days) | Backup configuration of the MySQL Flexible Server | `number` | `7` | no |
 | <a name="input_databases"></a> [databases](#input\_databases) | Databases to be created on the MySQL Flexible Server | <pre>map(object({<br/>    charset   = optional(string, "utf8")<br/>    collation = optional(string, "utf8_unicode_ci")<br/>  }))</pre> | n/a | yes |
 | <a name="input_delegated_subnet_id"></a> [delegated\_subnet\_id](#input\_delegated\_subnet\_id) | Delegated Subnet ID of the MySQL Flexible Server | `string` | `null` | no |
-| <a name="input_key_vault_id"></a> [key\_vault\_id](#input\_key\_vault\_id) | Key vault ID to save the secret | `string` | `""` | no |
+| <a name="input_key_vault_id"></a> [key\_vault\_id](#input\_key\_vault\_id) | Key vault ID to save the secret | `string` | n/a | yes |
 | <a name="input_location"></a> [location](#input\_location) | Location of the MySQL Flexible Server to create | `string` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | Name of the MySQL Flexible Server to create | `string` | n/a | yes |
 | <a name="input_private_dns_zone_id"></a> [private\_dns\_zone\_id](#input\_private\_dns\_zone\_id) | Private DNS zone to be used by the MySQL Flexible Server | `string` | `null` | no |

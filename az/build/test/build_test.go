@@ -154,6 +154,17 @@ func TestAzProject(t *testing.T) {
 		t.Errorf("Resource group location test FAILED. Expected resource group location %s, got %s.", env["location"].(string), outputs["resource_group_location"].(string))
 	}
 
+	// Test container registry
+	expectedContainerRegistryName := az["prefix"].(string) + env["environment"].(string) + env["location_short"].(string) + inputs["container_registry_name"].(string)
+	if override, exists := inputs["container_registry_name_override"]; exists && override != nil {
+		expectedContainerRegistryName = override.(string)
+	}
+	if assert.Equal(t, expectedContainerRegistryName, outputs["container_registry_name"].(string)) {
+		t.Logf("Container registry name test PASSED. Expected container registry name %s, got %s.", expectedContainerRegistryName, outputs["container_registry_name"].(string))
+	} else {
+		t.Errorf("Container registry name test FAILED. Expected container registry name %s, got %s.", expectedContainerRegistryName, outputs["container_registry_name"].(string))
+	}
+
 	// Test storage account name format
 	expectedSaName := outputs["storage_account_name"].(string)
 	if override, exists := inputs["storage_account_name_override"]; exists && override != nil {

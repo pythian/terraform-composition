@@ -12,6 +12,18 @@ provider "azurerm" {
   features {}
 }
 
+data "terraform_remote_state" "shared" {
+  backend = "azurerm"
+
+  config = {
+    container_name       = "tfstate"
+    key                  = "build.terraform.tfstate"
+    resource_group_name  = "cnx-build-cus-tfstate"
+    subscription_id      = "9712bfef-07af-4a61-804e-b2fa08462f70"
+    storage_account_name = "cnxbuildcustfstate"
+  }
+}
+
 
 module "application_gateway" {
   source = "../modules/app-gateway"
@@ -50,7 +62,8 @@ module "application_gateway" {
 module "app_service" {
   source = "../modules/app-service"
 
-  acr_id                  = module.container_registry.id
+  auto_scale_profile      = local.inputs.app_service_auto_scale_profile
+  acr_id                  = data.terraform_remote_state.shared.outputs.container_registry_id
   app_settings            = local.inputs.app_service_app_settings
   client_certificate_mode = local.inputs.app_service_client_certificate_mode
   hostnames               = local.inputs.app_service_hostnames
@@ -63,7 +76,9 @@ module "app_service" {
       })
     }
   } : {}
-  location = local.env.location
+  location                   = local.env.location
+  mysql_server_address       = "${module.mysql.name}.mysql.database.azure.com"
+  mysql_password_secret_name = local.inputs.app_service_mysql_password_secret_name
   name = coalesce(local.inputs.app_service_name_override,
     format("%s-%s-%s-%s",
       local.az.prefix,
@@ -90,23 +105,6 @@ module "app_service" {
   tags                      = merge(local.inputs.tags, local.env.tags)
   virtual_network_subnet_id = { for k, v in local.inputs.app_service_virtual_network_subnet : k => module.vnet[v.virtual_network].subnet_ids[v.subnet] }
   webapps                   = local.inputs.app_service_webapps
-}
-
-module "container_registry" {
-  source = "../modules/container-registry"
-
-  location = local.env.location
-  name = coalesce(local.inputs.container_registry_name_override,
-    format("%s%s%s%s",
-      local.az.prefix,
-      local.env.environment,
-      local.env.location_short,
-      local.inputs.container_registry_name,
-    )
-  )
-  resource_group = module.resource_group.name
-  sku            = local.inputs.container_registry_sku
-  tags           = merge(local.inputs.tags, local.env.tags)
 }
 
 module "key_vault" {
@@ -386,16 +384,6 @@ output "app_service_plan_name" {
 output "app_service_webapp_ids" {
   description = "App service plan deployed web applications ids"
   value       = module.app_service.webapp_ids
-}
-
-output "container_registry_id" {
-  description = "Container registry id"
-  value       = module.container_registry.id
-}
-
-output "container_registry_name" {
-  description = "Container registry name"
-  value       = module.container_registry.name
 }
 
 output "app_service_webapp_names" {

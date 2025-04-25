@@ -6,4 +6,8 @@ storage_account_name_override:
 containers:
   - tfstate
 container_name_override:
+### container registry
+container_registry_name: registry
+container_registry_name_override:
+container_registry_sku: Basic
 tags: {}

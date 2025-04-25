@@ -42,6 +42,33 @@ module "storage_account" {
   tags           = merge(local.inputs.tags, local.env.tags)
 }
 
+module "container_registry" {
+  source = "../modules/container-registry"
+
+  location = local.env.location
+  name = coalesce(local.inputs.container_registry_name_override,
+    format("%s%s%s%s",
+      local.az.prefix,
+      local.env.environment,
+      local.env.location_short,
+      local.inputs.container_registry_name,
+    )
+  )
+  resource_group = module.resource_group.name
+  sku            = local.inputs.container_registry_sku
+  tags           = merge(local.inputs.tags, local.env.tags)
+}
+
+output "container_registry_id" {
+  description = "Container registry id"
+  value       = module.container_registry.id
+}
+
+output "container_registry_name" {
+  description = "Container registry name"
+  value       = module.container_registry.name
+}
+
 output "resource_group_id" {
   description = "Resource group ID"
   value       = module.resource_group.id

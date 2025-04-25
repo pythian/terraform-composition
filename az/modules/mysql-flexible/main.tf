@@ -28,8 +28,6 @@ variable "delegated_subnet_id" {
 variable "key_vault_id" {
   description = "Key vault ID to save the secret"
   type        = string
-
-  default = ""
 }
 
 variable "location" {
@@ -127,8 +125,6 @@ resource "azurerm_mysql_flexible_server_configuration" "configuration" {
 }
 
 resource "azurerm_key_vault_secret" "password" {
-  count = var.key_vault_id == "" ? 0 : 1
-
   key_vault_id = var.key_vault_id
   name         = replace("${azurerm_mysql_flexible_server.main.name}-${azurerm_mysql_flexible_server.main.administrator_login}", "_", "-")
   value        = random_password.main.result

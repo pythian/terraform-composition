@@ -1,2 +1,0 @@
-# ignore database configuration files changes
-**/application/config/database.php

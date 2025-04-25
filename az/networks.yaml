@@ -11,12 +11,12 @@ dev:
       default: 10.1.4.0/24
       AppServiceSubnet: 10.1.5.0/24
       PrivateEndpointSubnet: 10.1.6.0/24
-prd:
+test:
   db:
     address_space:
       - "10.2.0.0/22"
     subnets:
-      cnxweb-subnet-db: "10.2.0.0/27"
+      cnxweb-subnet-db: 10.2.0.0/27
   web:
     address_space:
       - "10.2.4.0/22"
@@ -24,3 +24,16 @@ prd:
       default: 10.2.4.0/24
       AppServiceSubnet: 10.2.5.0/24
       PrivateEndpointSubnet: 10.2.6.0/24
+prd:
+  db:
+    address_space:
+      - "10.3.0.0/22"
+    subnets:
+      cnxweb-subnet-db: "10.3.0.0/27"
+  web:
+    address_space:
+      - "10.3.4.0/22"
+    subnets:
+      default: 10.3.4.0/24
+      AppServiceSubnet: 10.3.5.0/24
+      PrivateEndpointSubnet: 10.3.6.0/24

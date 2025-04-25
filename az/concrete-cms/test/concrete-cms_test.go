@@ -187,17 +187,6 @@ func TestAzProject(t *testing.T) {
 		t.Errorf("App service webapps input is not properly configured in inputs.yaml")
 	}
 
-	// Test container registry
-	expectedContainerRegistryName := az["prefix"].(string) + env["environment"].(string) + env["location_short"].(string) + inputs["container_registry_name"].(string)
-	if override, exists := inputs["container_registry_name_override"]; exists && override != nil {
-		expectedContainerRegistryName = override.(string)
-	}
-	if assert.Equal(t, expectedContainerRegistryName, outputs["container_registry_name"].(string)) {
-		t.Logf("Container registry name test PASSED. Expected container registry name %s, got %s.", expectedContainerRegistryName, outputs["container_registry_name"].(string))
-	} else {
-		t.Errorf("Container registry name test FAILED. Expected container registry name %s, got %s.", expectedContainerRegistryName, outputs["container_registry_name"].(string))
-	}
-
 	//Test key vault resource group
 	expectedKeyVaultRgName := az["prefix"].(string) + "-" + env["environment"].(string) + "-" + env["location_short"].(string) + "-" + inputs["key_vault_resource_group_name"].(string)
 	if override, exists := inputs["key_vault_resource_group_name_override"]; exists && override != nil {

@@ -12,7 +12,7 @@ help:
 	@echo ''
 	@echo '    az_configure_build Configure the deployment for build'
 	@echo '    az_configure_dev   Configure the deployment for dev'
-	@echo '    az_configure_uat   Configure the deployment for uat'
+	@echo '    az_configure_test   Configure the deployment for test'
 	@echo '    az_configure_prd   Configure the deployment for prd'
 	@echo ''
 	@echo 'All application environments'
@@ -32,6 +32,9 @@ help:
 	@echo ''
 	@echo '    az_clean_build     Clean up state files'
 	@echo '    az_deploy_build    Deploy configured resources'
+	@echo '    az_deploy_dev      Deploy configured resources'
+	@echo '    az_deploy_test     Deploy configured resources'
+	@echo '    az_deploy_prd      Deploy configured resources'
 	@echo '    az_init_build      Initialize modules, providers'
 	@echo '    az_lint_build      Run linters'
 	@echo '    az_plan_build      Show deployment plan'
@@ -82,13 +85,17 @@ az_test_build: az_init_build
 az_configure_dev:
 	@cd az && ./scripts/configure.sh -a 9712bfef-07af-4a61-804e-b2fa08462f70 -e dev -o connexus -p centralus -ps cus -t devops -z concrete-cms
 
+.PHONY: az_deploy_dev
+az_deploy_dev: az_configure_dev az_clean az_deploy
 
-#### UAT ENVIRONMENT ####
+#### TEST ENVIRONMENT ####
 
-.PHONY: az_configure_uat
-az_configure_uat:
-	@cd az && ./scripts/configure.sh -a 9712bfef-07af-4a61-804e-b2fa08462f70 -e uat -o connexus -p centralus -ps cus -t devops -z concrete-cms
+.PHONY: az_configure_test
+az_configure_test:
+	@cd az && ./scripts/configure.sh -a 9712bfef-07af-4a61-804e-b2fa08462f70 -e test -o connexus -p centralus -ps cus -t devops -z concrete-cms
 
+.PHONY: az_deploy_test
+az_deploy_test: az_configure_test az_clean az_deploy
 
 #### PROD ENVIRONMENT ####
 
@@ -96,6 +103,8 @@ az_configure_uat:
 az_configure_prd:
 	@cd az && ./scripts/configure.sh -a 9712bfef-07af-4a61-804e-b2fa08462f70 -e prd -o connexus -p centralus -ps cus -t devops -z concrete-cms
 
+.PHONY: az_deploy_prd
+az_deploy_prd: az_configure_prd az_clean az_deploy
 
 #### DEPLOYMENTS ALL APPLICATION ENVIRONMENTS ####
 
@@ -159,7 +168,7 @@ website_deploy_docker:
 	@echo 'docker build'
 	@tag=$(shell date +%Y%m%d) && cd cnx-website && sudo docker build -t cnx-website:$$tag .
 	@echo 'docker login'
-	@sudo az acr login --name cnxdevcusregistry
+	@sudo az acr login --name cnxbuildcusregistry
 	@echo 'docker push'
-	@tag=$(shell date +%Y%m%d) && sudo docker tag cnx-website:$$tag cnxdevcusregistry.azurecr.io/cnx-website:$$tag
-	@tag=$(shell date +%Y%m%d) && sudo docker push cnxdevcusregistry.azurecr.io/cnx-website:$$tag
+	@tag=$(shell date +%Y%m%d) && sudo docker tag cnx-website:$$tag cnxbuildcusregistry.azurecr.io/cnx-website:$$tag
+	@tag=$(shell date +%Y%m%d) && sudo docker push cnxbuildcusregistry.azurecr.io/cnx-website:$$tag

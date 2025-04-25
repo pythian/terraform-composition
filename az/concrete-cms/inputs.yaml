@@ -31,6 +31,41 @@ application_gateway_virtual_network: web
 app_service_app_settings:
   connexusenergy:
     WEBSITES_ENABLE_APP_SERVICE_STORAGE: true
+    MYSQL_USER: connexusenergy_user_2024
+app_service_auto_scale_profile:
+  default:
+    capacity:
+      minimum: 2
+      maximum: 30
+      default: 2
+    rules:
+      - metric_trigger:
+          operator: GreaterThan
+          metric_name: "CpuPercentage"
+          statistic: Average
+          threshold: 50
+          time_aggregation: Average
+          time_grain: PT1M
+          time_window: PT1M
+        scale_action:
+          cooldown: PT3M
+          direction: Increase
+          adjustment: 66
+          adjustment_type: PercentChangeCount
+      - metric_trigger:
+          operator: LessThan
+          metric_name: "CpuPercentage"
+          statistic: Average
+          threshold: 33
+          time_aggregation: Average
+          time_grain: PT1M
+          time_window: PT1M
+        scale_action:
+          cooldown: PT3M
+          direction: Decrease
+          value: 1
+          type: ChangeCount
+app_service_mysql_password_secret_name: connexusenergy-user-2024-db-password
 app_service_client_certificate_mode:
   connexusenergy: "Optional"
 app_service_hostnames:
@@ -61,9 +96,9 @@ app_service_site_config:
     cors_support_credentials: "false"
     default_documents:
     detailed_error_messages: true
-    docker_image_name: cnx-website:20250424
+    docker_image_name: cnx-website:20250425
     docker_registry_password:
-    docker_registry_url: https://cnxdevcusregistry.azurecr.io
+    docker_registry_url: https://cnxbuildcusregistry.azurecr.io
     docker_registry_username:
     dotnet_version:
     failed_request_tracing: true
@@ -96,10 +131,6 @@ app_service_virtual_network_subnet:
     subnet: AppServiceSubnet
 app_service_webapps:
 - connexusenergy
-### container registry
-container_registry_name: registry
-container_registry_name_override:
-container_registry_sku: Basic
 ### key Vault
 key_vault_name: web-01
 key_vault_name_override:
