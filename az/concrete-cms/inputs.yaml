@@ -43,10 +43,10 @@ app_service_auto_scale_profile:
           operator: GreaterThan
           metric_name: "CpuPercentage"
           statistic: Average
-          threshold: 50
+          threshold: 40
           time_aggregation: Average
           time_grain: PT1M
-          time_window: PT1M
+          time_window: PT5M
         scale_action:
           cooldown: PT1M
           direction: Increase
@@ -59,7 +59,7 @@ app_service_auto_scale_profile:
           threshold: 33
           time_aggregation: Average
           time_grain: PT1M
-          time_window: PT1M
+          time_window: PT5M
         scale_action:
           cooldown: PT3M
           direction: Decrease
