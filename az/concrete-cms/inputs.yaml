@@ -50,8 +50,8 @@ app_service_auto_scale_profile:
         scale_action:
           cooldown: PT3M
           direction: Increase
-          adjustment: 66
-          adjustment_type: PercentChangeCount
+          value: 66
+          type: PercentChangeCount
       - metric_trigger:
           operator: LessThan
           metric_name: "CpuPercentage"
