@@ -48,7 +48,7 @@ app_service_auto_scale_profile:
           time_grain: PT1M
           time_window: PT1M
         scale_action:
-          cooldown: PT3M
+          cooldown: PT1M
           direction: Increase
           value: 66
           type: PercentChangeCount
