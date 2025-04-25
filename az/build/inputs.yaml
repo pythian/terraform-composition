@@ -9,5 +9,5 @@ container_name_override:
 ### container registry
 container_registry_name: registry
 container_registry_name_override:
-container_registry_sku: Basic
+container_registry_sku: Standard
 tags: {}

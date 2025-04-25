@@ -209,20 +209,20 @@ resource "azurerm_linux_web_app" "main" {
   for_each = var.webapps
 
   app_settings = merge(var.app_settings[each.key], {
-    MYSQL_PASSWORD             = "@Microsoft.KeyVault(SecretUri=${data.azurerm_key_vault_secret.main.versionless_id})"
+    MYSQL_PASSWD               = "@Microsoft.KeyVault(SecretUri=${data.azurerm_key_vault_secret.main.versionless_id})"
     MYSQL_ADDR                 = var.mysql_server_address
-    CANNONICAL_URL             = "https://${var.prefix != "" ? format("https://%s.%s", var.prefix, each.key) : each.key}"
-    CANNONICAL_URL_ALTERNATIVE = "https://${var.prefix != "" ? format("https://%s.%s/", var.prefix, each.key) : each.key}"
+    CANNONICAL_URL             = "https://${format("%s.%s.com", var.prefix, each.key)}"
+    CANNONICAL_URL_ALTERNATIVE = "https://${format("%s.%s.com/", var.prefix, each.key)}"
   })
-  client_certificate_mode   = lookup(var.client_certificate_mode, each.key, null)
-  https_only                = local.https_only
-  name                      = "${var.name}-${each.key}"
-  resource_group_name       = azurerm_service_plan.main.resource_group_name
-  location                  = azurerm_service_plan.main.location
-  service_plan_id           = azurerm_service_plan.main.id
-  tags                      = var.tags
-  virtual_network_subnet_id = lookup(var.virtual_network_subnet_id, each.key, null)
-
+  client_certificate_mode         = lookup(var.client_certificate_mode, each.key, null)
+  https_only                      = local.https_only
+  key_vault_reference_identity_id = azurerm_user_assigned_identity.app[each.key].id
+  name                            = "${var.name}-${each.key}"
+  resource_group_name             = azurerm_service_plan.main.resource_group_name
+  location                        = azurerm_service_plan.main.location
+  service_plan_id                 = azurerm_service_plan.main.id
+  tags                            = var.tags
+  virtual_network_subnet_id       = lookup(var.virtual_network_subnet_id, each.key, null)
   identity {
     type = "UserAssigned"
     identity_ids = [
@@ -234,11 +234,13 @@ resource "azurerm_linux_web_app" "main" {
     for_each = tomap({ "config" = lookup(var.site_config, each.key, {}) })
 
     content {
-      always_on                               = lookup(site_config.value, "always_on", true)
-      api_definition_url                      = lookup(site_config.value, "api_definition_url", null)
-      api_management_api_id                   = lookup(site_config.value, "api_management_api_id", null)
-      app_command_line                        = lookup(site_config.value, "app_command_line", null)
-      container_registry_use_managed_identity = lookup(site_config.value, "container_registry_use_managed_identity", true)
+      always_on                                     = lookup(site_config.value, "always_on", true)
+      api_definition_url                            = lookup(site_config.value, "api_definition_url", null)
+      api_management_api_id                         = lookup(site_config.value, "api_management_api_id", null)
+      app_command_line                              = lookup(site_config.value, "app_command_line", null)
+      container_registry_use_managed_identity       = lookup(site_config.value, "container_registry_use_managed_identity", true)
+      container_registry_managed_identity_client_id = azurerm_user_assigned_identity.app[each.key].client_id
+
       application_stack {
         docker_image_name        = lookup(site_config.value, "docker_image_name", null)
         docker_registry_url      = lookup(site_config.value, "docker_registry_url", null)
@@ -286,7 +288,7 @@ resource "azurerm_linux_web_app" "main" {
       default_documents                 = lookup(site_config.value, "default_documents", null) != null ? tolist(split(",", replace(lookup(site_config.value, "default_documents"), " ", ""))) : null
       ftps_state                        = lookup(site_config.value, "ftps_state", "Disabled")
       health_check_path                 = lookup(site_config.value, "health_check_path", "/")
-      health_check_eviction_time_in_min = lookup(site_config.value, "health_check_eviction_time_in_min", null)
+      health_check_eviction_time_in_min = lookup(site_config.value, "health_check_eviction_time_in_min", 5)
       http2_enabled                     = lookup(site_config.value, "http2_enabled", false)
 
 
