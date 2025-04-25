@@ -104,8 +104,8 @@ app_service_site_config:
     failed_request_tracing: true
     ftps_state: "FtpsOnly"
     go_version:
-    health_check_eviction_time_in_min:
-    health_check_path:
+    health_check_eviction_time_in_min: 3
+    health_check_path: "/"
     http2_enabled: "false"
     http_logging_retention_in_days: 7
     http_logging_retention_in_mb: 35

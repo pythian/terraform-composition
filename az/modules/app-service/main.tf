@@ -285,7 +285,7 @@ resource "azurerm_linux_web_app" "main" {
       }
       default_documents                 = lookup(site_config.value, "default_documents", null) != null ? tolist(split(",", replace(lookup(site_config.value, "default_documents"), " ", ""))) : null
       ftps_state                        = lookup(site_config.value, "ftps_state", "Disabled")
-      health_check_path                 = lookup(site_config.value, "health_check_path", null)
+      health_check_path                 = lookup(site_config.value, "health_check_path", "/")
       health_check_eviction_time_in_min = lookup(site_config.value, "health_check_eviction_time_in_min", null)
       http2_enabled                     = lookup(site_config.value, "http2_enabled", false)
 
