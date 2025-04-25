@@ -408,7 +408,7 @@ resource "azurerm_monitor_autoscale_setting" "main" {
           metric_trigger {
             operator           = rule.value.metric_trigger.operator
             metric_name        = rule.value.metric_trigger.metric_name
-            metric_resource_id = azurerm_app_service_plan.main.id
+            metric_resource_id = azurerm_service_plan.main.id
             statistic          = rule.value.metric_trigger.statistic
             threshold          = rule.value.metric_trigger.threshold
             time_aggregation   = rule.value.metric_trigger.time_aggregation
