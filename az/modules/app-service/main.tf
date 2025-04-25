@@ -209,8 +209,10 @@ resource "azurerm_linux_web_app" "main" {
   for_each = var.webapps
 
   app_settings = merge(var.app_settings[each.key], {
-    MYSQL_PASSWORD = "@Microsoft.KeyVault(SecretUri=${data.azurerm_key_vault_secret.main.versionless_id})"
-    MYSQL_ADDR     = var.mysql_server_address
+    MYSQL_PASSWORD             = "@Microsoft.KeyVault(SecretUri=${data.azurerm_key_vault_secret.main.versionless_id})"
+    MYSQL_ADDR                 = var.mysql_server_address
+    CANNONICAL_URL             = "https://${var.prefix != "" ? format("https://%s.%s", var.prefix, each.key) : each.key}"
+    CANNONICAL_URL_ALTERNATIVE = "https://${var.prefix != "" ? format("https://%s.%s/", var.prefix, each.key) : each.key}"
   })
   client_certificate_mode   = lookup(var.client_certificate_mode, each.key, null)
   https_only                = local.https_only

@@ -87,7 +87,7 @@ module "app_service" {
       local.inputs.app_service_name,
     )
   )
-  prefix         = local.env.environment != "prod" ? local.env.environment : "www"
+  prefix         = local.env.environment != "prod" ? local.env.environment : "prd" # "www" #temporary url prefix
   resource_group = module.resource_group.name
   site_config    = local.inputs.app_service_site_config
   sku            = local.inputs.app_service_sku
