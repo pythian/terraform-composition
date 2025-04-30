@@ -98,7 +98,7 @@ app_service_site_config:
     cors_support_credentials: "false"
     default_documents:
     detailed_error_messages: true
-    docker_image_name: cnx-website:20250426
+    docker_image_name: cnx-website:20250430
     docker_registry_password:
     docker_registry_url: https://cnxbuildcusregistry.azurecr.io
     docker_registry_username:
@@ -160,6 +160,8 @@ mysql_databases:
 mysql_server_configuration:
   innodb_buffer_pool_size: 4294967296
   require_secure_transport: "OFF"
+  table_definition_cache: 40000
+  table_open_cache: 40000
 mysql_sku: MO_Standard_E4ads_v5
 mysql_zone: "3"
 ### Private DNS
