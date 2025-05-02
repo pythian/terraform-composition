@@ -127,6 +127,7 @@ app_service_site_config:
 app_service_sku: P0v3
 app_service_storage_mount_path:
   assets: /var/www/html/application/files
+  overrides: /var/www/html/application/config/generated_overrides
 app_service_virtual_network_subnet:
   connexusenergy:
     virtual_network: web
@@ -242,6 +243,11 @@ storage_account_public_network_access_enabled: true
 storage_account_shares:
   assets:
     name: assets
+    enabled_protocol: "SMB"
+    quota: 100
+    acl: {}
+  overrides:
+    name: overrides
     enabled_protocol: "SMB"
     quota: 100
     acl: {}

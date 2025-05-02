@@ -29,7 +29,7 @@ return [
     ],
     'security' => [
         'production' => [
-            'mode' => 'development',
+            'mode' => 'production',
         ],
         'misc' => [
             'content_security_policy' => true,
@@ -74,6 +74,10 @@ return [
         'clear' => [
             'thumbnails' => true,
         ],
+    ],
+    'debug' => [
+        'display_errors' => false,
+        'detail' => 'message'
     ],
     'theme' => [
         'compress_preprocessor_output' => false,
