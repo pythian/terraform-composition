@@ -215,7 +215,7 @@ output "share_ids" {
 
 output "share_names" {
   description = "Shares created under the storage account"
-  value       = [for s in azurerm_storage_share.main : s.name]
+  value       = { for k, s in azurerm_storage_share.main : k => s.name }
 }
 
 output "tier" {

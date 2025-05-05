@@ -92,12 +92,10 @@ module "app_service" {
   site_config    = local.inputs.app_service_site_config
   sku            = local.inputs.app_service_sku
   storage_account = { for k, v in local.inputs.app_service_storage_mount_path : k => {
-    account_id   = module.storage_account.id
-    account_key  = module.storage_account.access_key
     access_key   = module.storage_account.access_key
     account_name = module.storage_account.name
-    name         = module.storage_account.name
-    share_name   = module.storage_account.share_names[0]
+    name         = module.storage_account.share_names[k]
+    share_name   = module.storage_account.share_names[k]
     type         = local.storage_type
     mount_path   = v
     }

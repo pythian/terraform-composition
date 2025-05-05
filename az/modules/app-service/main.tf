@@ -328,7 +328,7 @@ resource "azurerm_linux_web_app" "main" {
     for_each = var.storage_account
     content {
       access_key   = storage_account.value.access_key
-      account_name = storage_account.value.name
+      account_name = storage_account.value.account_name
       name         = storage_account.value.name
       share_name   = storage_account.value.share_name
       type         = storage_account.value.type
