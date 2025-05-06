@@ -42,6 +42,10 @@ AddOutputFilterByType DEFLATE application/javascript
 AddOutputFilterByType DEFLATE application/x-javascript
 FileETag none
 
+<IfModule mod_deflate.c>
+   AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/javascript
+</IfModule>
+
 <IfModule mod_expires.c>
 ExpiresActive On
 ExpiresDefault "access plus 1 month"

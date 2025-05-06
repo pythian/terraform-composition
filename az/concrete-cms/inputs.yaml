@@ -44,26 +44,26 @@ app_service_auto_scale_profile:
           metric_name: "CpuPercentage"
           metric_namespace: "microsoft.web/serverfarms"
           statistic: Average
-          threshold: 40
+          threshold: 60
           time_aggregation: Average
           time_grain: PT1M
           time_window: PT1M
         scale_action:
           cooldown: PT1M
           direction: Increase
-          value: 66
+          value: 100
           type: PercentChangeCount
       - metric_trigger:
           operator: LessThan
           metric_name: "CpuPercentage"
           metric_namespace: "microsoft.web/serverfarms"
           statistic: Average
-          threshold: 33
+          threshold: 30
           time_aggregation: Average
           time_grain: PT1M
-          time_window: PT1M
+          time_window: PT10M
         scale_action:
-          cooldown: PT3M
+          cooldown: PT10M
           direction: Decrease
           value: 1
           type: ChangeCount
@@ -98,7 +98,7 @@ app_service_site_config:
     cors_support_credentials: "false"
     default_documents:
     detailed_error_messages: true
-    docker_image_name: cnx-website:20250502
+    docker_image_name: cnx-website:20250505
     docker_registry_password:
     docker_registry_url: https://cnxbuildcusregistry.azurecr.io
     docker_registry_username:
@@ -120,11 +120,11 @@ app_service_site_config:
     php_version:
     python_version:
     ruby_version:
-    use_32_bit_worker: "true"
+    use_32_bit_worker: "false"
     vnet_route_all_enabled: "true"
     websockets_enabled: "false"
-    worker_count: "1"
-app_service_sku: P0v3
+    worker_count: "2"
+app_service_sku: P1v3
 app_service_storage_mount_path:
   assets: /var/www/html/application/files
   overrides: /var/www/html/application/config/generated_overrides
