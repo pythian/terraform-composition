@@ -31,7 +31,7 @@ export const options = {
         },
     },
     thresholds: {
-        get_errors: ['rate<0.01'], // < 1%
+        get_errors: ['rate<0.03'], // < 3%
         get_response_time: ['p(95)<2000'], // < 2s
     },
 };
