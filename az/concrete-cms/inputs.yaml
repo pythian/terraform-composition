@@ -44,7 +44,7 @@ app_service_auto_scale_profile:
           metric_name: "CpuPercentage"
           metric_namespace: "microsoft.web/serverfarms"
           statistic: Average
-          threshold: 60
+          threshold: 50
           time_aggregation: Average
           time_grain: PT1M
           time_window: PT1M
@@ -58,7 +58,7 @@ app_service_auto_scale_profile:
           metric_name: "CpuPercentage"
           metric_namespace: "microsoft.web/serverfarms"
           statistic: Average
-          threshold: 30
+          threshold: 20
           time_aggregation: Average
           time_grain: PT1M
           time_window: PT10M
@@ -134,6 +134,37 @@ app_service_virtual_network_subnet:
     subnet: AppServiceSubnet
 app_service_webapps:
 - connexusenergy
+### Container App
+container_app_name: website
+container_app_name_override:
+container_app_container:
+  connexusenergy:
+    image: cnx-website:20250505
+    cpu: 0.5
+    memory: "1Gi"
+    name: "controller"
+    liveness_probe:
+      failure_threshold: 5
+      http_get:
+        port: 80
+        transport: "TCP"
+      initial_delay_seconds: 10
+      interval_seconds: 10
+      timeout_seconds: 5
+    readiness_probe:
+      http_get:
+        port: 80
+        transport: "TCP"
+      interval_seconds: 10
+      timeout_seconds: 5
+container_app_ingress:
+  allow_insecure_connections: true
+  target_port: 80 # this needs to be changed to 443 when the certificate is integrated
+  transport: "auto"
+  external_enabled: true
+container_app_replicas:
+  max: 10
+  min: 2
 ### key Vault
 key_vault_name: web-01
 key_vault_name_override:

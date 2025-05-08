@@ -105,6 +105,26 @@ module "app_service" {
   webapps                   = local.inputs.app_service_webapps
 }
 
+module "container-app" {
+  source = "../modules/container-app"
+
+  container_registry_id = data.terraform_remote_state.shared.outputs.container_registry_id
+  container             = local.inputs.container_app_container
+  ingress               = local.inputs.container_app_ingress
+  location              = local.env.location
+  name = coalesce(local.inputs.container_app_name_override,
+    format("%s-%s-%s-%s",
+      local.az.prefix,
+      local.env.environment,
+      local.env.location_short,
+      local.inputs.container_app_name,
+    )
+  )
+  replicas       = local.inputs.container_app_replicas
+  resource_group = module.resource_group.name
+  tags           = merge(local.inputs.tags, local.env.tags)
+}
+
 module "key_vault" {
   source = "../modules/key-vault"
 
