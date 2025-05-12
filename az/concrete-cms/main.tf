@@ -5,6 +5,7 @@ locals {
   inputs       = yamldecode(file("./inputs.yaml"))
   networks     = yamldecode((file("../networks.yaml")))
   storage_type = "AzureFiles"
+  url_prefix   = local.env.environment != "prod" ? local.env.environment : "prd" # "www" #temporary url prefix
 }
 
 provider "azurerm" {
@@ -24,6 +25,10 @@ data "terraform_remote_state" "shared" {
   }
 }
 
+data "azurerm_key_vault_secret" "mysql_password" {
+  name         = local.inputs.mysql_password_secret_name
+  key_vault_id = module.key_vault.id
+}
 
 module "application_gateway" {
   source = "../modules/app-gateway"
@@ -87,7 +92,7 @@ module "app_service" {
       local.inputs.app_service_name,
     )
   )
-  prefix         = local.env.environment != "prod" ? local.env.environment : "prd" # "www" #temporary url prefix
+  prefix         = local.url_prefix
   resource_group = module.resource_group.name
   site_config    = local.inputs.app_service_site_config
   sku            = local.inputs.app_service_sku
@@ -105,13 +110,61 @@ module "app_service" {
   webapps                   = local.inputs.app_service_webapps
 }
 
-module "container-app" {
+module "container_app" {
   source = "../modules/container-app"
 
   container_registry_id = data.terraform_remote_state.shared.outputs.container_registry_id
-  container             = local.inputs.container_app_container
-  ingress               = local.inputs.container_app_ingress
-  location              = local.env.location
+  container = merge(local.inputs.container_app_container, {
+    secrets = [
+      {
+        name  = "mysql-passwd",
+        value = data.azurerm_key_vault_secret.mysql_password.value
+      },
+      {
+        name  = "mysql-user",
+        value = local.inputs.container_app_mysql_user
+      },
+      {
+        name  = "mysql-addr",
+        value = "${module.mysql.name}.mysql.database.azure.com"
+      },
+      {
+        name  = "cannonical-url",
+        value = "https://${format("%s.%s", local.url_prefix, local.inputs.container_app_domain)}"
+      },
+      {
+        name  = "cannonical-url-alt",
+        value = "https://${format("%s.%s/", local.url_prefix, local.inputs.container_app_domain)}"
+      },
+    ]
+    env = [
+      {
+        name        = "MYSQL_PASSWD",
+        secret_name = "mysql-passwd",
+      },
+      {
+        name        = "MYSQL_USER",
+        secret_name = "mysql-user",
+      },
+      {
+        name        = "MYSQL_ADDR",
+        secret_name = "mysql-addr",
+      },
+      {
+        name        = "CANNONICAL_URL",
+        secret_name = "cannonical-url",
+      },
+      {
+        name        = "CANNONICAL_URL_ALTERNATIVE",
+        secret_name = "cannonical-url-alt",
+      },
+    ]
+  })
+  custom_domain          = format("%s.%s", local.url_prefix, local.inputs.container_app_domain)
+  ingress                = local.inputs.container_app_ingress
+  key_vault_certificates = local.inputs.container_app_key_vault_certificates
+  key_vault_id           = module.key_vault.id
+  location               = local.env.location
   name = coalesce(local.inputs.container_app_name_override,
     format("%s-%s-%s-%s",
       local.az.prefix,
@@ -120,8 +173,38 @@ module "container-app" {
       local.inputs.container_app_name,
     )
   )
-  replicas       = local.inputs.container_app_replicas
+  private_network_subnet_id = module.vnet[local.inputs.container_app_virtual_network].subnet_ids[local.inputs.container_app_subnet]
+  replicas                  = local.inputs.container_app_replicas
+  resource_group            = module.resource_group.name
+  storage = { for k, v in local.inputs.container_app_storage : k => {
+    access_key  = module.storage_account.access_key
+    access_mode = v.access_mode
+    name        = module.storage_account.name
+    share_name  = module.storage_account.share_names[k]
+    mount_path  = v.mount_path
+    }
+  }
+
+  tags             = merge(local.inputs.tags, local.env.tags)
+  workload_profile = local.inputs.container_app_workload_profile
+}
+
+module "container_app_private_dns" {
+  source = "../modules/private-dns"
+
+  a_records = {
+    "*" = {
+      name    = "*"
+      records = [module.container_app.ip_address]
+    }
+    "@" = {
+      name    = "@"
+      records = [module.container_app.ip_address]
+    }
+  }
+  name           = format("%s.%s", local.url_prefix, local.inputs.container_app_domain)
   resource_group = module.resource_group.name
+  vnet_id        = { for network_name in local.inputs.container_app_private_dns_links : network_name => module.vnet[network_name].id }
   tags           = merge(local.inputs.tags, local.env.tags)
 }
 
@@ -407,6 +490,16 @@ output "app_service_webapp_ids" {
 output "app_service_webapp_names" {
   description = "App service plan deployed web applications names"
   value       = module.app_service.webapp_names
+}
+
+output "container_app_id" {
+  description = "Container app id"
+  value       = module.container_app.id
+}
+
+output "container_app_name" {
+  description = "Container app name"
+  value       = module.container_app.name
 }
 
 output "key_vault_resource_group_id" {

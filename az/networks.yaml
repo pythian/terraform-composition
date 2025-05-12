@@ -11,6 +11,7 @@ dev:
       default: 10.1.4.0/24
       AppServiceSubnet: 10.1.5.0/24
       PrivateEndpointSubnet: 10.1.6.0/24
+      containerAppsSubnet: 10.1.7.0/24
 test:
   db:
     address_space:
@@ -24,6 +25,7 @@ test:
       default: 10.2.4.0/24
       AppServiceSubnet: 10.2.5.0/24
       PrivateEndpointSubnet: 10.2.6.0/24
+      containerAppsSubnet: 10.2.7.0/24
 prd:
   db:
     address_space:
@@ -37,3 +39,4 @@ prd:
       default: 10.3.4.0/24
       AppServiceSubnet: 10.3.5.0/24
       PrivateEndpointSubnet: 10.3.6.0/24
+      containerAppsSubnet: 10.3.7.0/24

@@ -187,6 +187,17 @@ func TestAzProject(t *testing.T) {
 		t.Errorf("App service webapps input is not properly configured in inputs.yaml")
 	}
 
+	//Test container app
+	expectedContainerAppName := az["prefix"].(string) + "-" + env["environment"].(string) + "-" + env["location_short"].(string) + "-" + inputs["container_app_name"].(string)
+	if override, exists := inputs["container_app_name_override"]; exists && override != nil {
+		expectedContainerAppName = override.(string)
+	}
+	if assert.Equal(t, expectedContainerAppName, outputs["container_app_name"].(string)) {
+		t.Logf("Container app name test PASSED. Expected container app name %s, got %s.", expectedContainerAppName, outputs["container_app_name"].(string))
+	} else {
+		t.Errorf("Container app name test FAILED. Expected container app name %s, got %s.", expectedContainerAppName, outputs["container_app_name"].(string))
+	}
+
 	//Test key vault resource group
 	expectedKeyVaultRgName := az["prefix"].(string) + "-" + env["environment"].(string) + "-" + env["location_short"].(string) + "-" + inputs["key_vault_resource_group_name"].(string)
 	if override, exists := inputs["key_vault_resource_group_name_override"]; exists && override != nil {

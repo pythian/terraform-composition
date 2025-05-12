@@ -115,7 +115,7 @@ az_clean:
 
 .PHONY: az_deploy
 az_deploy: az_init
-	@cd az/concrete-cms/test && go test -v
+	@cd az/concrete-cms/test && go test -timeout 30m -v
 
 .PHONY: az_init
 az_init:

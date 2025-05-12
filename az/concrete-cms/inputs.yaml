@@ -135,36 +135,55 @@ app_service_virtual_network_subnet:
 app_service_webapps:
 - connexusenergy
 ### Container App
-container_app_name: website
-container_app_name_override:
 container_app_container:
-  connexusenergy:
-    image: cnx-website:20250505
-    cpu: 0.5
-    memory: "1Gi"
-    name: "controller"
-    liveness_probe:
-      failure_threshold: 5
-      http_get:
-        port: 80
-        transport: "TCP"
-      initial_delay_seconds: 10
-      interval_seconds: 10
-      timeout_seconds: 5
-    readiness_probe:
-      http_get:
-        port: 80
-        transport: "TCP"
-      interval_seconds: 10
-      timeout_seconds: 5
+  image: cnx-website:20250505
+  cpu: 0.5
+  memory: "1Gi"
+  name: "connexusenergy"
+  liveness_probe:
+    failure_threshold: 5
+    http_get:
+      port: 80
+      transport: "TCP"
+    initial_delay_seconds: 10
+    interval_seconds: 10
+    timeout_seconds: 5
+  readiness_probe:
+    http_get:
+      port: 80
+      transport: "TCP"
+    interval_seconds: 10
+    timeout_seconds: 5
+container_app_domain: connexusenergy.com
 container_app_ingress:
-  allow_insecure_connections: true
-  target_port: 80 # this needs to be changed to 443 when the certificate is integrated
+  allow_insecure_connections: false
+  target_port: 80
   transport: "auto"
   external_enabled: true
+container_app_key_vault_certificates:
+  wildcard: "wildcard-connexusenergy"
+container_app_mysql_user: connexusenergy_user_2024
+container_app_name: website
+container_app_name_override:
+container_app_private_dns_links:
+  - web
 container_app_replicas:
   max: 10
   min: 2
+container_app_subnet: containerAppsSubnet
+container_app_storage:
+  assets:
+    access_mode: "ReadWrite"
+    mount_path: /var/www/html/application/files
+  overrides:
+    access_mode: "ReadWrite"
+    mount_path: /var/www/html/application/config/generated_overrides
+container_app_workload_profile:
+  name: Consumption
+  workload_profile_type: Consumption
+  maximum_count:
+  minimum_count:
+container_app_virtual_network: web
 ### key Vault
 key_vault_name: web-01
 key_vault_name_override:
@@ -189,6 +208,7 @@ mysql_databases:
   connex-db-live:
     charset: utf8
     collation: utf8_unicode_ci
+mysql_password_secret_name: connexusenergy-user-2024-db-password
 mysql_server_configuration:
   innodb_buffer_pool_size: 4294967296
   require_secure_transport: "OFF"
@@ -306,8 +326,14 @@ virtual_networks:
           service_name: "Microsoft.Web/serverFarms"
           service_actions:
           - "Microsoft.Network/virtualNetworks/subnets/action"
+      containerAppsSubnet:
+        delegation:
+          service_name: "Microsoft.App/environments"
+          service_actions:
+          - "Microsoft.Network/virtualNetworks/subnets/join/action"
     subnet_private_service_policies_enabled:
       AppServiceSubnet: true
+      containerAppsSubnet: true
       default: true
       PrivateEndpointSubnet: true
     subnet_services: {}

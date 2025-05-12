@@ -39,6 +39,12 @@ variable "container" {
       success_threshold = optional(number, null)
       timeout_seconds   = optional(number, null)
     }), null)
+    secrets = optional(list(object({
+      name                = string
+      key_vault_secret_id = optional(string, null)
+      identity            = optional(string, null)
+      value               = optional(string, null)
+    })), [])
     startup_probe = optional(object({
       failure_threshold = optional(number, null)
       http_get = optional(object({
@@ -53,11 +59,18 @@ variable "container" {
   })
 }
 
+variable "custom_domain" {
+  description = "Custom domain to use for the container app"
+  type        = string
+
+  default = ""
+}
+
 variable "identity_type" {
   description = "Managed identity type to be used by the container app"
   type        = string
 
-  default = "SystemAssigned"
+  default = "UserAssigned"
 }
 
 variable "ingress" {
@@ -69,13 +82,27 @@ variable "ingress" {
       certificate_id           = string
       name                     = string
     })), {})
-    external_enabled = optional(bool, false)
-    fqdn             = optional(string)
-    target_port      = optional(number)
-    transport        = optional(string, "auto")
+    client_certificate_mode = optional(string, "ignore")
+    external_enabled        = optional(bool, false)
+    fqdn                    = optional(string)
+    target_port             = optional(number)
+    transport               = optional(string, "auto")
   })
 
   default = {}
+}
+
+variable "key_vault_id" {
+  description = "Id of the key vault to use for the container app"
+  type        = string
+
+  default = ""
+}
+
+variable "key_vault_certificates" {
+  description = "Name of the key vault secret to use for the container app"
+  type        = map(string)
+  default     = {}
 }
 
 variable "location" {
@@ -117,6 +144,19 @@ variable "resource_group" {
   type        = string
 }
 
+variable "storage" {
+  description = "Storage account to use for the container app environment"
+  type = map(object({
+    access_key  = string
+    access_mode = optional(string, "ReadWrite")
+    mount_path  = optional(string, null)
+    name        = string
+    share_name  = string
+  }))
+
+  default = {}
+}
+
 variable "tags" {
   description = "Tags to apply to the container app"
   type        = map(string)
@@ -124,21 +164,60 @@ variable "tags" {
   default = {}
 }
 
+variable "workload_profile" {
+  description = "Workload profile to use for the container app"
+  type        = map(string)
+
+  default = {}
+
+}
+
 locals {
   container_registry_domain = "azurecr.io"
   latest_revision           = true
   revision_mode             = "Single"
   traffic_weight_percentage = 100
+  mount_options             = "dir_mode=0777,file_mode=0777,uid=33,gid=33,mfsymlinks,nobrl,cache=none"
+}
+
+data "azurerm_container_app_environment_certificate" "cert" {
+  for_each = var.key_vault_certificates
+
+  name                         = each.value
+  container_app_environment_id = azurerm_container_app_environment.env.id
+}
+
+
+resource "azurerm_user_assigned_identity" "main" {
+  name                = format("%s-identity", var.name)
+  location            = var.location
+  resource_group_name = var.resource_group
+  tags                = var.tags
 }
 
 resource "azurerm_container_app_environment" "env" {
   location                       = var.location
   log_analytics_workspace_id     = var.log_analytics_workspace_id == "" ? null : var.log_analytics_workspace_id
+  internal_load_balancer_enabled = var.private_network_subnet_id == "" ? false : true
+  infrastructure_subnet_id       = var.private_network_subnet_id == "" ? null : var.private_network_subnet_id
   name                           = var.name
   resource_group_name            = var.resource_group
   tags                           = var.tags
-  internal_load_balancer_enabled = var.private_network_subnet_id == "" ? false : true
-  infrastructure_subnet_id       = var.private_network_subnet_id == "" ? null : var.private_network_subnet_id
+  dynamic "workload_profile" {
+    for_each = var.workload_profile == {} ? [] : [for v in [var.workload_profile] : v]
+    content {
+      name                  = try(workload_profile.value.name)
+      workload_profile_type = try(workload_profile.value.workload_profile_type)
+      maximum_count         = try(workload_profile.value.maximum_count)
+      minimum_count         = try(workload_profile.value.minimum_count)
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      infrastructure_resource_group_name,
+    ]
+  }
 }
 
 resource "azurerm_container_app" "main" {
@@ -149,13 +228,15 @@ resource "azurerm_container_app" "main" {
   tags                         = var.tags
 
   identity {
-    type = var.identity_type
+    type         = var.identity_type
+    identity_ids = [azurerm_user_assigned_identity.main.id]
   }
 
   dynamic "ingress" {
     for_each = [for v in [var.ingress] : v]
     content {
       allow_insecure_connections = try(ingress.value.allow_insecure_connections)
+      client_certificate_mode    = try(ingress.value.client_certificate_mode)
       external_enabled           = try(ingress.value.external_enabled)
       fqdn                       = try(ingress.value.fqdn)
       target_port                = try(ingress.value.target_port)
@@ -177,7 +258,18 @@ resource "azurerm_container_app" "main" {
   }
 
   registry {
-    server = format("%s.%s", basename(var.container_registry_id), local.container_registry_domain)
+    server   = format("%s.%s", basename(var.container_registry_id), local.container_registry_domain)
+    identity = azurerm_user_assigned_identity.main.id
+  }
+
+  dynamic "secret" {
+    for_each = var.container.secrets
+    content {
+      name                = secret.value.name
+      value               = try(secret.value.value)
+      key_vault_secret_id = try(secret.value.key_vault_secret_id)
+      identity            = try(secret.value.identity)
+    }
   }
 
   template {
@@ -238,24 +330,62 @@ resource "azurerm_container_app" "main" {
             timeout                 = try(startup_probe.value.timeout_seconds)
           }
         }
-      }
 
+        dynamic "volume_mounts" {
+          for_each = var.storage
+          content {
+            name = volume_mounts.key
+            path = try(volume_mounts.value.mount_path)
+          }
+        }
+      }
     }
 
+    dynamic "volume" {
+      for_each = var.storage
+      content {
+        name          = volume.key
+        storage_name  = "${azurerm_container_app_environment.env.name}-${volume.key}"
+        storage_type  = "AzureFile"
+        mount_options = local.mount_options
+      }
+    }
   }
 
-  depends_on = [azurerm_role_assignment.roles]
 
-  lifecycle {
-    ignore_changes = [
-      secret,
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     secret,
+  #   ]
+  # }
+
+  depends_on = [
+    azurerm_role_assignment.acr,
+    azurerm_container_app_environment_storage.main,
+  ]
 
 }
 
+resource "azurerm_container_app_environment_storage" "main" {
+  for_each = var.storage
+
+  access_key                   = each.value.access_key
+  access_mode                  = each.value.access_mode
+  account_name                 = each.value.name
+  container_app_environment_id = azurerm_container_app_environment.env.id
+  name                         = "${azurerm_container_app_environment.env.name}-${each.key}"
+  share_name                   = each.value.share_name
+}
+
+resource "azurerm_container_app_custom_domain" "example" {
+  name                                     = var.custom_domain
+  container_app_id                         = azurerm_container_app.main.id
+  container_app_environment_certificate_id = data.azurerm_container_app_environment_certificate.cert["wildcard"].id
+  certificate_binding_type                 = "SniEnabled"
+}
+
 resource "azurerm_role_assignment" "acr" {
-  principal_id         = azurerm_container_app.main.identity[0].principal_id
+  principal_id         = azurerm_user_assigned_identity.main.principal_id
   role_definition_name = "AcrPull"
   scope                = var.container_registry_id
 }

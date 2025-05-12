@@ -12,6 +12,7 @@
 
 | Name | Version |
 |------|---------|
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.26.0 |
 | <a name="provider_terraform"></a> [terraform](#provider\_terraform) | n/a |
 
 ## Modules
@@ -21,7 +22,8 @@
 | <a name="module_app_service"></a> [app\_service](#module\_app\_service) | ../modules/app-service | n/a |
 | <a name="module_app_service_private-endpoints"></a> [app\_service\_private-endpoints](#module\_app\_service\_private-endpoints) | ../modules/private-endpoint | n/a |
 | <a name="module_application_gateway"></a> [application\_gateway](#module\_application\_gateway) | ../modules/app-gateway | n/a |
-| <a name="module_container-app"></a> [container-app](#module\_container-app) | ../modules/container-app | n/a |
+| <a name="module_container_app"></a> [container\_app](#module\_container\_app) | ../modules/container-app | n/a |
+| <a name="module_container_app_private_dns"></a> [container\_app\_private\_dns](#module\_container\_app\_private\_dns) | ../modules/private-dns | n/a |
 | <a name="module_key_vault"></a> [key\_vault](#module\_key\_vault) | ../modules/key-vault | n/a |
 | <a name="module_key_vault_private-endpoints"></a> [key\_vault\_private-endpoints](#module\_key\_vault\_private-endpoints) | ../modules/private-endpoint | n/a |
 | <a name="module_key_vault_resource_group"></a> [key\_vault\_resource\_group](#module\_key\_vault\_resource\_group) | ../modules/resource-group | n/a |
@@ -39,6 +41,7 @@
 
 | Name | Type |
 |------|------|
+| [azurerm_key_vault_secret.mysql_password](https://registry.terraform.io/providers/hashicorp/azurerm/4.26.0/docs/data-sources/key_vault_secret) | data source |
 | [terraform_remote_state.shared](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/data-sources/remote_state) | data source |
 
 ## Inputs
@@ -53,6 +56,8 @@ No inputs.
 | <a name="output_app_service_plan_name"></a> [app\_service\_plan\_name](#output\_app\_service\_plan\_name) | App service plan name |
 | <a name="output_app_service_webapp_ids"></a> [app\_service\_webapp\_ids](#output\_app\_service\_webapp\_ids) | App service plan deployed web applications ids |
 | <a name="output_app_service_webapp_names"></a> [app\_service\_webapp\_names](#output\_app\_service\_webapp\_names) | App service plan deployed web applications names |
+| <a name="output_container_app_id"></a> [container\_app\_id](#output\_container\_app\_id) | Container app id |
+| <a name="output_container_app_name"></a> [container\_app\_name](#output\_container\_app\_name) | Container app name |
 | <a name="output_key_vault_id"></a> [key\_vault\_id](#output\_key\_vault\_id) | Key Vault ID |
 | <a name="output_key_vault_name"></a> [key\_vault\_name](#output\_key\_vault\_name) | Key Vault name |
 | <a name="output_key_vault_resource_group_id"></a> [key\_vault\_resource\_group\_id](#output\_key\_vault\_resource\_group\_id) | Key Vault resource group ID |

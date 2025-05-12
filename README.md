@@ -13,6 +13,19 @@ The app service identity must have access to the key vaults to be able to retrie
 sourcegroups/cnx-dev-cus-keyvault/providers/Microsoft.KeyVault/vaults/cnx-dev-cus-web-01"
 ```
 
+## container app certificate
+Container apps currently does not support to retrieve the certificate from key vault via terraform as a native solution
+
+A workaround is:
+- inside container app environment
+- Enable system identity on container app environment
+- go to certificates and click in add
+- select the source from the key vault from the same environment
+- use a certificate that contains only lower case and "-" in their name
+- apply
+- use the certificate name in the variable for container apps "container_app_key_vault_certificates"
+
+
 # terraform-docs
 
 [![Build Status](https://github.com/terraform-docs/terraform-docs/workflows/ci/badge.svg)](https://github.com/terraform-docs/terraform-docs/actions) [![GoDoc](https://pkg.go.dev/badge/github.com/terraform-docs/terraform-docs)](https://pkg.go.dev/github.com/terraform-docs/terraform-docs) [![Go Report Card](https://goreportcard.com/badge/github.com/terraform-docs/terraform-docs)](https://goreportcard.com/report/github.com/terraform-docs/terraform-docs) [![Codecov Report](https://codecov.io/gh/terraform-docs/terraform-docs/branch/master/graph/badge.svg)](https://codecov.io/gh/terraform-docs/terraform-docs) [![License](https://img.shields.io/github/license/terraform-docs/terraform-docs)](https://github.com/terraform-docs/terraform-docs/blob/master/LICENSE) [![Latest release](https://img.shields.io/github/v/release/terraform-docs/terraform-docs)](https://github.com/terraform-docs/terraform-docs/releases)
