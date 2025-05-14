@@ -141,7 +141,7 @@ app_service_webapps:
 - connexusenergy
 ### Container App
 container_app_container:
-  image: cnx-website:20250514
+  image: cnx-website:20250505
   cpu: 1
   custom_scale_rule: {}
   http_scale_rule:

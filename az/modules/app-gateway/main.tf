@@ -237,8 +237,8 @@ resource "azurerm_application_gateway" "main" {
     for_each = var.probes
 
     content {
-      name                                      = format("%s-%s", local.backend_address_pool_name, probe.key)
-      host                                      = probe.key
+      name                                      = probe.key
+      host                                      = probe.value.host
       interval                                  = probe.value.interval
       path                                      = probe.value.path
       pick_host_name_from_backend_http_settings = probe.value.pick_host_name_from_backend_address
