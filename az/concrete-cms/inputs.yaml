@@ -19,7 +19,7 @@ application_gateway_name_override:
 application_gateway_probes:
   connexusenergy:
     path: "/company"
-    timeout: 120
+    timeout: 300
 application_gateway_routing_rules:
   connexusenergy:
     backend_address_pool: connexusenergy
@@ -164,7 +164,7 @@ container_app_container:
       transport: "HTTP"
     interval_seconds: 15
     success_threshold: 1
-    timeout_seconds: 60
+    timeout_seconds: 300
 container_app_domain: connexusenergy.com
 container_app_ingress:
   allow_insecure_connections: false

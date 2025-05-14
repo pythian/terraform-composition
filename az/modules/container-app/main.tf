@@ -10,12 +10,9 @@ variable "container" {
     command = optional(list(string), null)
     cpu     = optional(number, null)
     custom_scale_rule = optional(map(object({
-      name = string
-      type = string
-      metadata = object({
-        type  = string
-        value = string
-      })
+      name     = string
+      type     = string
+      metadata = map(string)
     })), {})
     http_scale_rule = optional(object({
       name                = string
@@ -294,8 +291,7 @@ resource "azurerm_container_app" "main" {
         name             = custom_scale_rule.value.name
         custom_rule_type = custom_scale_rule.value.type
         metadata = {
-          type  = custom_scale_rule.value.metadata.type
-          value = custom_scale_rule.value.metadata.value
+          for k, v in custom_scale_rule.value.metadata : k => v
         }
       }
     }
