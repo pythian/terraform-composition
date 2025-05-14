@@ -35,7 +35,7 @@ module "application_gateway" {
 
   autoscale_configuration = local.inputs.application_gateway_autoscale_configuration
   backend_settings = { for k, v in local.inputs.application_gateway_backend_settings : k => {
-    fqdns        = module.app_service.webapp_hostnames[k]
+    fqdns        = [format("%s.%s", local.url_prefix, local.inputs.container_app_domain)]
     http_setting = lookup(local.inputs.application_gateway_backend_settings[k], "http_setting")
     }
   }
@@ -405,8 +405,9 @@ module "resource_group" {
 module "storage_account" {
   source = "../modules/storage-account"
 
-  kind     = local.inputs.storage_account_kind
-  location = local.env.location
+  https_traffic_only_enabled = local.inputs.storage_account_https_traffic_only_enabled
+  kind                       = local.inputs.storage_account_kind
+  location                   = local.env.location
   name = coalesce(local.inputs.resource_group_name_override,
     format("%s%s%s%s",
       local.az.prefix,

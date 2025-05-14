@@ -12,6 +12,13 @@ variable "hierarchical_namespace_enabled" {
   default = false
 }
 
+variable "https_traffic_only_enabled" {
+  description = "Whether or not HTTPS traffic is allowed for the storage account"
+  type        = bool
+
+  default = true
+}
+
 variable "kind" {
   description = "Type of storage account to create (BlobStorage, BlockBlobStorage, FileStorage, Storage, StorageV2)"
   type        = string
@@ -94,6 +101,7 @@ resource "azurerm_storage_account" "main" {
   account_kind                  = var.kind
   account_replication_type      = var.replication_type
   account_tier                  = var.tier
+  https_traffic_only_enabled    = var.https_traffic_only_enabled
   is_hns_enabled                = var.hierarchical_namespace_enabled
   location                      = var.location
   name                          = var.name

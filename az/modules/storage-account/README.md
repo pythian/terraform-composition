@@ -30,6 +30,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_containers"></a> [containers](#input\_containers) | List of containers to create in the storage account | `set(string)` | `[]` | no |
 | <a name="input_hierarchical_namespace_enabled"></a> [hierarchical\_namespace\_enabled](#input\_hierarchical\_namespace\_enabled) | Whether the storage account has hierarchical namespaces enabled | `bool` | `false` | no |
+| <a name="input_https_traffic_only_enabled"></a> [https\_traffic\_only\_enabled](#input\_https\_traffic\_only\_enabled) | Whether or not HTTPS traffic is allowed for the storage account | `bool` | `true` | no |
 | <a name="input_kind"></a> [kind](#input\_kind) | Type of storage account to create (BlobStorage, BlockBlobStorage, FileStorage, Storage, StorageV2) | `string` | `"StorageV2"` | no |
 | <a name="input_location"></a> [location](#input\_location) | Location of the storage account to create | `string` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | Name of the storage account to create | `string` | n/a | yes |
