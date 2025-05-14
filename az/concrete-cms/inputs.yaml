@@ -162,9 +162,9 @@ container_app_container:
       port: 80
       path: "/company"
       transport: "HTTP"
-    interval_seconds: 15
+    interval_seconds: 30
     success_threshold: 1
-    timeout_seconds: 300
+    timeout_seconds: 240
 container_app_domain: connexusenergy.com
 container_app_ingress:
   allow_insecure_connections: false
