@@ -16,8 +16,12 @@ application_gateway_frontend_settings:
     require_sni: true
 application_gateway_name: gateway
 application_gateway_name_override:
+application_gateway_probes:
+  connexusenergy:
+    path: "/company"
+    timeout: 120
 application_gateway_routing_rules:
-  "connexusenergy":
+  connexusenergy:
     backend_address_pool: connexusenergy
     backend_http_settings: connexusenergy
     http_listener: "443"
@@ -137,25 +141,13 @@ app_service_webapps:
 - connexusenergy
 ### Container App
 container_app_container:
-  image: cnx-website:20250505
-  cpu: 0.5
-  custom_scale_rule:
-    cpu:
-      name: cpu
-      type: cpu
-      metadata:
-        type: "Utilization"
-        value: 30
-    memory:
-      name: memory
-      type: memory
-      metadata:
-        type: "Utilization"
-        value: 50
+  image: cnx-website:20250514
+  cpu: 1
+  custom_scale_rule: {}
   http_scale_rule:
     name: http
     concurrent_requests: 50
-  memory: "1Gi"
+  memory: "2Gi"
   name: "connexusenergy"
   liveness_probe:
     failure_threshold: 5
@@ -168,10 +160,11 @@ container_app_container:
   readiness_probe:
     http_get:
       port: 80
-      path: "/"
+      path: "/company"
       transport: "HTTP"
     interval_seconds: 15
-    timeout_seconds: 45
+    success_threshold: 1
+    timeout_seconds: 60
 container_app_domain: connexusenergy.com
 container_app_ingress:
   allow_insecure_connections: false
@@ -186,7 +179,7 @@ container_app_name_override:
 container_app_private_dns_links:
   - web
 container_app_replicas:
-  max: 20
+  max: 100
   min: 4
 container_app_subnet: containerAppsSubnet
 container_app_storage:

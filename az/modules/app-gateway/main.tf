@@ -58,6 +58,22 @@ variable "name" {
   type        = string
 }
 
+variable "probes" {
+  description = "Probes to be added to the application gateway"
+  type = map(object({
+    host                                = optional(string, null)
+    interval                            = optional(number, 30)
+    path                                = optional(string, "/")
+    pick_host_name_from_backend_address = optional(bool, true)
+    port                                = optional(number, null)
+    protocol                            = optional(string, "Https")
+    timeout                             = optional(number, 30)
+    unhealthy_threshold                 = optional(number, 3)
+  }))
+
+  default = {}
+}
+
 variable "resource_group" {
   description = "Name of the resource group in which to deploy the application gateway"
   type        = string
@@ -176,6 +192,7 @@ resource "azurerm_application_gateway" "main" {
       protocol                            = backend_http_settings.value.http_setting.protocol
       pick_host_name_from_backend_address = backend_http_settings.value.http_setting.pick_host_name_from_backend_address
       request_timeout                     = backend_http_settings.value.http_setting.request_timeout
+      probe_name                          = var.probes != {} ? backend_http_settings.key : null
     }
   }
 
@@ -214,6 +231,23 @@ resource "azurerm_application_gateway" "main" {
       require_sni                    = http_listener.value.require_sni
       ssl_certificate_name           = var.ssl_configuration.ssl_certificate_name
     }
+  }
+
+  dynamic "probe" {
+    for_each = var.probes
+
+    content {
+      name                                      = format("%s-%s", local.backend_address_pool_name, probe.key)
+      host                                      = probe.key
+      interval                                  = probe.value.interval
+      path                                      = probe.value.path
+      pick_host_name_from_backend_http_settings = probe.value.pick_host_name_from_backend_address
+      port                                      = probe.value.port
+      protocol                                  = probe.value.protocol
+      timeout                                   = probe.value.timeout
+      unhealthy_threshold                       = probe.value.unhealthy_threshold
+    }
+
   }
 
   dynamic "request_routing_rule" {

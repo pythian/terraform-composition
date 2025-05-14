@@ -26,8 +26,8 @@ export const options = {
         'stress_test': {
             executor: 'shared-iterations',
             iterations: csvData.length,
-            vus: 250,
-            maxDuration: '5m',
+            vus: 500,
+            maxDuration: '10m',
         },
     },
     thresholds: {

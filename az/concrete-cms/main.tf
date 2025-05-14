@@ -57,6 +57,7 @@ module "application_gateway" {
       local.inputs.application_gateway_name,
     )
   )
+  probes            = local.inputs.application_gateway_probes
   resource_group    = module.resource_group.name
   routing_rules     = local.inputs.application_gateway_routing_rules
   ssl_configuration = local.inputs.application_gateway_ssl_configuration

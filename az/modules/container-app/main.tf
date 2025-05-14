@@ -348,6 +348,7 @@ resource "azurerm_container_app" "main" {
             path                    = try(readiness_probe.value.http_get.path)
             interval_seconds        = try(readiness_probe.value.interval_seconds)
             port                    = readiness_probe.value.http_get.port
+            success_count_threshold = try(readiness_probe.value.success_threshold)
             transport               = readiness_probe.value.http_get.transport
             timeout                 = try(readiness_probe.value.timeout_seconds)
           }
