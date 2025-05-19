@@ -142,12 +142,12 @@ app_service_webapps:
 ### Container App
 container_app_container:
   image: cnx-website:20250505
-  cpu: 1
+  cpu: 4
   custom_scale_rule: {}
   http_scale_rule:
     name: http
     concurrent_requests: 50
-  memory: "2Gi"
+  memory: "8Gi"
   name: "connexusenergy"
   liveness_probe:
     failure_threshold: 5
@@ -180,7 +180,7 @@ container_app_private_dns_links:
   - web
 container_app_replicas:
   max: 100
-  min: 4
+  min: 2
 container_app_subnet: containerAppsSubnet
 container_app_storage:
   assets:
