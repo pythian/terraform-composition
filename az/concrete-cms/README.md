@@ -19,8 +19,6 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_app_service"></a> [app\_service](#module\_app\_service) | ../modules/app-service | n/a |
-| <a name="module_app_service_private-endpoints"></a> [app\_service\_private-endpoints](#module\_app\_service\_private-endpoints) | ../modules/private-endpoint | n/a |
 | <a name="module_application_gateway"></a> [application\_gateway](#module\_application\_gateway) | ../modules/app-gateway | n/a |
 | <a name="module_container_app"></a> [container\_app](#module\_container\_app) | ../modules/container-app | n/a |
 | <a name="module_container_app_private_dns"></a> [container\_app\_private\_dns](#module\_container\_app\_private\_dns) | ../modules/private-dns | n/a |
@@ -52,10 +50,8 @@ No inputs.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_app_service_plan_id"></a> [app\_service\_plan\_id](#output\_app\_service\_plan\_id) | App service plan id |
-| <a name="output_app_service_plan_name"></a> [app\_service\_plan\_name](#output\_app\_service\_plan\_name) | App service plan name |
-| <a name="output_app_service_webapp_ids"></a> [app\_service\_webapp\_ids](#output\_app\_service\_webapp\_ids) | App service plan deployed web applications ids |
-| <a name="output_app_service_webapp_names"></a> [app\_service\_webapp\_names](#output\_app\_service\_webapp\_names) | App service plan deployed web applications names |
+| <a name="output_application_gateway_id"></a> [application\_gateway\_id](#output\_application\_gateway\_id) | Application gateway id |
+| <a name="output_application_gateway_name"></a> [application\_gateway\_name](#output\_application\_gateway\_name) | Application gateway name |
 | <a name="output_container_app_id"></a> [container\_app\_id](#output\_container\_app\_id) | Container app id |
 | <a name="output_container_app_name"></a> [container\_app\_name](#output\_container\_app\_name) | Container app name |
 | <a name="output_key_vault_id"></a> [key\_vault\_id](#output\_key\_vault\_id) | Key Vault ID |
