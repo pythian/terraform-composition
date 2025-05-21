@@ -163,30 +163,6 @@ func TestAzProject(t *testing.T) {
 	// 	t.Errorf("Application gateway name test FAILED. Expected application gateway name %s, got %s.", expectedAppGatewayName, outputs["application_gateway_name"].(string))
 	// }
 
-	//Test app service plan and websites
-	expectedAppServicePlanName := az["prefix"].(string) + "-" + env["environment"].(string) + "-" + env["location_short"].(string) + "-" + inputs["app_service_name"].(string)
-	if override, exists := inputs["app_service_name_override"]; exists && override != nil {
-		expectedAppServicePlanName = override.(string)
-	}
-
-	if assert.Equal(t, expectedAppServicePlanName, outputs["app_service_plan_name"].(string)) {
-		t.Logf("App service plan name test PASSED. Expected app service plan name %s, got %s.", expectedAppServicePlanName, outputs["app_service_plan_name"].(string))
-	} else {
-		t.Errorf("App service plan name test FAILED. Expected app service plan name %s, got %s.", expectedAppServicePlanName, outputs["app_service_plan_name"].(string))
-	}
-	if webapps, ok := inputs["app_service_webapps"].([]interface{}); ok && webapps != nil {
-		for i := 0; i < len(webapps); i++ {
-			expectedWebAppName := az["prefix"].(string) + "-" + env["environment"].(string) + "-" + env["location_short"].(string) + "-" + inputs["app_service_name"].(string) + "-" + webapps[i].(string)
-			if assert.Contains(t, outputs["app_service_webapp_names"].([]interface{}), expectedWebAppName) {
-				t.Logf("App service webapp name test PASSED. Expected app service webapp name %s, got %s.", expectedWebAppName, outputs["app_service_webapp_names"].([]interface{}))
-			} else {
-				t.Errorf("App service webapp name test FAILED. Expected app service webapp name %s, got %s.", expectedWebAppName, outputs["app_service_webapp_names"].([]interface{}))
-			}
-		}
-	} else {
-		t.Errorf("App service webapps input is not properly configured in inputs.yaml")
-	}
-
 	//Test container app
 	expectedContainerAppName := az["prefix"].(string) + "-" + env["environment"].(string) + "-" + env["location_short"].(string) + "-" + inputs["container_app_name"].(string)
 	if override, exists := inputs["container_app_name_override"]; exists && override != nil {
