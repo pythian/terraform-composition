@@ -42,7 +42,7 @@ module "application_gateway" {
     for k, v in local.inputs.application_gateway_frontend_settings :
     k => merge(v, {
       public_ip_id = module.public_ip.id
-      hostnames    = format("%s.%s", local.url_prefix, local.inputs.container_app_domain)
+      hostnames    = [format("%s.%s", local.url_prefix, local.inputs.container_app_domain)]
       },
     )
   }
