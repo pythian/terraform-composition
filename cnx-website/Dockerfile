@@ -1,22 +1,26 @@
-FROM php:8.2-apache
+FROM php:8.2-fpm
 
 RUN apt-get update \
     && apt-get install -y git gzip curl libmcrypt-dev default-mysql-client samba smbclient libsmbclient-dev libfreetype6-dev libjpeg62-turbo-dev libpng-dev \
     && apt-get install -y --no-install-recommends dialog \
     && apt-get install -y --no-install-recommends openssh-server \
+    && apt-get install -y --no-install-recommends apache2 libapache2-mod-fcgid \
     && docker-php-ext-install mysqli pdo pdo_mysql opcache gd \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && pecl install smbclient \
     && docker-php-ext-enable pdo_mysql opcache smbclient gd
 
+RUN a2enmod mpm_event
 RUN a2enmod rewrite
 RUN a2enmod headers
 RUN a2enmod expires
 RUN a2enmod cache
 RUN a2enmod cache_disk
 RUN a2enmod deflate
+RUN a2enmod proxy_fcgi
 
 COPY ./public-html/ /var/www/html/
+RUN rm /var/www/html/index.html
 RUN chmod -R 775 /var/www/html && chown -R www-data:www-data /var/www/html
 RUN mkdir -p /var/php/sessions/ea-php82 && chown -R www-data:www-data /var/php/sessions/ea-php82 && chmod -R 775 /var/php/sessions/ea-php82
 
