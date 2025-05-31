@@ -31,7 +31,7 @@ COPY ./001-concrete.conf /etc/apache2/sites-available/001-concrete.conf
 RUN a2dissite 000-default && a2ensite 001-concrete
 COPY entrypoint.sh ./
 
-#add the following lines at the end of /etc/apache2/apache2.conf
+# add the following lines at the end of /etc/apache2/apache2.conf
 RUN { \
         echo ''; \
         echo '#Set caching directives'; \
@@ -44,9 +44,13 @@ RUN { \
         echo 'ServerName www.connexusenergy.com'; \
     } >> "/etc/apache2/apache2.conf"
 
-    RUN sed -ri -e 's/Timeout 300/Timeout 30/g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+RUN sed -ri -e 's/Timeout 300/Timeout 30/g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Start and enable SSH inside the webApp only
+# php-fpm compression
+RUN sed -ri -e 's/zlib.output_compression = Off/zlib.output_compression = On/' /etc/php/8.3/fpm/php.ini
+RUN sed -ri -e 's/;zlib.output_compression_level = -1/zlib.output_compression_level = -1/' /etc/php/8.3/fpm/php.ini
+
+# start and enable SSH inside the webApp only
 RUN echo "root:Docker!" | chpasswd \
     && chmod u+x ./entrypoint.sh
 COPY sshd_config /etc/ssh/
