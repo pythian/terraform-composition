@@ -8,6 +8,7 @@ RUN apt-get update -y \
     && apt-get install -y --no-install-recommends php-mysql php-gd php8.3-opcache php-smbclient
 
 RUN a2dismod php8.3 mpm_prefork
+RUN a2disconf serve-cgi-bin
 RUN a2enconf php8.3-fpm && a2enmod mpm_event
 RUN a2enmod actions fcgid alias proxy_fcgi
 RUN a2enmod rewrite headers expires setenvif
