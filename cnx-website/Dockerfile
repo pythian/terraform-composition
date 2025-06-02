@@ -10,7 +10,7 @@ RUN apt-get update -y \
 RUN a2dismod php8.3 mpm_prefork
 RUN a2enconf php8.3-fpm && a2enmod mpm_event
 RUN a2enmod actions fcgid alias proxy_fcgi
-RUN a2enmod rewrite headers expires
+RUN a2enmod rewrite headers expires setenvif
 RUN a2enmod cache cache_disk deflate
 
 # delete the installed "index.html"
