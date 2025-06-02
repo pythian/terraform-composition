@@ -4,8 +4,9 @@ RUN apt-get update -y \
     && apt-get install -y git gzip curl libmcrypt-dev default-mysql-client samba smbclient libsmbclient-dev libfreetype6-dev libjpeg62-dev libpng-dev \
     && apt-get install -y --no-install-recommends dialog \
     && apt-get install -y --no-install-recommends openssh-server \
-    && apt-get install -y --no-install-recommends apache2 libapache2-mod-php libapache2-mod-fcgid php php-fpm php-cli  \
-    && apt-get install -y --no-install-recommends php-mysql php-gd php8.3-opcache php-smbclient
+    && apt-get install -y --no-install-recommends apache2 libapache2-mod-php libapache2-mod-fcgid openssl \
+    php php-cli php-curl php-fpm php-gd php-mbstring php-mysql php8.3-opcache php-smbclient \
+    php-symfony-polyfill-ctype php-symfony-dom-crawler php-symfony-polyfill-iconv php-xml php-zip
 
 RUN a2dismod php8.3 mpm_prefork
 RUN a2disconf serve-cgi-bin
