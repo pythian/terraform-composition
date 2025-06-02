@@ -36,6 +36,12 @@ COPY entrypoint.sh ./
 # add the following lines at the end of /etc/apache2/apache2.conf
 RUN { \
         echo ''; \
+        echo '<Directory /var/www/html>'; \
+        echo '    Options Indexes FollowSymLinks'; \
+        echo '    AllowOverride FileInfo Indexes'; \
+        echo '    Require all granted'; \
+        echo '</Directory>'; \
+        echo ''; \
         echo '#Set caching directives'; \
         echo 'CacheRoot "/var/cache/apache2/mod_cache_disk"'; \
         echo 'CacheEnable disk /'; \
