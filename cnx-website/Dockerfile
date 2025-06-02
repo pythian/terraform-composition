@@ -25,6 +25,7 @@ RUN ln -sfT /dev/stderr /var/log/apache2/error.log; \
     ln -sfT /dev/stdout /var/log/apache2/access.log; \
     ln -sfT /dev/stdout /var/log/apache2/other_vhosts_access.log; \
     chown -R --no-dereference www-data:www-data /var/log/apache2
+RUN ln -sfT /dev/stderr /var/log/php8.3-fpm.log;
 
 COPY ./001-concrete.conf /etc/apache2/sites-available/001-concrete.conf
 
