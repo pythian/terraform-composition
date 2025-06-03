@@ -41,7 +41,6 @@ RUN { \
         echo '    Options Indexes FollowSymLinks'; \
         echo '    AllowOverride All'; \
         echo '    Require all granted'; \
-        echo '    CGIPassAuth on'; \
         echo '</Directory>'; \
         echo ''; \
         echo '#Set caching directives'; \
