@@ -39,7 +39,7 @@ RUN { \
         echo ''; \
         echo '<Directory /var/www/html>'; \
         echo '    Options Indexes FollowSymLinks'; \
-        echo '    AllowOverride FileInfo Indexes'; \
+        echo '    AllowOverride All'; \
         echo '    Require all granted'; \
         echo '</Directory>'; \
         echo ''; \
