@@ -51,7 +51,7 @@ RUN { \
         echo 'CacheIgnoreHeaders Set-Cookie'; \
         echo ''; \
         echo 'ServerName connexusenergy.com'; \
-    } >> "/etc/apache2/apache2.conf"
+    } >> /etc/apache2/apache2.conf
 
 RUN sed -ri -e 's/Timeout 300/Timeout 30/g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
@@ -60,8 +60,15 @@ RUN sed -ri -e 's/zlib.output_compression = Off/zlib.output_compression = On/' /
 RUN sed -ri -e 's/;zlib.output_compression_level = -1/zlib.output_compression_level = -1/' /etc/php/8.3/fpm/php.ini
 
 # configure php-fpm to use the environment
-RUN sed -ri -e 's/;clear_env = no/clear_env = no/' /etc/php/8.3/fpm/pool.d/www.conf
 RUN sed -ri -e 's/variables_order = "GPCS"/variables_order = "EGPCS"/' /etc/php/8.3/fpm/php.ini
+RUN { \
+        echo ''; \
+        echo 'env[CANONICAL_URL] = $CANONICAL_URL'; \
+        echo 'env[CANONICAL_URL_ALTERNATIVE] = $CANONICAL_URL_ALTERNATIVE'; \
+        echo 'env[MYSQL_ADDRESS] = $MYSQL_ADDRESS'; \
+        echo 'env[MYSQL_PASSWORD] = $MYSQL_PASSWORD'; \
+        echo 'env[MYSQL_USER] = $MYSQL_USER'; \
+    } >> /etc/php/8.3/fpm/pool.d/www.conf
 
 # start and enable SSH inside the webApp only
 RUN echo "root:Docker!" | chpasswd \
