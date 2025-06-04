@@ -34,7 +34,7 @@ application_gateway_ssl_configuration:
 application_gateway_virtual_network: web
 ### Container App
 container_app_container:
-  image: cnx-website:20250505
+  image: cnx-website:20250604
   cpu: 4
   custom_scale_rule: {}
   http_scale_rule:
