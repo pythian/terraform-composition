@@ -12,20 +12,29 @@ Header set Cross-Origin-Opener-Policy "same-origin"
 Header set Cross-Origin-Resource-Policy "cross-origin"
 </IfModule>
 
+# --- app gateway rules start ---
 <IfModule mod_setenvif.c>
    SetEnvIf X-Forwarded-Proto "https" HTTPS=on
 </IfModule>
 
+# comment the block below for local testing; it's needed
+# to operate behind a reverse proxy with SSL offload.
+<IfModule mod_rewrite.c>
+   RewriteEngine On
+   RewriteCond %{HTTPS} !=on
+   RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
+   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+# --- app gateway rules end ---
+
 # -- concrete5 urls start --
 <IfModule mod_rewrite.c>
-RewriteEngine On
-RewriteBase /
-RewriteCond %{HTTPS} !on
-RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME}/index.html !-f
-RewriteCond %{REQUEST_FILENAME}/index.php !-f
-RewriteRule . index.php [L]
+   RewriteEngine On
+   RewriteBase /
+   RewriteCond %{REQUEST_FILENAME} !-f
+   RewriteCond %{REQUEST_FILENAME}/index.html !-f
+   RewriteCond %{REQUEST_FILENAME}/index.php !-f
+   RewriteRule . index.php [L]
 </IfModule>
 # -- concrete5 urls end --
 
@@ -46,18 +55,18 @@ FileETag none
 </IfModule>
 
 <IfModule mod_expires.c>
-ExpiresActive On
-ExpiresDefault "access plus 1 month"
-ExpiresByType image/jpg "access plus 1 month"
-ExpiresByType image/jpeg "access plus 1 month"
-ExpiresByType image/gif "access plus 1 month"
-ExpiresByType image/png "access plus 1 month"
-ExpiresByType image/webp "access plus 1 month"
-ExpiresByType image/svg+xml "access plus 1 month"
-ExpiresByType image/x-icon "access plus 1 month"
-ExpiresByType text/css "access plus 1 month"
-ExpiresByType text/javascript "access plus 1 month"
-ExpiresByType application/javascript "access plus 1 month"
-ExpiresByType application/x-javascript "access plus 1 month"
+   ExpiresActive On
+   ExpiresDefault "access plus 1 month"
+   ExpiresByType image/jpg "access plus 1 month"
+   ExpiresByType image/jpeg "access plus 1 month"
+   ExpiresByType image/gif "access plus 1 month"
+   ExpiresByType image/png "access plus 1 month"
+   ExpiresByType image/webp "access plus 1 month"
+   ExpiresByType image/svg+xml "access plus 1 month"
+   ExpiresByType image/x-icon "access plus 1 month"
+   ExpiresByType text/css "access plus 1 month"
+   ExpiresByType text/javascript "access plus 1 month"
+   ExpiresByType application/javascript "access plus 1 month"
+   ExpiresByType application/x-javascript "access plus 1 month"
 </IfModule>
 # -- compress attempts --
