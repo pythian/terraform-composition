@@ -12,6 +12,10 @@ Header set Cross-Origin-Opener-Policy "same-origin"
 Header set Cross-Origin-Resource-Policy "cross-origin"
 </IfModule>
 
+<IfModule mod_setenvif.c>
+   SetEnvIf X-Forwarded-Proto "https" HTTPS=on
+</IfModule>
+
 # -- concrete5 urls start --
 <IfModule mod_rewrite.c>
 RewriteEngine On
