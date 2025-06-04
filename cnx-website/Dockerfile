@@ -65,8 +65,8 @@ RUN { \
         echo ''; \
         echo 'env[CANONICAL_URL] = $CANONICAL_URL'; \
         echo 'env[CANONICAL_URL_ALTERNATIVE] = $CANONICAL_URL_ALTERNATIVE'; \
-        echo 'env[MYSQL_ADDRESS] = $MYSQL_ADDRESS'; \
-        echo 'env[MYSQL_PASSWORD] = $MYSQL_PASSWORD'; \
+        echo 'env[MYSQL_ADDR] = $MYSQL_ADDR'; \
+        echo 'env[MYSQL_PASSWD] = $MYSQL_PASSWD'; \
         echo 'env[MYSQL_USER] = $MYSQL_USER'; \
     } >> /etc/php/8.3/fpm/pool.d/www.conf
 
