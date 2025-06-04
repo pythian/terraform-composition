@@ -6,7 +6,7 @@ RUN apt-get update -y \
     && apt-get install -y --no-install-recommends openssh-server \
     && apt-get install -y --no-install-recommends apache2 libapache2-mod-php libapache2-mod-fcgid openssl \
     php php-cli php-common php-curl php-fpm php-gd php-mbstring php-mysql php8.3-opcache php-smbclient \
-    php-symfony-polyfill-ctype php-symfony-dom-crawler php-symfony-polyfill-iconv php-xml php-zip
+    php-symfony-polyfill-ctype php-symfony-dom-crawler php-symfony-dotenv php-symfony-polyfill-iconv php-xml php-zip
 
 RUN a2dismod php8.3 mpm_prefork
 RUN a2disconf serve-cgi-bin
@@ -58,6 +58,9 @@ RUN sed -ri -e 's/Timeout 300/Timeout 30/g' /etc/apache2/apache2.conf /etc/apach
 # php-fpm compression
 RUN sed -ri -e 's/zlib.output_compression = Off/zlib.output_compression = On/' /etc/php/8.3/fpm/php.ini
 RUN sed -ri -e 's/;zlib.output_compression_level = -1/zlib.output_compression_level = -1/' /etc/php/8.3/fpm/php.ini
+
+# configure php-fpm to use the environment
+COPY 10-env.ini /etc/php/8.3/fpm/conf.d/
 
 # start and enable SSH inside the webApp only
 RUN echo "root:Docker!" | chpasswd \
