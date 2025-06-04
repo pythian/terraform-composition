@@ -50,7 +50,6 @@ RUN { \
         echo 'CacheDirLength 1'; \
         echo 'CacheIgnoreHeaders Set-Cookie'; \
         echo ''; \
-        echo 'ServerName www.connexusenergy.com'; \
     } >> "/etc/apache2/apache2.conf"
 
 RUN sed -ri -e 's/Timeout 300/Timeout 30/g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
