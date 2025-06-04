@@ -63,7 +63,7 @@ RUN sed -ri -e 's/;zlib.output_compression_level = -1/zlib.output_compression_le
 RUN sed -ri -e 's/variables_order = "GPCS"/variables_order = "EGPCS"/' /etc/php/8.3/fpm/php.ini
 
 # handle sessions
-RUN sed -ri -e 's/;session.save_path = "/var/lib/php/sessions"/session.save_path = "/var/lib/php-fpm/sessions"/' /etc/php/8.3/fpm/php.ini
+RUN sed -ri -e 's:;session.save_path = "/var/lib/php/sessions":session.save_path = "/var/lib/php-fpm/sessions":' /etc/php/8.3/fpm/php.ini
 RUN { \
     mkdir -p /var/lib/php-fpm/sessions; \
     chmod 755 /var/lib/php-fpm/sessions; \
