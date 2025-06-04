@@ -5,7 +5,7 @@ RUN apt-get update -y \
     && apt-get install -y --no-install-recommends dialog \
     && apt-get install -y --no-install-recommends openssh-server \
     && apt-get install -y --no-install-recommends apache2 libapache2-mod-php libapache2-mod-fcgid openssl \
-    php php-cli php-curl php-fpm php-gd php-mbstring php-mysql php8.3-opcache php-smbclient \
+    php php-cli php-common php-curl php-fpm php-gd php-mbstring php-mysql php8.3-opcache php-smbclient \
     php-symfony-polyfill-ctype php-symfony-dom-crawler php-symfony-polyfill-iconv php-xml php-zip
 
 RUN a2dismod php8.3 mpm_prefork
