@@ -5,7 +5,7 @@ set -e
 service ssh start
 
 # Start PHP
-/etc/init.d/php8.3-fpm php8.3-fpm start
+/etc/init.d/php8.3-fpm start
 
 # Start Apache in the foreground
 apache2ctl -D FOREGROUND
