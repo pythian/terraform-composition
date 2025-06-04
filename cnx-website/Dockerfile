@@ -61,6 +61,7 @@ RUN sed -ri -e 's/;zlib.output_compression_level = -1/zlib.output_compression_le
 
 # configure php-fpm to use the environment
 RUN sed -ri -e 's/;clear_env = no/clear_env = no/' /etc/php/8.3/fpm/pool.d/www.conf
+RUN sed -ri -e 's/variables_order = "GPCS"/variables_order = "EGPCS"' /etc/php/8.3/fpm/php.ini
 
 # start and enable SSH inside the webApp only
 RUN echo "root:Docker!" | chpasswd \
