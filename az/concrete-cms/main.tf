@@ -83,7 +83,7 @@ module "container_app" {
         value = "${module.mysql.name}.mysql.database.azure.com"
       },
       {
-        name  = "cannnical-url",
+        name  = "canonical-url",
         value = "https://${format("%s.%s", local.url_prefix, local.inputs.container_app_domain)}"
       },
       {
