@@ -83,11 +83,11 @@ module "container_app" {
         value = "${module.mysql.name}.mysql.database.azure.com"
       },
       {
-        name  = "cannonical-url",
+        name  = "canonical-url",
         value = "https://${format("%s.%s", local.url_prefix, local.inputs.container_app_domain)}"
       },
       {
-        name  = "cannonical-url-alt",
+        name  = "canonical-url-alt",
         value = "https://${format("%s.%s/", local.url_prefix, local.inputs.container_app_domain)}"
       },
     ]
@@ -105,12 +105,12 @@ module "container_app" {
         secret_name = "mysql-addr",
       },
       {
-        name        = "CANNONICAL_URL",
-        secret_name = "cannonical-url",
+        name        = "CANONICAL_URL",
+        secret_name = "canonical-url",
       },
       {
-        name        = "CANNONICAL_URL_ALTERNATIVE",
-        secret_name = "cannonical-url-alt",
+        name        = "CANONICAL_URL_ALTERNATIVE",
+        secret_name = "canonical-url-alt",
       },
     ]
   })

@@ -17,8 +17,8 @@ return [
             'name' => 'Connexus Energy',
             'timezone' => 'America/Chicago',
             'seo' => [
-                'canonical_url' => getenv('CANNONICAL_URL', true) ?: getenv('CANNONICAL_URL'),
-                'canonical_url_alternative' => getenv('CANNONICAL_URL_ALTERNATIVE', true) ?: getenv('CANNONICAL_URL_ALTERNATIVE'),
+                'canonical_url' => getenv('CANONICAL_URL', true) ?: getenv('CANONICAL_URL'),
+                'canonical_url_alternative' => getenv('CANONICAL_URL_ALTERNATIVE', true) ?: getenv('CANONICAL_URL_ALTERNATIVE'),
                 'canonical_tag' => [
                     'enabled' => true,
                 ],
