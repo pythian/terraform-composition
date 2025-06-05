@@ -81,13 +81,12 @@ RUN { \
         echo 'env[MYSQL_USER] = $MYSQL_USER'; \
     } >> /etc/php/8.3/fpm/pool.d/www.conf
 
-    # tune the fpm pool
+# tune the fpm pool
 RUN sed -ri -e 's/pm.max_children.*/pm.max_children = 64/' /etc/php/8.3/fpm/pool.d/www.conf
 RUN sed -ri -e 's/pm.start_servers.*/pm.start_servers = 12/' /etc/php/8.3/fpm/pool.d/www.conf
 RUN sed -ri -e 's/pm.min_spare_servers.*/pm.min_spare_servers = 4/' /etc/php/8.3/fpm/pool.d/www.conf
 RUN sed -ri -e 's/pm.max_spare_servers.*/pm.max_spare_servers = 12/' /etc/php/8.3/fpm/pool.d/www.conf
 RUN sed -ri -e 's/;pm.max_spawn_rate.*/pm.max_spawn_rate = 16/' /etc/php/8.3/fpm/pool.d/www.conf
-RUN sed -ri -e 's/;pm.process_idle_timeout.*/pm.process_idle_timeout = 6s;/' /etc/php/8.3/fpm/pool.d/www.conf
 
 # start and enable SSH inside the webApp only
 RUN echo "root:Docker!" | chpasswd \
