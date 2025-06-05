@@ -67,8 +67,8 @@ RUN { \
     chown www-data:www-data /var/lib/php-fpm/sessions; \
     }
 
-# html errors off
-RUN sed -ri -e 's/;html_errors.*/html_errors = Off/' /etc/php/8.3/fpm/php.ini
+# short open tag
+RUN sed -ri -e 's/short_open_tag = Off/short_open_tag = On/' /etc/php/8.3/fpm/php.ini
 
 # configure php-fpm to use the environment
 RUN sed -ri -e 's/variables_order = "GPCS"/variables_order = "EGPCS"/' /etc/php/8.3/fpm/php.ini
