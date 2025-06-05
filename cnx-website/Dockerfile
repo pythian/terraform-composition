@@ -59,13 +59,16 @@ RUN sed -ri -e 's/Timeout 300/Timeout 30/g' /etc/apache2/apache2.conf /etc/apach
 RUN sed -ri -e 's/zlib.output_compression = Off/zlib.output_compression = On/' /etc/php/8.3/fpm/php.ini
 RUN sed -ri -e 's/;zlib.output_compression_level = -1/zlib.output_compression_level = -1/' /etc/php/8.3/fpm/php.ini
 
-# handle sessionsAdd commentMore actions
+# handle sessions
 RUN sed -ri -e 's:;session.save_path = "/var/lib/php/sessions":session.save_path = "/var/lib/php-fpm/sessions":' /etc/php/8.3/fpm/php.ini
 RUN { \
     mkdir -p /var/lib/php-fpm/sessions; \
     chmod 755 /var/lib/php-fpm/sessions; \
     chown www-data:www-data /var/lib/php-fpm/sessions; \
     }
+
+# html errors off
+RUN sed -ri -e 's/;html_errors.*/html_errors = Off/' /etc/php/8.3/fpm/php.ini
 
 # configure php-fpm to use the environment
 RUN sed -ri -e 's/variables_order = "GPCS"/variables_order = "EGPCS"/' /etc/php/8.3/fpm/php.ini
