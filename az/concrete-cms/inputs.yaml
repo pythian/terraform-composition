@@ -118,7 +118,7 @@ mysql_server_configuration:
   require_secure_transport: "OFF"
   table_definition_cache: 40000
   table_open_cache: 40000
-mysql_sku: MO_Standard_E4ads_v5
+mysql_sku: GP_Standard_D2ads_v5
 mysql_zone: "3"
 ### Private DNS
 private_dns_zones:
