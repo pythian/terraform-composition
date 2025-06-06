@@ -35,12 +35,12 @@ application_gateway_virtual_network: web
 ### Container App
 container_app_container:
   image: cnx-website:20250605
-  cpu: 4
+  cpu: 1
   custom_scale_rule: {}
   http_scale_rule:
     name: http
-    concurrent_requests: 50
-  memory: "8Gi"
+    concurrent_requests: 40
+  memory: "2Gi"
   name: "connexusenergy"
   liveness_probe:
     failure_threshold: 5
@@ -72,7 +72,7 @@ container_app_name_override:
 container_app_private_dns_links:
   - web
 container_app_replicas:
-  max: 100
+  max: 24
   min: 2
 container_app_subnet: containerAppsSubnet
 container_app_storage:
