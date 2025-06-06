@@ -39,7 +39,7 @@ container_app_container:
   custom_scale_rule: {}
   http_scale_rule:
     name: http
-    concurrent_requests: 40
+    concurrent_requests: 36
   memory: "2Gi"
   name: "connexusenergy"
   liveness_probe:
