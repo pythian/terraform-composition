@@ -190,7 +190,8 @@ storage_account_bypass:
 storage_account_default_action: "Deny"
 storage_account_https_traffic_only_enabled: true
 storage_account_kind: StorageV2
-storage_account_ip_rules: []
+storage_account_ip_rules:
+  - "72.35.254.251"
 storage_account_name: website
 storage_account_name_override:
 storage_account_virtual_networks_allowed:
