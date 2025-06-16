@@ -140,6 +140,24 @@ locals {
   listener_name                     = "${var.name}-httplstn"
   request_routing_rule_name         = "${var.name}-rqrt"
   redirect_configuration_name       = "${var.name}-rdrcfg"
+  rewrite_rule_sets = {
+    "default" = {
+      name = "set-x-forwarded-proto"
+      rewrite_rules = [
+        {
+          name          = "set-x-forwarded-proto-rule"
+          rule_sequence = 100
+          request_header_configurations = [
+            {
+              header_name  = "X-Forwarded-Proto"
+              header_value = "https"
+            }
+          ]
+          response_header_configurations = []
+        }
+      ]
+    }
+  }
 }
 
 data "azurerm_key_vault_certificate" "main" {
@@ -177,6 +195,41 @@ resource "azurerm_application_gateway" "main" {
     content {
       name  = format("%s-%s", local.backend_address_pool_name, backend_address_pool.key)
       fqdns = backend_address_pool.value.fqdns
+    }
+  }
+
+  dynamic "rewrite_rule_set" {
+    for_each = local.rewrite_rule_sets
+
+    content {
+      name = rewrite_rule_set.value.name
+
+      dynamic "rewrite_rule" {
+        for_each = rewrite_rule_set.value.rewrite_rules
+
+        content {
+          name          = rewrite_rule.value.name
+          rule_sequence = rewrite_rule.value.rule_sequence
+
+          dynamic "request_header_configuration" {
+            for_each = rewrite_rule.value.request_header_configurations
+
+            content {
+              header_name  = request_header_configuration.value.header_name
+              header_value = request_header_configuration.value.header_value
+            }
+          }
+
+          dynamic "response_header_configuration" {
+            for_each = rewrite_rule.value.response_header_configurations
+
+            content {
+              header_name  = response_header_configuration.value.header_name
+              header_value = response_header_configuration.value.header_value
+            }
+          }
+        }
+      }
     }
   }
 

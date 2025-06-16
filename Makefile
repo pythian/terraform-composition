@@ -4,48 +4,44 @@ help:
 	@echo ''
 	@echo 'Targets:'
 	@echo ''
-	@echo '    help               Show this help'
-	@echo '    pre-commit         Run pre-commit checks'
-	@echo '    az_install         Install Terraform'
+	@echo '    help                    Show this help'
+	@echo '    pre-commit              Run pre-commit checks'
+	@echo '    az_install              Install Terraform'
 	@echo ''
 	@echo 'Configure environments'
 	@echo ''
-	@echo '    az_configure_build Configure the deployment for build'
-	@echo '    az_configure_dev   Configure the deployment for dev'
-	@echo '    az_configure_test   Configure the deployment for test'
-	@echo '    az_configure_prd   Configure the deployment for prd'
+	@echo '    az_configure_build      Configure the deployment for build'
+	@echo '    az_configure_dev        Configure the deployment for dev'
+	@echo '    az_configure_test       Configure the deployment for test'
+	@echo '    az_configure_prd        Configure the deployment for prd'
 	@echo ''
 	@echo 'All application environments'
 	@echo ''
-	@echo '    az_clean           Clean up state files'
-	@echo '    az_deploy          Deploy configured resources'
-	@echo '    az_init            Initialize modules, providers'
-	@echo '    az_lint            Run linters'
-	@echo '    az_plan            Show deployment plan'
-	@echo '    az_test            Run tests'
+	@echo '    az_clean                Clean up state files'
+	@echo '    az_deploy               Deploy configured resources'
+	@echo '    az_init                 Initialize modules, providers'
+	@echo '    az_lint                 Run linters'
+	@echo '    az_plan                 Show deployment plan'
+	@echo '    az_test                 Run tests'
 	@echo ''
-	@echo 'Load tests'
-	@echo ''
-	@echo '    az_load_test       Run load tests'
 	@echo ''
 	@echo 'Terraform build environment'
 	@echo ''
-	@echo '    az_clean_build     Clean up state files'
-	@echo '    az_deploy_build    Deploy configured resources'
-	@echo '    az_deploy_dev      Deploy configured resources'
-	@echo '    az_deploy_test     Deploy configured resources'
-	@echo '    az_deploy_prd      Deploy configured resources'
-	@echo '    az_init_build      Initialize modules, providers'
-	@echo '    az_lint_build      Run linters'
-	@echo '    az_plan_build      Show deployment plan'
-	@echo '    az_test_build      Run tests'
+	@echo '    az_clean_build          Clean up state files'
+	@echo '    az_deploy_build         Deploy configured resources'
+	@echo '    az_init_build           Initialize modules, providers'
+	@echo '    az_lint_build           Run linters'
+	@echo '    az_plan_build           Show deployment plan'
+	@echo '    az_test_build           Run tests'
 	@echo ''
-	@echo '    website_deploy     Deploy website over FTPS'
+	@echo 'Terraform deploy environments'
 	@echo ''
-
-#### RUN ENTIRE PROJECT ####
-.PHONY: az_project_deploy
-az_project_deploy: az_deploy_build az_configure_dev az_deploy
+	@echo '    az_deploy_dev           Deploy configured resources'
+	@echo '    az_deploy_test          Deploy configured resources'
+	@echo '    az_deploy_prd           Deploy configured resources'
+	@echo ''
+	@echo '    website_deploy_docker   Build container and Deploy website using Docker'
+	@echo ''
 
 #### BUILD ENVIRONMENT ####
 
@@ -134,11 +130,6 @@ az_plan: az_init
 az_test: az_init
 	@cd az/concrete-cms/test && go test -v -destroy
 
-#### LOAD TESTS ####
-
-.PHONY: az_load_test
-az_load_test:
-	@echo "To be implemented with k6"
 
 #### SHARED ####
 
@@ -154,15 +145,6 @@ az_install:
 	@sudo ./scripts/install_go.sh -v ./az/versions.yaml
 
 #### WEBSITE DEPLOY ####
-.PHONY: website_deploy_zip
-website_deploy_zip:
-	@echo 'zip the package'
-	@cd cnx-website/public-html && zip -r ../cnx-website.zip .
-	@echo 'use website deployment via azure cli'
-	@az webapp deploy --resource-group cnx-dev-cus-website --name cnx-dev-cus-website-connexusenergy --src-path cnx-website/cnx-website.zip
-
-# @az webapp config appsettings set --resource-group cnx-dev-cus-website --name cnx-dev-cus-website-connexusenergy --settings WEBSITE_RUN_FROM_PACKAGE="1"
-
 .PHONY: website_deploy_docker
 website_deploy_docker:
 	@echo 'docker build'
