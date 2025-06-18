@@ -82,6 +82,9 @@ container_app_storage:
   overrides:
     access_mode: "ReadWrite"
     mount_path: /var/www/html/application/config/generated_overrides
+  # html:
+  #   access_mode: "ReadWrite"
+  #   mount_path: /var/www/html
 container_app_workload_profile:
   name: Consumption
   workload_profile_type: Consumption
@@ -205,6 +208,11 @@ storage_account_shares:
     acl: {}
   overrides:
     name: overrides
+    enabled_protocol: "SMB"
+    quota: 100
+    acl: {}
+  html:
+    name: html
     enabled_protocol: "SMB"
     quota: 100
     acl: {}

@@ -299,6 +299,10 @@ resource "azurerm_application_gateway" "main" {
       protocol                                  = probe.value.protocol
       timeout                                   = probe.value.timeout
       unhealthy_threshold                       = probe.value.unhealthy_threshold
+
+      match {
+        status_code = ["200-399"]
+      }
     }
 
   }
