@@ -397,7 +397,7 @@ resource "azurerm_container_app_environment_storage" "main" {
   access_mode                  = each.value.access_mode
   account_name                 = each.value.name
   container_app_environment_id = azurerm_container_app_environment.env.id
-  name                         = "${azurerm_container_app_environment.env.name}-${each.key}"
+  name                         = lower("${azurerm_container_app_environment.env.name}-${each.key}")
   share_name                   = each.value.share_name
 }
 

@@ -76,15 +76,33 @@ container_app_replicas:
   min: 2
 container_app_subnet: containerAppsSubnet
 container_app_storage:
-  # assets:
-  #   access_mode: "ReadWrite"
-  #   mount_path: /var/www/html/application/files
-  # overrides:
-  #   access_mode: "ReadWrite"
-  #   mount_path: /var/www/html/application/config/generated_overrides
-  html:
+  assets:
     access_mode: "ReadWrite"
-    mount_path: /var/www/html
+    mount_path: /var/www/html/application/files
+  overrides:
+    access_mode: "ReadWrite"
+    mount_path: /var/www/html/application/config/generated_overrides
+  # html:
+  #   access_mode: "ReadWrite"
+  #   mount_path: /var/www/html
+  freenights:
+    access_mode: "ReadWrite"
+    mount_path: /var/www/html/FreeNights
+  mymeter:
+    access_mode: "ReadWrite"
+    mount_path: /var/www/html/MyMeter
+  newsletter:
+    access_mode: "ReadWrite"
+    mount_path: /var/www/html/Newsletter
+  outagemap:
+    access_mode: "ReadWrite"
+    mount_path: /var/www/html/OutageMap
+  ptr:
+    access_mode: "ReadWrite"
+    mount_path: /var/www/html/PTR
+  unccash:
+    access_mode: "ReadWrite"
+    mount_path: /var/www/html/Unclaimed_CashBack
 container_app_workload_profile:
   name: Consumption
   workload_profile_type: Consumption
@@ -213,6 +231,36 @@ storage_account_shares:
     acl: {}
   html:
     name: html
+    enabled_protocol: "SMB"
+    quota: 100
+    acl: {}
+  freenights:
+    name: freenights
+    enabled_protocol: "SMB"
+    quota: 100
+    acl: {}
+  mymeter:
+    name: mymeter
+    enabled_protocol: "SMB"
+    quota: 100
+    acl: {}
+  newsletter:
+    name: newsletter
+    enabled_protocol: "SMB"
+    quota: 100
+    acl: {}
+  outagemap:
+    name: outagemap
+    enabled_protocol: "SMB"
+    quota: 100
+    acl: {}
+  ptr:
+    name: ptr
+    enabled_protocol: "SMB"
+    quota: 100
+    acl: {}
+  unccash:
+    name: unclaimedcashback
     enabled_protocol: "SMB"
     quota: 100
     acl: {}
