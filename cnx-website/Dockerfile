@@ -29,7 +29,14 @@ RUN ln -sfT /dev/stderr /var/log/apache2/error.log; \
     chown -R --no-dereference www-data:www-data /var/log/apache2
 RUN ln -sfT /dev/stderr /var/log/php8.3-fpm.log;
 
+# place the virtual server config
 COPY ./001-concrete.conf /etc/apache2/sites-available/001-concrete.conf
+
+# place the event module config
+COPY ./mpm_event.conf /etc/apache2/mods-available/mpm_event.conf
+
+# place the fcgi config
+COPY ./php8.3-fpm.conf /etc/apache2/conf-available/php8.3-fpm.conf
 
 RUN a2dissite 000-default && a2ensite 001-concrete
 COPY entrypoint.sh ./
@@ -53,7 +60,7 @@ RUN { \
         echo 'ServerName connexusenergy.com'; \
     } >> /etc/apache2/apache2.conf
 
-RUN sed -ri -e 's/Timeout 300/Timeout 30/g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+RUN sed -ri -e 's/Timeout 300/Timeout 120/g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
 # php-fpm compression
 RUN sed -ri -e 's/zlib.output_compression = Off/zlib.output_compression = On/' /etc/php/8.3/fpm/php.ini
