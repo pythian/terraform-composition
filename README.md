@@ -10,6 +10,13 @@
 ## database configuration
 The file `cnx-website/public_html/application/config/database.php` is using an environment variables to receive the database connection information, these values are being set via Terraform based on the key vault secrets during deployment.
 
+## Help scripts
+To get help over the scripts implemented the command make help would give you all the items that could be used in this deployment
+
+```
+make help
+```
+
 ## Docker image creation
 To create a new docker image based on the file sin this repository use the command (running as root) and with azure cli logged in as root
 
