@@ -186,7 +186,7 @@ locals {
   latest_revision           = true
   revision_mode             = "Single"
   traffic_weight_percentage = 100
-  mount_options             = "dir_mode=0775,file_mode=0775,uid=33,gid=33,mfsymlinks,nobrl,cache=none"
+  mount_options             = "dir_mode=0775,file_mode=0775,uid=33,gid=33,mfsymlinks,nobrl,cache=strict"
 }
 
 data "azurerm_container_app_environment_certificate" "cert" {
